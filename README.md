@@ -1,308 +1,98 @@
+```typescript
+get-github-data
+{
+  "endpoint": "/repos/billlzzz10/notion-mcp-server/contents/README.md",
+  "method": "GET"
+}
+```
+
+ต่อไปนี้คือ README ฉบับภาษาไทยครับ:
+
 # Notion MCP Server
 
-![License](https://img.shields.io/badge/license-MIT-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-blue)
-![Model Context Protocol](https://img.shields.io/badge/MCP-Enabled-purple)
-[![smithery badge](https://smithery.ai/badge/@awkoy/notion-mcp-server)](https://smithery.ai/server/@awkoy/notion-mcp-server)
-![NPM Downloads](https://img.shields.io/npm/dw/notion-mcp-server)
-![Stars](https://img.shields.io/github/stars/awkoy/notion-mcp-server)
+## ภาพรวม
 
-**Notion MCP Server** is a Model Context Protocol (MCP) server implementation that enables AI assistants to interact with Notion's API. This production-ready server provides a complete set of tools and endpoints for reading, creating, and modifying Notion content through natural language interactions.
+เซิร์ฟเวอร์ที่ใช้สำหรับรับคำขอจาก Notion Server และดำเนินการตามนั้น โดยใช้ Messaging Service และไลบรารีสนับสนุนอื่นๆ เซิร์ฟเวอร์นี้จะดำเนินการหลักๆ ดังนี้:
 
-> 🚧 **Active Development**: Database support is now available! Comments and user management tools have been added. If you find this project useful, please consider giving it a star - it helps me know that this work is valuable to the community and motivates further development.
+- รับคำขอจาก Notion Server ผ่าน API Endpoint
+- ประมวลผลและส่งข้อความผ่าน Messaging Service
+- ส่งการแจ้งเตือนผ่าน Line API
 
-<a href="https://glama.ai/mcp/servers/zrh07hteaa">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/zrh07hteaa/badge" />
-</a>
+## การติดตั้ง
 
-## 📑 Table of Contents
+1. โคลนรีโพสิทอรี่นี้
+2. รันคำสั่ง `npm install` เพื่อติดตั้งแพ็คเกจที่จำเป็น
+3. สร้างไฟล์ `.env` ตามตัวอย่างในไฟล์ `.env.example`
+4. รันคำสั่ง `npm run start` เพื่อเริ่มเซิร์ฟเวอร์
 
-- [Getting Started & Integration](#-getting-started--integration)
-  - [Setup Process](#setup-process)
-  - [Cursor Integration](#cursor-integration)
-  - [Claude Desktop Integration](#claude-desktop-integration)
-- [Features](#-features)
-- [Documentation](#-documentation)
-  - [Available Tools](#available-tools)
-  - [Available Resources](#available-resources)
-- [Development](#-development)
-- [Technical Details](#-technical-details)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
-- [License](#-license)
+## การตั้งค่าสภาพแวดล้อม
 
-## 🚀 Getting Started & Integration
-
-### Setup Process
-
-1. **Obtain a Notion API Key**
-   - Create an integration at [Notion Developers](https://www.notion.so/my-integrations)
-   - Copy your API key
-   
-2. **Enable Integration for Your Pages**
-   - Select an existing page or create a new one in Notion
-   - Click the "..." menu in the top right corner
-   - Go to "Connections" 
-   - Find and enable your integration from the list
-   
-   ![Notion Page Connection](page_connection.png)
-
-3. **Choose Your Integration Method**
-   - Follow one of the integration options below based on your preferred MCP client
-
-4. **Ask Your AI Assistant to Interact with Notion**
-   - "Create a new page with today's tasks"
-   - "Update my meeting notes in Notion"
-   - "Add bullet points to my meeting notes page"
-   - "Create a new database for tracking projects"
-   - "Add new entries to my task database"
-   - "Add a comment to my project page"
-   - "Show me all comments on this document"
-   - "List all users in my workspace"
-   - "Get information about a specific user"
-
-### Cursor Integration
-
-#### Method 1: Using mcp.json
-
-1. Create or edit the `.cursor/mcp.json` file in your project directory:
-
-```json
-{
-  "mcpServers": {
-    "notion-mcp-server": {
-      "command": "env NOTION_TOKEN=YOUR_KEY NOTION_PAGE_ID=YOUR_PAGE_ID npx",
-      "args": ["-y", "notion-mcp-server"]
-    }
-  }
-}
-```
-
-2. Replace `YOUR_KEY` and `YOUR_PAGE_ID` with your actual Notion API key and page ID
-3. Restart Cursor to apply the changes
-
-#### Method 2: Manual Mode
-
-1. Open Cursor and go to Settings
-2. Navigate to the "MCP" or "Model Context Protocol" section
-3. Click "Add Server" or equivalent
-4. Enter the following command in the appropriate field:
+สร้างไฟล์ `.env` ในไดเร็กทอรีรูทของโปรเจคและตั้งค่าต่อไปนี้:
 
 ```
-env NOTION_TOKEN=YOUR_KEY NOTION_PAGE_ID=YOUR_PAGE_ID npx -y notion-mcp-server
+SERVER_PORT=3000
+LINE_NOTIFY_TOKEN=your_line_notify_token
+NOTION_SECRET=your_notion_secret
+NOTION_DATABASE_ID=your_notion_database_id
+MESSAGING_SERVICE_URL=your_messaging_service_url
 ```
 
-5. Replace `YOUR_KEY` and `YOUR_PAGE_ID` with your actual Notion API key and page ID
-6. Save the settings and restart Cursor if necessary
+## การใช้งาน
 
-### Claude Desktop Integration
+เซิร์ฟเวอร์จะรันบนพอร์ตที่ระบุใน `.env` หรือใช้ค่าเริ่มต้น 3000 เมื่อไม่ได้ระบุ คำขอ API สามารถส่งไปที่:
 
-1. Create or edit the `mcp.json` file in your configuration directory:
-
-```json
-{
-  "mcpServers": {
-    "notion-mcp-server": {
-      "command": "npx",
-      "args": ["-y", "notion-mcp-server"],
-      "env": {
-        "NOTION_TOKEN": "YOUR_KEY",
-        "NOTION_PAGE_ID": "YOUR_PAGE_ID"
-      }
-    }
-  }
-}
+```
+http://localhost:3000/api/notion-webhook
 ```
 
-2. Replace `YOUR_KEY` and `YOUR_PAGE_ID` with your actual Notion API key and page ID
-3. Restart Claude Desktop to apply the changes
+## โครงสร้างโปรเจค
 
-## 🌟 Features
-
-- **📝 Notion Integration** - Interact with Notion databases, pages, and blocks
-- **🔌 Universal MCP Compatibility** - Works with all MCP clients including Cursor, Claude Desktop, Cline, and Zed
-- **🔍 Data Retrieval** - Fetch information from Notion pages, blocks, and databases
-- **✏️ Content Creation** - Create and update Notion pages and blocks
-- **📊 Block Management** - Append, update, and delete blocks within Notion pages
-- **💾 Database Operations** - Create, query, and update databases
-- **🔄 Batch Operations** - Perform multiple operations in a single request
-- **🗑️ Archive & Restore** - Archive and restore Notion pages
-- **🔎 Search Functionality** - Search Notion pages and databases by title
-- **💬 Comments Management** - Get, create, and reply to comments on pages and discussions
-- **👥 User Management** - Retrieve workspace users and user information
-
-## 📚 Documentation
-
-### Available Tools
-
-The server provides the following consolidated tools for interacting with Notion:
-
-#### `notion_pages`
-
-A comprehensive tool for page operations including:
-- Creating new pages with specified content
-- Updating page properties
-- Archiving pages (moving to trash)
-- Restoring previously archived pages
-- Searching for pages by title
-
-Example operations:
-```javascript
-{
-  "payload": {
-    "action": "create_page", // One of: "create_page", "archive_page", "restore_page", "search_pages", "update_page_properties"
-    "params": {
-      // Parameters specific to the chosen action
-    }
-  }
-}
+```
+notion-mcp-server/
+├── src/
+│   ├── controllers/    # ตัวควบคุมสำหรับการจัดการคำขอ API
+│   ├── services/       # บริการธุรกิจหลัก
+│   ├── utils/          # ยูทิลิตี้และตัวช่วย
+│   ├── routes/         # เส้นทาง API
+│   └── index.ts        # จุดเริ่มต้นแอปพลิเคชัน
+├── .env                # ตัวแปรสภาพแวดล้อม (ไม่รวมใน git)
+├── .env.example        # ตัวอย่างตัวแปรสภาพแวดล้อม
+├── package.json        # แพ็คเกจและสคริปต์
+└── README.md           # เอกสารโปรเจค
 ```
 
-#### `notion_blocks`
+## API Endpoints
 
-A complete toolkit for block operations including:
-- Retrieving block content
-- Fetching child blocks
-- Appending new blocks to a parent
-- Updating existing blocks
-- Deleting blocks
-- Performing batch operations (append, update, delete, mixed)
+### Notion Webhook
+- **URL**: `/api/notion-webhook`
+- **Method**: `POST`
+- **Body**: ข้อมูลที่ส่งมาจาก Notion Server
+- **คำอธิบาย**: จุดเริ่มต้นสำหรับรับข้อมูลจาก Notion
 
-Example operations:
-```javascript
-{
-  "payload": {
-    "action": "append_block_children", // One of: "append_block_children", "retrieve_block", "retrieve_block_children", "update_block", "delete_block", "batch_append_block_children", "batch_update_blocks", "batch_delete_blocks", "batch_mixed_operations"
-    "params": {
-      // Parameters specific to the chosen action
-    }
-  }
-}
-```
+## การพัฒนา
 
-#### `notion_database`
+1. รันคำสั่ง `npm run dev` เพื่อเริ่มเซิร์ฟเวอร์ในโหมดพัฒนา (ด้วย nodemon)
+2. ทำการเปลี่ยนแปลงโค้ดของคุณ
+3. เซิร์ฟเวอร์จะรีสตาร์ทโดยอัตโนมัติเมื่อมีการเปลี่ยนแปลงไฟล์
 
-A powerful tool for database interactions including:
-- Creating new databases with custom properties
-- Querying databases with filters and sorting
-- Updating database structure and properties
+## การแก้ไขปัญหา
 
-Example operations:
-```javascript
-{
-  "payload": {
-    "action": "create_database", // One of: "create_database", "query_database", "update_database"
-    "params": {
-      // Parameters specific to the chosen action
-    }
-  }
-}
-```
+หากคุณพบปัญหาในการเชื่อมต่อกับ Notion API หรือ Line API ตรวจสอบว่า:
 
-#### `notion_comments`
+1. โทเค็นและคีย์ทั้งหมดในไฟล์ `.env` ถูกต้อง
+2. บริการภายนอกที่คุณกำลังใช้งานอยู่
+3. คอนโซลและบันทึกเพื่อดูข้อความข้อผิดพลาดโดยละเอียด
 
-A tool for managing comments on Notion content:
-- Retrieving comments from pages and blocks
-- Adding new comments to pages
-- Replying to existing discussions
+## การเพิ่มเติมในอนาคต
 
-Example operations:
-```javascript
-{
-  "payload": {
-    "action": "get_comments", // One of: "get_comments", "add_page_comment", "add_discussion_comment"
-    "params": {
-      // Parameters specific to the chosen action
-    }
-  }
-}
-```
+- การเพิ่มการทดสอบ
+- การเพิ่มการบันทึกที่ดีขึ้น
+- การเพิ่มการตรวจสอบสิทธิ์สำหรับ API Endpoint
 
-#### `notion_users`
+## การมีส่วนร่วม
 
-A tool for accessing user information:
-- Listing all workspace users
-- Getting details about specific users
-- Retrieving information about the current bot user
+การมีส่วนร่วมยินดีต้อนรับ! กรุณาส่ง pull request หรือเปิด issue สำหรับการปรับปรุงที่เสนอ
 
-Example operations:
-```javascript
-{
-  "payload": {
-    "action": "list_users", // One of: "list_users", "get_user", "get_bot_user"
-    "params": {
-      // Parameters specific to the chosen action
-    }
-  }
-}
-```
+## ลิขสิทธิ์
 
-### Available Resources
-
-The server currently does not expose any resources, focusing instead on tool-based operations.
-
-## 🛠 Development
-
-1. **Clone the Repository**
-   ```
-   git clone https://github.com/awkoy/notion-mcp-server.git
-   cd notion-mcp-server
-   ```
-
-2. **Install Dependencies**
-   ```
-   npm install
-   ```
-
-3. **Set Up Environment Variables**
-   - Create a `.env` file with:
-     ```
-     NOTION_TOKEN=your_notion_api_key
-     NOTION_PAGE_ID=your_notion_page_id
-     ```
-
-4. **Build the Project**
-   ```
-   npm run build
-   ```
-
-5. **Run the Inspector**
-   ```
-   npm run inspector
-   ```
-
-## 🔧 Technical Details
-
-- Built using TypeScript and the MCP SDK (version 1.7.0+)
-- Uses the official Notion API client (@notionhq/client v2.3.0+)
-- Follows the Model Context Protocol specification
-- Implements tools for CRUD operations on Notion pages, blocks, and databases
-- Supports efficient batch operations for performance optimization
-- Validates input/output with Zod schemas
-
-## ❓ Troubleshooting
-
-- **Common Issues**
-  - **Authentication Errors**: Ensure your Notion token has the correct permissions and integration is enabled for your pages/databases
-  - **Page Access Issues**: Make sure your integration has been added to the pages you're attempting to access
-  - **Rate Limiting**: Notion API has rate limits - use batch operations to optimize requests
-
-- **Getting Help**
-  - Create an issue on the [GitHub repository](https://github.com/awkoy/notion-mcp-server/issues)
-  - Check the [Notion API documentation](https://developers.notion.com/reference/intro)
-  - Visit the MCP community channels for assistance
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
+MIT
