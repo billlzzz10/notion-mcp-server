@@ -4,7 +4,21 @@
 /coverage
 /logs
 /tmp
+
+# Environment files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Web chat build outputs
+web-chat/node_modules/
+web-chat/dist/
+web-chat/web-build/
+web-chat/.env
+
+# Cursor AI files
 .cursor
 .cursorignore
 .cursorrules
@@ -15,6 +29,9 @@
 
 #Ignore vscode AI rules
 .github\copilot-instructions.md
+
+# Legacy/Deprecated folders
+web-interface/
 
 # VS Code
 .vscode/
@@ -39,3 +56,14 @@ Icon?
 # Others
 *.orig
 *.rej
+
+# Development/Debug files
+debug.log
+error.log
+test-results/
+coverage/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

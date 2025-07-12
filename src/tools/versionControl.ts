@@ -1,9 +1,9 @@
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { notion } from "../services/notion.js";
 
-export const trackVersionTool: Tool = {
-  name: "track_version",
-  description: "บันทึกการเปลี่ยนแปลงในฐานข้อมูล Version History",
+export const versionControlTool: Tool = {
+  name: "version_control",
+  description: "บันทึกการเปลี่ยนแปลงและติดตามเวอร์ชันในฐานข้อมูล Version History",
   inputSchema: {
     type: "object",
     properties: {
@@ -43,7 +43,7 @@ export const trackVersionTool: Tool = {
   }
 };
 
-export async function handleTrackVersion(args: any) {
+export async function handleVersionControl(args: any) {
   const versionHistoryDb = process.env.NOTION_VERSION_HISTORY_DB_ID;
   
   if (!versionHistoryDb) {

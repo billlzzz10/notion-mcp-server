@@ -9,7 +9,7 @@ export const storyStructureAnalyzerTool: Tool = {
     properties: {
       analysisType: {
         type: "string",
-        enum: ["pacing_analysis", "character_development", "plot_structure", "emotional_beats", "theme_consistency", "conflict_progression", "full_analysis"],
+        enum: ["pacing_analysis", "character_development", "plot_structure", "emotional_beats", "theme_consistency", "conflict_progression", "ai_prompt_analysis", "full_analysis"],
         description: "ประเภทการวิเคราะห์"
       },
       chapterRange: {
@@ -71,6 +71,9 @@ export async function handleStoryStructureAnalysis(args: any) {
       case "conflict_progression":
         analysisResult = await analyzeConflictProgression(storyData);
         break;
+      case "ai_prompt_analysis":
+        analysisResult = await analyzeAIPrompts(storyData);
+        break;
       case "full_analysis":
         analysisResult = await performFullAnalysis(storyData, args);
         break;
@@ -105,7 +108,8 @@ async function gatherStoryData(chapterRange?: any) {
     characters: [],
     storyArcs: [],
     timeline: [],
-    worldRules: []
+    worldRules: [],
+    aiPrompts: []
   };
 
   // ตั้งค่าช่วงตอน
@@ -198,6 +202,25 @@ async function gatherStoryData(chapterRange?: any) {
         endChapter: props["End Chapter"]?.number || 0,
         theme: props.Theme?.select?.name || "",
         centralConflict: props["Central Conflict"]?.rich_text?.[0]?.text?.content || ""
+      };
+    });
+  }
+
+  // ดึงข้อมูล AI Prompts
+  const aiPromptsDb = process.env.NOTION_AI_PROMPTS_DB_ID;
+  if (aiPromptsDb) {
+    const promptsResponse = await notion.databases.query({
+      database_id: aiPromptsDb
+    });
+
+    storyData.aiPrompts = promptsResponse.results.map((prompt: any) => {
+      const props = prompt.properties;
+      return {
+        id: prompt.id,
+        prompt: props.Prompt?.rich_text?.[0]?.text?.content || "",
+        type: props.Type?.select?.name || "",
+        usage: props.Usage?.rich_text?.[0]?.text?.content || "",
+        effectiveness: props.Effectiveness?.number || 0
       };
     });
   }
@@ -398,7 +421,7 @@ async function analyzePlotStructure(storyData: any, template?: string): Promise<
 
   analysis += "💝 **Emotional Progression:**\n";
   const emotionalCounts = new Map();
-  emotionalProgression.forEach(ep => {
+  emotionalProgression.forEach((ep: any) => {
     emotionalCounts.set(ep.emotional, (emotionalCounts.get(ep.emotional) || 0) + 1);
   });
 
@@ -424,7 +447,7 @@ async function analyzeEmotionalBeats(storyData: any): Promise<string> {
   
   // จัดกลุ่มตามตอน
   const chapterTones = new Map();
-  toneProgression.forEach(tp => {
+  toneProgression.forEach((tp: any) => {
     const chapter = tp.chapter;
     if (!chapterTones.has(chapter)) {
       chapterTones.set(chapter, []);
@@ -439,12 +462,12 @@ async function analyzeEmotionalBeats(storyData: any): Promise<string> {
   });
 
   // วิเคราะห์ emotional variety
-  const toneVariety = new Set(toneProgression.map(tp => tp.tone));
+  const toneVariety = new Set(toneProgression.map((tp: any) => tp.tone));
   analysis += `\n🌈 **ความหลากหลายทางอารมณ์:** ${toneVariety.size} โทนที่แตกต่าง\n`;
 
   // ตรวจสอบความสมดุลทางอารมณ์
   const toneCounts = new Map();
-  toneProgression.forEach(tp => {
+  toneProgression.forEach((tp: any) => {
     toneCounts.set(tp.tone, (toneCounts.get(tp.tone) || 0) + 1);
   });
 
@@ -513,8 +536,9 @@ async function performFullAnalysis(storyData: any, args: any): Promise<string> {
   const plot = await analyzePlotStructure(storyData);
   const emotional = await analyzeEmotionalBeats(storyData);
   const conflict = await analyzeConflictProgression(storyData);
+  const aiPrompts = await analyzeAIPrompts(storyData);
 
-  return `${pacing}\n\n---\n\n${character}\n\n---\n\n${plot}\n\n---\n\n${emotional}\n\n---\n\n${conflict}`;
+  return `${pacing}\n\n---\n\n${character}\n\n---\n\n${plot}\n\n---\n\n${emotional}\n\n---\n\n${conflict}\n\n---\n\n${aiPrompts}`;
 }
 
 async function generateImprovementSuggestions(storyData: any, analysisType: string): Promise<string> {
@@ -529,6 +553,9 @@ async function generateImprovementSuggestions(storyData: any, analysisType: stri
       break;
     case "plot_structure":
       suggestions += generatePlotSuggestions(storyData);
+      break;
+    case "ai_prompt_analysis":
+      suggestions += generateAIPromptSuggestions(storyData);
       break;
     default:
       suggestions += generateGeneralSuggestions(storyData);
@@ -645,4 +672,84 @@ async function saveAnalysisReport(analysis: string, suggestions: string, args: a
   } catch (error) {
     console.error("ไม่สามารถบันทึกรายงานการวิเคราะห์:", error);
   }
+}
+
+async function analyzeAIPrompts(storyData: any): Promise<string> {
+  let analysis = "🤖 **การวิเคราะห์ AI Prompts:**\n\n";
+
+  if (storyData.aiPrompts.length === 0) {
+    analysis += "⚠️ ยังไม่มีข้อมูล AI Prompts ในฐานข้อมูล\n";
+    analysis += "💡 แนะนำให้เพิ่ม prompts ที่ใช้ในการพัฒนาเรื่อง\n";
+    return analysis;
+  }
+
+  // วิเคราะห์ประเภท prompts
+  const promptTypes = new Map();
+  storyData.aiPrompts.forEach((prompt: any) => {
+    const type = prompt.type || "ไม่ระบุ";
+    promptTypes.set(type, (promptTypes.get(type) || 0) + 1);
+  });
+
+  analysis += `📊 **สถิติ AI Prompts:**\n`;
+  analysis += `  จำนวนทั้งหมด: ${storyData.aiPrompts.length} prompts\n`;
+  analysis += `  ประเภทที่แตกต่าง: ${promptTypes.size} ประเภท\n\n`;
+
+  analysis += `🏷️ **การแจกแจงตามประเภท:**\n`;
+  promptTypes.forEach((count, type) => {
+    const percentage = ((count / storyData.aiPrompts.length) * 100).toFixed(1);
+    analysis += `  ${type}: ${count} prompts (${percentage}%)\n`;
+  });
+
+  // วิเคราะห์ประสิทธิภาพ
+  const effectivePrompts = storyData.aiPrompts.filter((p: any) => p.effectiveness >= 7);
+  const averageEffectiveness = storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length;
+
+  analysis += `\n⭐ **ประสิทธิภาพ:**\n`;
+  analysis += `  ค่าเฉลี่ย: ${averageEffectiveness.toFixed(1)}/10\n`;
+  analysis += `  Prompts ที่มีประสิทธิภาพสูง (7+): ${effectivePrompts.length}/${storyData.aiPrompts.length}\n`;
+
+  // แนะนำ prompts ที่มีประสิทธิภาพสูง
+  if (effectivePrompts.length > 0) {
+    analysis += `\n🌟 **Prompts ที่แนะนำ:**\n`;
+    effectivePrompts.slice(0, 3).forEach((prompt: any, index: number) => {
+      const shortPrompt = prompt.prompt.length > 100 ? 
+        prompt.prompt.substring(0, 100) + "..." : 
+        prompt.prompt;
+      analysis += `${index + 1}. [${prompt.type}] ${shortPrompt} (${prompt.effectiveness}/10)\n`;
+    });
+  }
+
+  return analysis;
+}
+
+function generateAIPromptSuggestions(storyData: any): string {
+  let suggestions = "";
+  
+  if (storyData.aiPrompts.length === 0) {
+    suggestions += "🤖 **AI Prompts:** สร้างฐานข้อมูล prompts เพื่อเก็บเทคนิคที่ได้ผล\n";
+    suggestions += "📝 **แนะนำประเภท prompts:**\n";
+    suggestions += "  - Character Development: สำหรับพัฒนาตัวละคร\n";
+    suggestions += "  - Scene Writing: สำหรับเขียนฉากต่างๆ\n";
+    suggestions += "  - World Building: สำหรับขยายโลก Ashval\n";
+    suggestions += "  - Dialogue: สำหรับบทสนทนา\n";
+    return suggestions;
+  }
+
+  const averageEffectiveness = storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length;
+  
+  if (averageEffectiveness < 6) {
+    suggestions += "📈 **AI Prompts:** ปรับปรุงคุณภาพ prompts โดยเพิ่มรายละเอียดและบริบท\n";
+  }
+
+  const promptTypes = new Set(storyData.aiPrompts.map((p: any) => p.type));
+  if (promptTypes.size < 4) {
+    suggestions += "🎯 **AI Prompts:** เพิ่มความหลากหลายของประเภท prompts\n";
+  }
+
+  const lowEffectivePrompts = storyData.aiPrompts.filter((p: any) => p.effectiveness < 5);
+  if (lowEffectivePrompts.length > 0) {
+    suggestions += `⚡ **AI Prompts:** ปรับปรุง ${lowEffectivePrompts.length} prompts ที่มีประสิทธิภาพต่ำ\n`;
+  }
+
+  return suggestions;
 }

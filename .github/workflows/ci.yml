@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Type check
+      run: npm run build
+
+    - name: Run tests (if exists)
+      run: |
+        if [ -f package.json ] && grep -q "\"test\"" package.json; then
+          npm test
+        else
+          echo "No tests found, skipping..."
+        fi
+
+    - name: Check tool registration
+      run: |
+        echo "Checking MCP tool registration..."
+        node -e "
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Check if all tools are properly exported
+        const indexPath = path.join('./src/tools/index.ts');
+        if (fs.existsSync(indexPath)) {
+          const content = fs.readFileSync(indexPath, 'utf8');
+          const toolRegistrations = content.match(/server\.tool\(/g);
+          console.log(\`Found \${toolRegistrations ? toolRegistrations.length : 0} tool registrations\`);
+          
+          if (toolRegistrations && toolRegistrations.length >= 15) {
+            console.log('✅ All 15 tools are registered');
+            process.exit(0);
+          } else {
+            console.log('❌ Missing tool registrations');
+            process.exit(1);
+          }
+        } else {
+          console.log('❌ Tool index file not found');
+          process.exit(1);
+        }
+        "
+
+  update-readme:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Update README status
+      run: |
+        echo "Updating README with current tool status..."
+        node -e "
+        const fs = require('fs');
+        const path = require('path');
+        
+        // Count tools from source
+        const indexPath = path.join('./src/tools/index.ts');
+        let notionTools = 0;
+        let ashvalTools = 0;
+        
+        if (fs.existsSync(indexPath)) {
+          const content = fs.readFileSync(indexPath, 'utf8');
+          const notionMatches = content.match(/server\.tool\(\s*['\"]notion_/g);
+          const ashvalMatches = content.match(/server\.tool\(\s*['\"]ashval_/g);
+          
+          notionTools = notionMatches ? notionMatches.length : 0;
+          ashvalTools = ashvalMatches ? ashvalMatches.length : 0;
+        }
+        
+        // Update README
+        const readmePath = './README.md';
+        if (fs.existsSync(readmePath)) {
+          let readme = fs.readFileSync(readmePath, 'utf8');
+          
+          // Update build status
+          const buildStatus = '[![Build Status](https://github.com/billlzzz10/notion-mcp-server/workflows/CI/badge.svg)](https://github.com/billlzzz10/notion-mcp-server/actions)';
+          
+          // Update tool counts
+          readme = readme.replace(
+            /### ✅ Notion Base Tools \(\d+\/\d+ เครื่องมือ\)/,
+            \`### ✅ Notion Base Tools (\${notionTools}/\${notionTools} เครื่องมือ)\`
+          );
+          
+          readme = readme.replace(
+            /### ✅ Ashval World Building Tools \(\d+\/\d+ เครื่องมือ\)/,
+            \`### ✅ Ashval World Building Tools (\${ashvalTools}/\${ashvalTools} เครื่องมือ)\`
+          );
+          
+          readme = readme.replace(
+            /### 🟢 สถานะรวม: พร้อมใช้งาน \(\d+\/\d+ เครื่องมือ\)/,
+            \`### 🟢 สถานะรวม: พร้อมใช้งาน (\${notionTools + ashvalTools}/\${notionTools + ashvalTools} เครื่องมือ)\`
+          );
+          
+          // Add last updated timestamp
+          const now = new Date().toISOString().split('T')[0];
+          if (!readme.includes('Last updated:')) {
+            readme = readme.replace(
+              '### 🟢 สถานะรวม: พร้อมใช้งาน',
+              \`### 🟢 สถานะรวม: พร้อมใช้งาน\`
+            );
+            readme = readme.replace(
+              /(### 🟢 สถานะรวม: พร้อมใช้งาน.*)\n/,
+              \`\$1\n\n*Last updated: \${now}*\n\`
+            );
+          } else {
+            readme = readme.replace(
+              /\*Last updated: .*\*/,
+              \`*Last updated: \${now}*\`
+            );
+          }
+          
+          fs.writeFileSync(readmePath, readme);
+          console.log(\`✅ Updated README: \${notionTools} Notion tools, \${ashvalTools} Ashval tools\`);
+        }
+        "
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add README.md
+          git commit -m "🤖 Auto-update README status [skip ci]"
+          git push
+          echo "✅ README updated and pushed"
+        fi

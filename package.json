@@ -9,7 +9,26 @@
     "build": "tsc && shx chmod +x build/*.js",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id"
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id",
+    "update-readme": "node scripts/update-readme.js",
+    "status": "node scripts/update-readme.js",
+    "setup-hooks": "node scripts/setup-hooks.js",
+    "check-schema": "node checkSchema.js",
+    "generate-tools": "node generateTools.js",
+    "story-check": "node comprehensiveChecker.js",
+    "consistency-check": "node storyConsistencyChecker.js",
+    "issue-check": "node storyIssueChecker.js",
+    "character-analysis": "node characterAnalyzer.js",
+    "quick-test": "node quickTest.js",
+    "create-sample": "node createSampleData.js",
+    "create-problems": "node createProblematicData.js",
+    "start-bot": "node build/bot/index.js",
+    "start-web": "cd web-chat && npx vite",
+    "start-web-chat": "cd web-chat && npx vite",
+    "build-web-chat": "cd web-chat && npm run build",
+    "serve-web": "cd web-chat && npx vite preview",
+    "dev-bot": "tsc && node build/bot/index.js",
+    "demo": "node demo/integration-demo.js"
   },
   "homepage": "https://github.com/awkoy/notion-mcp-server",
   "keywords": [
@@ -27,10 +46,15 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@notionhq/client": "^2.3.0",
-    "zod": "^3.24.2"
+    "dotenv": "^17.2.0",
+    "node-fetch": "^3.3.2",
+    "zod": "^3.24.2",
+    "@google/generative-ai": "^0.21.0",
+    "node-telegram-bot-api": "^0.66.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
+    "@types/node-telegram-bot-api": "^0.64.0",
     "shx": "^0.3.4",
     "typescript": "^5.8.2"
   },

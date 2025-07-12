@@ -1,7 +1,80 @@
 
-# 🦄 Notion MCP Server (Ashval World Building)
+# 🏰 Ashval Chat - Notion MCP Server with Perfect UX
 
-เซิร์ฟเวอร์ Node.js สำหรับเชื่อมต่อ Notion API และสร้างระบบ world-building อัตโนมัติสำหรับโลกแฟนตาซี "Ashval"
+[![Build Status](https://github.com/billlzzz10/notion-mcp-server/workflows/CI/badge.svg)](https://github.com/billlzzz10/notion-mcp-server/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Notion API](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)](https://developers.notion.com/)
+[![Gemini AI](https://img.shields.io/badge/Gemini-4285F4?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
+
+**🆕 Modern Web Chat Interface with Auto-Detection Schema System**  
+เซิร์ฟเวอร์ Node.js สำหรับเชื่อมต่อ Notion API พร้อมระบบ world-building อัตโนมัติสำหรับโลกแฟนตาซี "Ashval" และ Web Chat Interface ที่ทันสมัย
+
+---
+
+## 🚀 เริ่มต้นใช้งาน
+
+### 🌟 **Ashval Chat v2.1 - Perfect UX Edition** (แนะนำ)
+
+```bash
+# 1. ติดตั้ง dependencies
+npm install
+
+# 2. ตั้งค่า environment variables
+cd web-chat
+cp .env.example .env
+# แก้ไข .env ใส่ API keys ของคุณ
+
+# 3. เปิดใช้งาน
+npm run start-web-chat
+# เปิดที่ http://localhost:3001
+```
+
+#### ✨ **Features ใหม่ล่าสุด:**
+- 🔧 **Auto-load Environment Variables** - อ่าน API key จาก .env อัตโนมัติ
+- 📱 **Responsive Design** - รองรับทุกหน้าจอ มือถือ แท็บเล็ต เดสก์ท็อป
+- ☰ **Sidebar Toggle** - ซ่อน/แสดง sidebar ได้
+- 📎 **File Upload Support** - รองรับไฟล์สูงสุด 10MB (Text, Images, PDF, etc.)
+- 🔗 **Chat Sharing** - แชร์การสนทนาได้
+- 💾 **Save to MCP** - บันทึกคำตอบ AI เข้า Notion Database อัตโนมัติ
+- 🎨 **Modern UI/UX** - animations ที่นุ่มนวล, toast notifications
+- 🔍 **Auto-Detection Schema** - ตรวจจับโครงสร้าง Notion Database อัตโนมัติ
+
+### 🔧 MCP Server (สำหรับ AI agents)
+```bash
+npm install
+npm run build
+npm start
+```
+
+---
+
+## 📊 สถานะเครื่องมือ MCP
+
+### ✅ Notion Base Tools (5/5 เครื่องมือ)
+
+- ✅ **notion_pages** - จัดการหน้า (สร้าง, อัปเดต, ค้นหา, เก็บถาวร)
+- ✅ **notion_blocks** - จัดการบล็อค (ดู, แก้ไข, ลบ, เพิ่ม)
+- ✅ **notion_database** - จัดการฐานข้อมูล (สร้าง, ค้นหา, อัปเดต)
+- ✅ **notion_comments** - จัดการความคิดเห็น (ดู, เพิ่ม)
+- ✅ **notion_users** - จัดการผู้ใช้ (ดูรายชื่อ, ข้อมูล)
+
+### ✅ Ashval World Building Tools (12/12 เครื่องมือ)
+
+- ✅ **ashval_version_control** - ติดตามและจัดการเวอร์ชันของข้อมูล
+- ✅ **ashval_timeline_analyzer** - วิเคราะห์ timeline และตรวจหาความขัดแย้งทางเวลา
+- ✅ **ashval_conflict_generator** - สร้างความขัดแย้งระหว่างตัวละครและสถานการณ์
+- ✅ **ashval_story_arc_analyzer** - วิเคราะห์ story arcs และความเชื่อมโยง
+- ✅ **ashval_smart_filter** - สร้าง views และ filters อัจฉริยะสำหรับฐานข้อมูล
+- ✅ **ashval_image_generator** - สร้างคำสั่งสำหรับ AI image generation
+- ✅ **ashval_consistency_checker** - ตรวจสอบความสอดคล้องของข้อมูลในโลก Ashval
+- ✅ **ashval_world_rules_query** - ค้นหาและตรวจสอบกฎของโลก Ashval
+- ✅ **ashval_advanced_prompt_generator** - สร้าง AI prompts ขั้นสูงสำหรับการเขียนเรื่อง
+- ✅ **ashval_story_structure_analyzer** - วิเคราะห์โครงสร้างเรื่องและ pacing
+
+### 🟢 สถานะรวม: พร้อมใช้งาน (17/17 เครื่องมือ)
+
+*Last updated: 2025-07-12*
 
 ---
 
@@ -144,6 +217,18 @@ npm start
 npm run watch
 ```
 
+### 5️⃣ ตั้งค่า Auto-update (ทางเลือก)
+
+สำหรับการอัปเดตสถานะ README อัตโนมัติ:
+
+```bash
+# ตั้งค่า git hooks เพื่ออัปเดต README ก่อน commit
+npm run setup-hooks
+
+# หรือทำการอัปเดตด้วยตนเอง
+npm run status
+```
+
 ---
 
 ## 🗂️ โครงสร้างโปรเจกต์
@@ -195,3 +280,5 @@ notion-mcp-server/
 ## 📄 License
 
 MIT
+ 
+ 

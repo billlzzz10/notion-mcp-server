@@ -21,6 +21,9 @@ import { consistencyCheckerTool, handleConsistencyCheck } from "./consistencyChe
 import { worldRulesQueryTool, handleWorldRulesQuery } from "./worldRulesQuery.js";
 import { advancedPromptGeneratorTool, handleAdvancedPromptGeneration } from "./advancedPromptGenerator.js";
 import { storyStructureAnalyzerTool, handleStoryStructureAnalysis } from "./storyStructureAnalyzer.js";
+import { databaseAnalyzerTool, handleDatabaseAnalysis } from "./databaseAnalyzer.js";
+import { dataCompletionAssistantTool, handleDataCompletionAssistance } from "./dataCompletionAssistant.js";
+import { projectsTools, handleProjectsTools } from "./projects.js";
 
 export const registerAllTools = () => {
   // Register combined pages operation tool
@@ -67,70 +70,96 @@ export const registerAllTools = () => {
   server.tool(
     "ashval_version_control",
     "ติดตามและจัดการเวอร์ชันของข้อมูลใน Ashval World",
-    versionControlTool.inputSchema,
-    handleVersionControl
+    versionControlTool.inputSchema as any,
+    handleVersionControl as any
   );
 
   server.tool(
     "ashval_timeline_analyzer",
     "วิเคราะห์ timeline และตรวจหาความขัดแย้งทางเวลา",
-    timelineAnalyzerTool.inputSchema,
-    handleTimelineAnalysis
+    timelineAnalyzerTool.inputSchema as any,
+    handleTimelineAnalysis as any
   );
 
   server.tool(
     "ashval_conflict_generator",
     "สร้างความขัดแย้งระหว่างตัวละครและสถานการณ์",
-    conflictGeneratorTool.inputSchema,
-    handleConflictGeneration
+    conflictGeneratorTool.inputSchema as any,
+    handleConflictGeneration as any
   );
 
   server.tool(
     "ashval_story_arc_analyzer",
     "วิเคราะห์ story arcs และความเชื่อมโยง",
-    storyArcAnalyzerTool.inputSchema,
-    handleStoryArcAnalysis
+    storyArcAnalyzerTool.inputSchema as any,
+    handleStoryArcAnalysis as any
   );
 
   server.tool(
     "ashval_smart_filter",
     "สร้าง views และ filters อัจฉริยะสำหรับฐานข้อมูล",
-    smartFilterTool.inputSchema,
-    handleSmartFilter
+    smartFilterTool.inputSchema as any,
+    handleSmartFilter as any
   );
 
   server.tool(
     "ashval_image_generator",
     "สร้างคำสั่งสำหรับ AI image generation",
-    imageGeneratorTool.inputSchema,
-    handleImageGeneration
+    imageGeneratorTool.inputSchema as any,
+    handleImageGeneration as any
   );
 
   server.tool(
     "ashval_consistency_checker",
     "ตรวจสอบความสอดคล้องของข้อมูลในโลก Ashval",
-    consistencyCheckerTool.inputSchema,
-    handleConsistencyCheck
+    consistencyCheckerTool.inputSchema as any,
+    handleConsistencyCheck as any
   );
 
   server.tool(
     "ashval_world_rules_query",
     "ค้นหาและตรวจสอบกฎของโลก Ashval",
-    worldRulesQueryTool.inputSchema,
-    handleWorldRulesQuery
+    worldRulesQueryTool.inputSchema as any,
+    handleWorldRulesQuery as any
   );
 
   server.tool(
     "ashval_advanced_prompt_generator",
     "สร้าง AI prompts ขั้นสูงสำหรับการเขียนเรื่อง",
-    advancedPromptGeneratorTool.inputSchema,
-    handleAdvancedPromptGeneration
+    advancedPromptGeneratorTool.inputSchema as any,
+    handleAdvancedPromptGeneration as any
   );
 
   server.tool(
     "ashval_story_structure_analyzer",
     "วิเคราะห์โครงสร้างเรื่องและ pacing",
-    storyStructureAnalyzerTool.inputSchema,
-    handleStoryStructureAnalysis
+    storyStructureAnalyzerTool.inputSchema as any,
+    handleStoryStructureAnalysis as any
   );
+
+  server.tool(
+    "ashval_database_analyzer",
+    "วิเคราะห์สถานะและความคืบหน้าของข้อมูลในฐานข้อมูลทั้งหมด",
+    databaseAnalyzerTool.inputSchema as any,
+    handleDatabaseAnalysis as any
+  );
+
+  server.tool(
+    "ashval_data_completion_assistant",
+    "ช่วยเติมข้อมูลที่ขาดหายไปในฐานข้อมูลด้วย AI และสร้างข้อเสนะแนะ",
+    dataCompletionAssistantTool.inputSchema as any,
+    handleDataCompletionAssistance as any
+  );
+
+  // Register Projects Tools
+  for (const tool of projectsTools) {
+    server.tool(
+      tool.name,
+      tool.description || "Projects management tool",
+      tool.inputSchema as any,
+      async (args: any) => {
+        return await handleProjectsTools(tool.name, args);
+      }
+    );
+  }
 };
