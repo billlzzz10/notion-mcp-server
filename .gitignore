@@ -12,3 +12,30 @@
 .cursorignorerules
 .cursorignoreconfig
 .npmrc
+
+#Ignore vscode AI rules
+.github\copilot-instructions.md
+
+# VS Code
+.vscode/
+
+# OS/Editor junk
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+~$*
+
+# TypeScript
+*.tsbuildinfo
+
+# Mac/Windows system files
+ehthumbs.db
+Icon?
+
+# Others
+*.orig
+*.rej

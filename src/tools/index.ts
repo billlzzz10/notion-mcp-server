@@ -10,6 +10,18 @@ import { registerDatabaseOperationTool } from "./database.js";
 import { registerCommentsOperationTool } from "./comments.js";
 import { registerUsersOperationTool } from "./users.js";
 
+// Import World Building Tools
+import { versionControlTool, handleVersionControl } from "./versionControl.js";
+import { timelineAnalyzerTool, handleTimelineAnalysis } from "./timelineAnalyzer.js";
+import { conflictGeneratorTool, handleConflictGeneration } from "./conflictGenerator.js";
+import { storyArcAnalyzerTool, handleStoryArcAnalysis } from "./storyArcAnalyzer.js";
+import { smartFilterTool, handleSmartFilter } from "./smartFilter.js";
+import { imageGeneratorTool, handleImageGeneration } from "./imageGenerator.js";
+import { consistencyCheckerTool, handleConsistencyCheck } from "./consistencyChecker.js";
+import { worldRulesQueryTool, handleWorldRulesQuery } from "./worldRulesQuery.js";
+import { advancedPromptGeneratorTool, handleAdvancedPromptGeneration } from "./advancedPromptGenerator.js";
+import { storyStructureAnalyzerTool, handleStoryStructureAnalysis } from "./storyStructureAnalyzer.js";
+
 export const registerAllTools = () => {
   // Register combined pages operation tool
   server.tool(
@@ -49,5 +61,76 @@ export const registerAllTools = () => {
     "Perform various user operations (list, get, get bot)",
     USERS_OPERATION_SCHEMA,
     registerUsersOperationTool
+  );
+
+  // Register World Building Tools
+  server.tool(
+    "ashval_version_control",
+    "ติดตามและจัดการเวอร์ชันของข้อมูลใน Ashval World",
+    versionControlTool.inputSchema,
+    handleVersionControl
+  );
+
+  server.tool(
+    "ashval_timeline_analyzer",
+    "วิเคราะห์ timeline และตรวจหาความขัดแย้งทางเวลา",
+    timelineAnalyzerTool.inputSchema,
+    handleTimelineAnalysis
+  );
+
+  server.tool(
+    "ashval_conflict_generator",
+    "สร้างความขัดแย้งระหว่างตัวละครและสถานการณ์",
+    conflictGeneratorTool.inputSchema,
+    handleConflictGeneration
+  );
+
+  server.tool(
+    "ashval_story_arc_analyzer",
+    "วิเคราะห์ story arcs และความเชื่อมโยง",
+    storyArcAnalyzerTool.inputSchema,
+    handleStoryArcAnalysis
+  );
+
+  server.tool(
+    "ashval_smart_filter",
+    "สร้าง views และ filters อัจฉริยะสำหรับฐานข้อมูล",
+    smartFilterTool.inputSchema,
+    handleSmartFilter
+  );
+
+  server.tool(
+    "ashval_image_generator",
+    "สร้างคำสั่งสำหรับ AI image generation",
+    imageGeneratorTool.inputSchema,
+    handleImageGeneration
+  );
+
+  server.tool(
+    "ashval_consistency_checker",
+    "ตรวจสอบความสอดคล้องของข้อมูลในโลก Ashval",
+    consistencyCheckerTool.inputSchema,
+    handleConsistencyCheck
+  );
+
+  server.tool(
+    "ashval_world_rules_query",
+    "ค้นหาและตรวจสอบกฎของโลก Ashval",
+    worldRulesQueryTool.inputSchema,
+    handleWorldRulesQuery
+  );
+
+  server.tool(
+    "ashval_advanced_prompt_generator",
+    "สร้าง AI prompts ขั้นสูงสำหรับการเขียนเรื่อง",
+    advancedPromptGeneratorTool.inputSchema,
+    handleAdvancedPromptGeneration
+  );
+
+  server.tool(
+    "ashval_story_structure_analyzer",
+    "วิเคราะห์โครงสร้างเรื่องและ pacing",
+    storyStructureAnalyzerTool.inputSchema,
+    handleStoryStructureAnalysis
   );
 };
