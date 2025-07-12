@@ -17,6 +17,8 @@ web-chat/node_modules/
 web-chat/dist/
 web-chat/web-build/
 web-chat/.env
+web-chat/.env.local
+web-chat/vite-env.d.ts
 
 # Cursor AI files
 .cursor
