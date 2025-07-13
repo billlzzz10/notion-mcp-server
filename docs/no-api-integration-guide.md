@@ -34,7 +34,7 @@
         "NOTION_POWER_SYSTEMS_DB_ID": "your_power_systems_db_id",
         "NOTION_ARCANAS_DB_ID": "your_arcanas_db_id",
         "NOTION_MISSIONS_DB_ID": "your_missions_db_id",
-        "NOTION_AI_PROMPTS_DB_ID": "20f5e81a91ff813990f6ece5f2f3d1c6",
+        "NOTION_AI_PROMPTS_DB_ID": "your_ai_prompts_db_id",
         "NOTION_VERSION_HISTORY_DB_ID": "your_version_history_db_id",
         "NOTION_STORY_TIMELINE_DB_ID": "your_story_timeline_db_id",
         "NOTION_STORY_ARCS_DB_ID": "your_story_arcs_db_id",

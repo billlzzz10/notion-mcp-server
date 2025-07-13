@@ -69,3 +69,23 @@ coverage/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Gateway server files
+server/logs/
+server/*.log
+
+# Testing files  
+check-db-structure.js
+simple-check.js
+
+# AL (Business Central) files
+.alpackages/
+.snapshots/
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Testing files (temporary)
+test-tools.js
+create-test-task.js

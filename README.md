@@ -1,5 +1,9 @@
-
-# 🏰 Ashval Chat - Notion MCP Server with Perfect UX
+# 🏰 Ashval Chat - Notion MCP Server with Pe```text
+notion-mcp-server/
+├── 📂 src/                    # MCP Server source code
+│   ├── 📂 tools/             # เครื่องมือ MCP ทั้งหมด (17 ตัว)
+│   ├── 📂 server/            # MCP server configuration
+│   ├── 📂 services/          # Notion API servicesUX
 
 [![Build Status](https://github.com/billlzzz10/notion-mcp-server/workflows/CI/badge.svg)](https://github.com/billlzzz10/notion-mcp-server/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -7,44 +11,65 @@
 [![Notion API](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)](https://developers.notion.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini-4285F4?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
 
-**🆕 Modern Web Chat Interface with Auto-Detection Schema System**  
-เซิร์ฟเวอร์ Node.js สำหรับเชื่อมต่อ Notion API พร้อมระบบ world-building อัตโนมัติสำหรับโลกแฟนตาซี "Ashval" และ Web Chat Interface ที่ทันสมัย
+**🆕 Modern Web Chat Interface with Auto-Detection Schema System & MCP Gateway**  
+เซิร์ฟเวอร์ Node.js สำหรับเชื่อมต่อ Notion API พร้อมระบบ world-building อัตโนมัติสำหรับโลกแฟนตาซี "Ashval" พร้อม Web Chat Interface และ MCP Gateway
 
 ---
 
 ## 🚀 เริ่มต้นใช้งาน
 
-### 🌟 **Ashval Chat v2.1 - Perfect UX Edition** (แนะนำ)
+### 🌟 **Ashval Chat v3.0 - Complete Integration Edition** (แนะนำ)
 
 ```bash
 # 1. ติดตั้ง dependencies
 npm install
 
 # 2. ตั้งค่า environment variables
-cd web-chat
 cp .env.example .env
-# แก้ไข .env ใส่ API keys ของคุณ
+# แก้ไข .env ใส่ API keys และ Database IDs
 
-# 3. เปิดใช้งาน
-npm run start-web-chat
-# เปิดที่ http://localhost:3001
+# 3. Build MCP Server
+npm run build
+
+# 4. เริ่มใช้งาน (เลือกได้หลายวิธี)
+
+# Web Chat Interface
+npm run start-web-chat      # → http://localhost:8080
+
+# MCP Gateway 
+npm run start-gateway       # → http://localhost:3001
+
+# MCP Server (สำหรับ AI agents)
+npm start                   # → stdio MCP protocol
 ```
 
-#### ✨ **Features ใหม่ล่าสุด:**
-- 🔧 **Auto-load Environment Variables** - อ่าน API key จาก .env อัตโนมัติ
-- 📱 **Responsive Design** - รองรับทุกหน้าจอ มือถือ แท็บเล็ต เดสก์ท็อป
-- ☰ **Sidebar Toggle** - ซ่อน/แสดง sidebar ได้
-- 📎 **File Upload Support** - รองรับไฟล์สูงสุด 10MB (Text, Images, PDF, etc.)
-- 🔗 **Chat Sharing** - แชร์การสนทนาได้
-- 💾 **Save to MCP** - บันทึกคำตอบ AI เข้า Notion Database อัตโนมัติ
-- 🎨 **Modern UI/UX** - animations ที่นุ่มนวล, toast notifications
-- 🔍 **Auto-Detection Schema** - ตรวจจับโครงสร้าง Notion Database อัตโนมัติ
+---
 
-### 🔧 MCP Server (สำหรับ AI agents)
-```bash
-npm install
-npm run build
-npm start
+## 📁 โครงสร้างโปรเจกต์
+
+```
+notion-mcp-server/
+├── � src/                    # MCP Server source code
+│   ├── 📂 tools/             # เครื่องมือ MCP ทั้งหมด (17 ตัว)
+│   ├── 📂 server/            # MCP server configuration
+│   ├── � services/          # Notion API services
+│   └── index.ts              # MCP entry point
+├── 📂 server/                # Gateway & API server
+│   ├── � mcp-gateway/       # API gateway สำหรับ HTTP requests
+│   └── app.js                # Express server
+├── 📂 web-chat/              # Web interface
+│   ├── index.tsx             # React web chat app
+│   ├── index.html            # หน้าเว็บหลัก
+│   └── package.json          # Web dependencies
+├── 📂 docs/                  # คู่มือและเอกสาร
+│   ├── copilot-integration-guide.md
+│   ├── bot-integration-guide.md
+│   └── no-api-integration-guide.md
+├── 📂 demo/                  # ตัวอย่างการใช้งาน
+├── 📂 scripts/               # สคริปต์อรรถประโยชน์
+├── .env.example              # ตัวอย่างการตั้งค่า
+├── ASHVAL_GUIDE.md           # คู่มือโลก Ashval
+└── COMPLETION_SUMMARY.md     # สรุปความสำเร็จ
 ```
 
 ---
@@ -259,6 +284,45 @@ notion-mcp-server/
 - รองรับ batch operations และการเชื่อมโยงข้อมูลข้ามฐานข้อมูล
 - สร้าง AI prompts สำหรับ world-building
 - บันทึกประวัติการเปลี่ยนแปลงอัตโนมัติ
+
+---
+
+## ✨ **Features ใหม่ล่าสุด v3.0:**
+
+### 🌐 Web Chat Interface
+- **Auto-Schema Detection** - ตรวจจับโครงสร้างฐานข้อมูลอัตโนมัติ
+- **Dynamic Properties** - ปรับเครื่องมือตาม schema ที่ตรวจพบ
+- **File Upload Support** - รองรับไฟล์หลายประเภท (รูปภาพ, PDF, text)
+- **Real-time Chat** - สนทนากับ Gemini AI แบบ real-time
+- **Responsive Design** - รองรับทุกอุปกรณ์
+
+### 🔧 MCP Gateway
+- **HTTP API Endpoints** - เรียกใช้ MCP tools ผ่าน REST API
+- **Schema Cache** - เก็บ schema ใน memory เพื่อประสิทธิภาพ
+- **Error Handling** - จัดการข้อผิดพลาดอย่างชาญฉลาด
+- **Webhook Ready** - พร้อมรับ webhooks จาก Notion
+
+### 🤖 GitHub Copilot Integration
+- **VS Code Extension Ready** - ใช้งานผ่าน GitHub Copilot
+- **Natural Language** - สั่งงานด้วยภาษาธรรมดา
+- **Code Generation** - สร้างโค้ดด้วย AI
+- **Documentation** - คู่มือครบถ้วนใน `docs/`
+
+---
+
+## 🛠️ การทดสอบเครื่องมือ
+
+```bash
+# ทดสอบการเชื่อมต่อและ schema
+node test-tools.js
+
+# ทดสอบการสร้างงานใหม่
+node create-test-task.js
+
+# ทดสอบ MCP Gateway
+npm run start-gateway
+curl http://localhost:3001/api/schema/YOUR_DB_ID
+```
 
 ---
 

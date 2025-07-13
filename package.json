@@ -1,6 +1,6 @@
 {
   "name": "notion-mcp-server",
-  "version": "1.0.1",
+  "version": "3.0.0",
   "type": "module",
   "bin": {
     "notion-mcp-server": "build/index.js"
@@ -28,7 +28,11 @@
     "build-web-chat": "cd web-chat && npm run build",
     "serve-web": "cd web-chat && npx vite preview",
     "dev-bot": "tsc && node build/bot/index.js",
-    "demo": "node demo/integration-demo.js"
+    "demo": "node demo/integration-demo.js",
+    "start-gateway": "node server/app.js",
+    "test": "node test-tools.js",
+    "test-simple": "node simple-check.js",
+    "test-task": "node create-test-task.js"
   },
   "homepage": "https://github.com/awkoy/notion-mcp-server",
   "keywords": [
@@ -50,7 +54,9 @@
     "node-fetch": "^3.3.2",
     "zod": "^3.24.2",
     "@google/generative-ai": "^0.21.0",
-    "node-telegram-bot-api": "^0.66.0"
+    "node-telegram-bot-api": "^0.66.0",
+    "express": "^4.18.2",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
