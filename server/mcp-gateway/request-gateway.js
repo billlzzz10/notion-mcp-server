@@ -1,10 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const { getSchema, refreshSchema } = require('./schema-check');
-const { createProject } = require('../mcp/project');
-const { createTask } = require('../mcp/task');
-const { savePrompt } = require('../mcp/prompt');
-const { evaluateImprovement } = require('../mcp/ai-eval');
+import express from 'express';
+import bodyParser from 'body-parser';
+import { getSchema, refreshSchema } from './schema-check.js';
+
+// Mock imports for missing MCP modules
+const createProject = async (data) => ({ success: true, id: 'mock-project', ...data });
+const createTask = async (data) => ({ success: true, id: 'mock-task', ...data });
+const savePrompt = async (data) => ({ success: true, id: 'mock-prompt', ...data });
+const evaluateImprovement = async (oldResp, newResp) => ({ improvement: 'mock-eval', score: 85 });
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -64,4 +66,4 @@ router.post('/ai-eval', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

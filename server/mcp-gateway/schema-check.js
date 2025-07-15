@@ -1,5 +1,5 @@
-const { Client } = require('@notionhq/client');
-const NodeCache = require('node-cache');
+import { Client } from '@notionhq/client';
+import NodeCache from 'node-cache';
 
 // In-memory cache for schema
 const schemaCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
@@ -26,4 +26,4 @@ async function refreshSchema(databaseId) {
   return schema;
 }
 
-module.exports = { getSchema, refreshSchema };
+export { getSchema, refreshSchema };
