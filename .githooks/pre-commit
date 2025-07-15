@@ -3,10 +3,16 @@
 # Pre-commit hook to update README.md with current tool status
 # This hook will run before each commit to ensure the README is up to date
 
+# Skip if this is already a hook-generated commit
+if git log -1 --pretty=format:"%s" | grep -q "\[skip hook\]"; then
+    echo "🔄 Skipping README update (hook-generated commit)"
+    exit 0
+fi
+
 echo "🔄 Updating README.md with current tool status..."
 
 # Run the update script
-npm run status --silent
+npm run status --silent 2>/dev/null || echo "⚠️ Status update failed, continuing..."
 
 # Check if README.md was modified
 if git diff --cached --name-only | grep -q "README.md"; then
