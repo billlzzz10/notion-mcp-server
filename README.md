@@ -360,6 +360,28 @@ npm run build
 
 # Run linting
 npm run lint
+
+# Google Drive Integration
+npm run gdrive:upload
+npm run backup:notion
+npm run backup:test
+
+# Test Google Drive connection
+node scripts/test-gdrive.js
+```
+
+```bash
+# Start development mode
+npm run dev
+
+# Start gateway only
+npm run start-gateway
+
+# Build for production
+npm run build
+
+# Run linting
+npm run lint
 ```
 
 ---
