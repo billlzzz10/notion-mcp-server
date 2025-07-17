@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🦄 UnicornX - AI-Powered Notion Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .typing-animation {
+      border-right: 2px solid #667eea;
+      animation: blink-caret 1s step-end infinite;
+    }
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #667eea; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+  <!-- Navigation -->
+  <nav class="gradient-bg text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="text-3xl">🦄</div>
+          <div>
+            <h1 class="text-xl font-bold">UnicornX</h1>
+            <p class="text-xs opacity-80">AI-Powered Notion Assistant</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="glass-effect px-3 py-1 rounded-full text-xs">
+            <span id="connectionStatus">🟢 Connected</span>
+          </div>
+          <button class="glass-effect px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-30 transition">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto p-6">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold text-gray-800 mb-4">
+        เพียงบอกสิ่งที่คุณต้องการ
+        <span class="text-purple-600 typing-animation">AI จะจัดการให้</span>
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        ไม่ต้องเรียนรู้การตั้งค่าซับซ้อนเหมือน Make หรือ Zapier 
+        แค่พิมพ์ภาษาไทยธรรมดา AI จะสร้างระบบอัตโนมัติใน Notion ให้คุณ
+      </p>
+    </div>
+    
+    <!-- Main Command Interface -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl mb-8 border border-purple-100">
+      <div class="mb-6">
+        <h3 class="text-2xl font-semibold flex items-center mb-4">
+          <i data-lucide="message-circle" class="mr-3 w-6 h-6 text-purple-600"></i>
+          พิมพ์คำสั่งของคุณ
+        </h3>
+        <div class="bg-purple-50 p-4 rounded-lg mb-4">
+          <h4 class="font-medium text-purple-800 mb-2">💡 ตัวอย่างคำสั่งที่ใช้ได้:</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-purple-700">
+            <div>• "สร้างแดชบอร์ดสรุปข้อมูลลูกค้าและยอดขาย"</div>
+            <div>• "ส่งสรุปงานประจำวันไปยัง Telegram ทุกเย็น 17:00 น."</div>
+            <div>• "แจ้งเตือนเมื่อมีโปรเจ็คใหม่ที่มูลค่าเกิน 50,000 บาท"</div>
+            <div>• "สร้างรายงานประสิทธิภาพทีมรายสัปดาห์"</div>
+          </div>
+        </div>
+        
+        <div class="relative">
+          <textarea 
+            id="nlCommand" 
+            class="w-full h-32 p-4 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition resize-none text-lg" 
+            placeholder="เช่น: สร้างแดชบอร์ดแสดงสถิติการขายประจำเดือน แยกตามสาขาและประเภทสินค้า..."
+          ></textarea>
+          <div class="absolute bottom-4 right-4 text-xs text-gray-400" id="charCount">0/500</div>
+        </div>
+      </div>
+      
+      <div class="flex gap-4">
+        <button 
+          id="processCommand" 
+          class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-purple-700 hover:to-blue-700 flex items-center justify-center text-lg font-medium transition transform hover:scale-105"
+        >
+          <i data-lucide="sparkles" class="mr-3 w-6 h-6"></i>
+          ให้ AI วิเคราะห์และดำเนินการ
+        </button>
+        <button 
+          id="voiceCommand" 
+          class="bg-gray-100 text-gray-700 px-6 py-4 rounded-xl hover:bg-gray-200 flex items-center justify-center transition"
+        >
+          <i data-lucide="mic" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Quick Templates Section -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl">
+      <h3 class="text-2xl font-semibold flex items-center mb-6">
+        <i data-lucide="layout-template" class="mr-3 w-6 h-6 text-purple-600"></i>
+        Templates ยอดนิยม
+      </h3>
+      <p class="text-gray-600 mb-6">เลือกใช้ template สำเร็จรูปหรือใช้เป็นแรงบันดาลใจ</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="templateSuggestions">
+        <!-- Templates will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // Character counter
+    const commandInput = document.getElementById('nlCommand');
+    const charCount = document.getElementById('charCount');
+    
+    commandInput.addEventListener('input', (e) => {
+      const count = e.target.value.length;
+      charCount.textContent = `${count}/500`;
+      if (count > 500) {
+        charCount.classList.add('text-red-500');
+      } else {
+        charCount.classList.remove('text-red-500');
+      }
+    });
+    
+    // Main process command
+    document.getElementById('processCommand').addEventListener('click', async () => {
+      const command = commandInput.value.trim();
+      if (!command) {
+        alert('กรุณาใส่คำสั่งที่ต้องการ');
+        return;
+      }
+      
+      alert('🎉 UnicornX AI ได้รับคำสั่งแล้ว! ระบบจะพัฒนาเพิ่มเติมในเร็วๆ นี้');
+    });
+    
+    // Voice command (placeholder)
+    document.getElementById('voiceCommand').addEventListener('click', () => {
+      alert('ฟีเจอร์การสั่งงานด้วยเสียงจะเปิดใช้งานเร็วๆ นี้');
+    });
+    
+    // Create template suggestions
+    function createTemplateSuggestions() {
+      const templates = [
+        {
+          title: 'แดชบอร์ดภาพรวมโปรเจ็ค',
+          description: 'รวมข้อมูลความคืบหน้า งบประมาณ และทรัพยากรจากหลายฐานข้อมูลในแดชบอร์ดเดียว',
+          icon: 'layout-dashboard',
+          color: 'purple'
+        },
+        {
+          title: 'รายงานสรุปประจำวัน',
+          description: 'ส่งสรุปงานและเป้าหมายที่ทำสำเร็จไปยัง Telegram ทุกเย็น',
+          icon: 'file-bar-chart',
+          color: 'blue'
+        },
+        {
+          title: 'ระบบติดตามประสิทธิภาพ',
+          description: 'ดึงข้อมูลจาก Google Sheets และสร้างกราฟวิเคราะห์แนวโน้มใน Notion',
+          icon: 'trending-up',
+          color: 'green'
+        },
+        {
+          title: 'ระบบแจ้งเตือนอัตโนมัติ',
+          description: 'ส่งแจ้งเตือนเมื่อมีการอัปเดตในฐานข้อมูลตามเงื่อนไขที่กำหนด',
+          icon: 'bell',
+          color: 'orange'
+        },
+        {
+          title: 'แดชบอร์ดยอดขายรายเดือน',
+          description: 'สร้างกราฟยอดขายแยกตามสาขาและประเภทสินค้า พร้อมแนวโน้ม',
+          icon: 'bar-chart',
+          color: 'indigo'
+        },
+        {
+          title: 'ระบบจัดการลูกค้า',
+          description: 'ติดตามสถานะลูกค้า การติดต่อ และกำหนดการประชุมอัตโนมัติ',
+          icon: 'users',
+          color: 'pink'
+        }
+      ];
+      
+      const templateHtml = templates.map(template => 
+        `<div class="group border border-gray-200 rounded-xl p-6 hover:border-${template.color}-300 hover:shadow-lg cursor-pointer transition-all duration-300 bg-gradient-to-br from-white to-gray-50">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-${template.color}-500 to-${template.color}-600 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+              <i data-lucide="${template.icon}" class="w-6 h-6 text-white"></i>
+            </div>
+            <h4 class="font-semibold text-lg">${template.title}</h4>
+          </div>
+          <p class="text-gray-600 text-sm leading-relaxed">${template.description}</p>
+          <div class="mt-4 inline-flex items-center text-${template.color}-600 text-sm font-medium">
+            <span>ใช้ template นี้</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </div>`
+      ).join('');
+      
+      document.getElementById('templateSuggestions').innerHTML = templateHtml;
+      lucide.createIcons();
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      createTemplateSuggestions();
+    });
+  </script>
+</body>
+</html>

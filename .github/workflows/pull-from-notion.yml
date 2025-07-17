@@ -1,55 +1,75 @@
-name: 'Pull from Notion'
+name: Pull from Notion and Upload to Google Drive
 
 on:
-  # ทำให้เราสามารถกดปุ่ม "Run workflow" ในหน้า Actions ของ GitHub ได้
   workflow_dispatch:
     inputs:
-      database_id:
-        description: 'Notion Database ID (optional - will use default from secrets)'
-        required: false
-        default: ''
+      database_type:
+        description: 'Database type to sync'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - projects
+        - tasks
+        - characters
+        - scenes
+        - locations
+        - items
+        - organizations
+        - events
+        - relationships
+        - ai_prompts
       target_folder:
-        description: 'Target folder for synced files'
+        description: 'Google Drive folder name'
         required: false
-        default: 'vault'
+        default: 'notion-backup'
+        type: string
+  schedule:
+    - cron: '0 2 * * *'  # รันทุกวัน 02:00 UTC
 
 jobs:
-  pull:
+  backup-notion:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout repository'
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 'Setup Node.js'
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
-      - name: 'Install dependencies'
+      - name: Install dependencies
         run: npm ci
 
-      - name: 'Create vault directory if not exists'
-        run: mkdir -p vault
-
-      - name: 'Run Notion Pull Script'
+      - name: Pull from Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ github.event.inputs.database_id || secrets.NOTION_CHARACTERS_DB_ID }}
-          TARGET_FOLDER: ${{ github.event.inputs.target_folder || 'vault' }}
-          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
-          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
-        run: node ./scripts/pull-from-notion.js
-
-      - name: 'Commit and push changes'
+          NOTION_PROJECTS_DB_ID: ${{ secrets.NOTION_PROJECTS_DB_ID }}
+          NOTION_TASKS_DB_ID: ${{ secrets.NOTION_TASKS_DB_ID }}
+          NOTION_CHARACTERS_DB_ID: ${{ secrets.NOTION_CHARACTERS_DB_ID }}
+          NOTION_SCENES_DB_ID: ${{ secrets.NOTION_SCENES_DB_ID }}
+          NOTION_LOCATIONS_DB_ID: ${{ secrets.NOTION_LOCATIONS_DB_ID }}
+          NOTION_ITEMS_DB_ID: ${{ secrets.NOTION_ITEMS_DB_ID }}
+          NOTION_ORGANIZATIONS_DB_ID: ${{ secrets.NOTION_ORGANIZATIONS_DB_ID }}
+          NOTION_EVENTS_DB_ID: ${{ secrets.NOTION_EVENTS_DB_ID }}
+          NOTION_RELATIONSHIPS_DB_ID: ${{ secrets.NOTION_RELATIONSHIPS_DB_ID }}
+          NOTION_AI_PROMPTS_DB_ID: ${{ secrets.NOTION_AI_PROMPTS_DB_ID }}
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add vault/
-          # ตรวจสอบว่ามีอะไรเปลี่ยนแปลงก่อน commit
-          if ! git diff --staged --quiet; then
-            git commit -m "🔄 Sync: Pull content from Notion database"
-            git push
-          else
-            echo "✅ No changes detected - vault is up to date"
-          fi
+          node scripts/pull-from-notion.js ${{ inputs.database_type || 'all' }}
+
+      - name: Upload to Google Drive
+        env:
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: |
+          node scripts/upload-to-drive.js ${{ inputs.target_folder || 'notion-backup' }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: notion-backup-${{ github.run_number }}
+          path: vault/
+          retention-days: 7

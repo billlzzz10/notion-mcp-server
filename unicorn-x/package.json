@@ -1,0 +1,70 @@
+{
+  "name": "unicorn-x",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "🦄 UnicornX - Next Generation AI-Powered Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "node -r ts-node/register src/index.ts",
+    "start": "node dist/index.js",
+    "simple": "node server-commonjs.cjs",
+    "ai": "node server-ai.cjs",
+    "dashboard": "node server-ai.cjs",
+    "build": "tsc",
+    "test": "echo \"No tests specified\"",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@google/genai": "^0.12.0",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "rate-limiter-flexible": "^5.0.3",
+    "winston": "^3.16.0",
+    "joi": "^17.13.3",
+    "uuid": "^10.0.0",
+    "socket.io": "^4.8.1",
+    "redis": "^4.7.0",
+    "prisma": "^6.1.0",
+    "@prisma/client": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/ws": "^8.5.10",
+    "@types/uuid": "^10.0.0",
+    "@types/helmet": "^0.0.48",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.7.2",
+    "vite": "^6.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vitest": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "eslint": "^9.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "tailwindcss": "^3.4.18",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1"
+  },
+  "keywords": [
+    "unicorn-x",
+    "ai",
+    "platform",
+    "automation",
+    "cloud",
+    "typescript",
+    "microservices"
+  ],
+  "author": "UnicornX Development Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

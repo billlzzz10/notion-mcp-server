@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnicornX - Notion Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e0e7ff;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-secondary {
+            background: #e0e7ff;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #c7d2fe;
+        }
+
+        .command-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .command-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .chat-container {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e0e7ff;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e7ff;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .command-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .command-input:focus {
+            border-color: #667eea;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-connected {
+            background: #10b981;
+        }
+
+        .status-disconnected {
+            background: #ef4444;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            margin-top: 20px;
+        }
+
+        .database-item {
+            background: #f8f9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .database-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .database-count {
+            font-size: 1.2rem;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .database-status {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .database-error {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .database-error .database-count {
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦄 UnicornX Dashboard</h1>
+            <p>Notion Management System</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2>📊 โปรเจค</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="projects-count">-</div>
+                        <div class="stat-label">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="projects-active">-</div>
+                        <div class="stat-label">กำลังทำ</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="loadProjects()">🔄 อัพเดท</button>
+                    <button class="btn btn-secondary" onclick="sendCommand('แสดงรายการโปรเจค')">📋 ดูทั้งหมด</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>� เวิร์คสเปซ Notion</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="workspace-pages">-</div>
+                        <div class="stat-label">หน้าทั้งหมด</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="workspace-databases">-</div>
+                        <div class="stat-label">ฐานข้อมูล</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="loadWorkspaceStats()">🔄 อัพเดท</button>
+                    <button class="btn btn-secondary" onclick="showDatabaseBreakdown()">📋 รายละเอียด</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>�📄 หน้าทั้งหมด</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-pages">-</div>
+                        <div class="stat-label">หน้าทั้งหมด</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="databases-count">-</div>
+                        <div class="stat-label">ฐานข้อมูล</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="loadPages()">🔄 อัพเดท</button>
+                    <button class="btn btn-secondary" onclick="sendCommand('นับจำนวนหน้า')">📊 นับหน้า</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>✅ งาน</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="tasks-count">-</div>
+                        <div class="stat-label">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="tasks-completed">-</div>
+                        <div class="stat-label">เสร็จแล้ว</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="loadTasks()">🔄 อัพเดท</button>
+                    <button class="btn btn-secondary" onclick="sendCommand('แสดงรายการงาน')">📋 ดูทั้งหมด</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-section">
+            <h2>💬 คำสั่ง</h2>
+            <div class="chat-container" id="chat-container">
+                <div class="message bot">
+                    <div>🦄 สวัสดี! ยินดีต้อนรับสู่ UnicornX Dashboard</div>
+                    <div class="message-time" id="system-time"></div>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>กำลังประมวลผล...</div>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" class="command-input" id="command-input" placeholder="พิมพ์คำสั่ง... (เช่น: สร้างโปรเจค My Project)" onkeypress="handleKeyPress(event)">
+                <button class="btn btn-primary" onclick="sendCommand()">ส่ง</button>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="btn btn-secondary" onclick="sendCommand('แสดงรายการโปรเจค')">📋 ดูโปรเจค</button>
+                <button class="btn btn-secondary" onclick="sendCommand('แสดงรายการงาน')">📋 ดูงาน</button>
+                <button class="btn btn-secondary" onclick="sendCommand('นับจำนวนหน้า')">📊 นับหน้า</button>
+                <button class="btn btn-secondary" onclick="sendCommand('สร้างโปรเจค Test Project')">➕ สร้างโปรเจค</button>
+                <button class="btn btn-secondary" onclick="sendCommand('สร้างงาน Test Task')">➕ สร้างงาน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Breakdown Modal -->
+    <div id="database-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-header">📊 รายละเอียดฐานข้อมูล</h2>
+            <div id="database-breakdown"></div>
+            <button class="btn btn-primary modal-close" onclick="closeDatabaseModal()">ปิด</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let systemStatus = {
+            notion: false,
+            databases: 0
+        };
+        let workspaceData = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemTime();
+            checkSystemHealth();
+            loadProjects();
+            loadPages();
+            loadTasks();
+            loadWorkspaceStats();
+            
+            // Update time every second
+            setInterval(updateSystemTime, 1000);
+            
+            // Focus on input
+            document.getElementById('command-input').focus();
+        });
+
+        function updateSystemTime() {
+            const now = new Date();
+            document.getElementById('system-time').textContent = now.toLocaleString('th-TH');
+        }
+
+        async function checkSystemHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                systemStatus.notion = data.notion_connected;
+                systemStatus.databases = data.databases_configured;
+                
+                // Update status indicators if they exist
+                updateStatusIndicators();
+            } catch (error) {
+                console.error('Health check failed:', error);
+                systemStatus.notion = false;
+                systemStatus.databases = 0;
+            }
+        }
+
+        function updateStatusIndicators() {
+            // Add status indicators to the header if needed
+            const statusHtml = `
+                <div style="margin-top: 10px;">
+                    <span class="status-indicator ${systemStatus.notion ? 'status-connected' : 'status-disconnected'}"></span>
+                    Notion: ${systemStatus.notion ? 'เชื่อมต่อแล้ว' : 'ยังไม่เชื่อมต่อ'}
+                    <span style="margin-left: 20px;"></span>
+                    📊 ฐานข้อมูล: ${systemStatus.databases}/14
+                </div>
+            `;
+        }
+
+        async function loadWorkspaceStats() {
+            try {
+                const response = await fetch('/api/pages');
+                const data = await response.json();
+                
+                workspaceData = data;
+                
+                if (data.workspaceStats) {
+                    document.getElementById('workspace-pages').textContent = data.workspaceStats.totalPages;
+                    document.getElementById('workspace-databases').textContent = 
+                        `${data.workspaceStats.configuredDatabases}/${data.workspaceStats.totalDatabases}`;
+                }
+                
+                // Update regular page count display too
+                document.getElementById('total-pages').textContent = data.totalPages || 0;
+                document.getElementById('databases-count').textContent = data.databases || 0;
+                
+            } catch (error) {
+                console.error('Failed to load workspace stats:', error);
+                document.getElementById('workspace-pages').textContent = 'Error';
+                document.getElementById('workspace-databases').textContent = 'Error';
+            }
+        }
+
+        function showDatabaseBreakdown() {
+            if (!workspaceData || !workspaceData.databaseStats) {
+                alert('ไม่มีข้อมูลฐานข้อมูล กรุณาอัพเดตก่อน');
+                return;
+            }
+            
+            const breakdown = document.getElementById('database-breakdown');
+            let html = '';
+            
+            for (const [dbId, stats] of Object.entries(workspaceData.databaseStats)) {
+                const hasError = stats.error;
+                const itemClass = hasError ? 'database-item database-error' : 'database-item';
+                
+                html += `
+                    <div class="${itemClass}">
+                        <div class="database-name">${stats.name}</div>
+                        <div class="database-count">${stats.count} หน้า</div>
+                        <div class="database-status">
+                            ${hasError ? 
+                                `❌ Error: ${stats.error}` : 
+                                `✅ อัพเดตล่าสุด: ${stats.lastUpdated ? new Date(stats.lastUpdated).toLocaleString('th-TH') : 'ไม่มีข้อมูล'}`
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+            
+            breakdown.innerHTML = html;
+            document.getElementById('database-modal').style.display = 'block';
+        }
+
+        function closeDatabaseModal() {
+            document.getElementById('database-modal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('database-modal');
+            if (event.target === modal) {
+                closeDatabaseModal();
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                const data = await response.json();
+                
+                if (data.projects) {
+                    document.getElementById('projects-count').textContent = data.projects.length;
+                    const activeProjects = data.projects.filter(p => p.status === 'In Progress' || p.status === 'Planning');
+                    document.getElementById('projects-active').textContent = activeProjects.length;
+                } else {
+                    document.getElementById('projects-count').textContent = '0';
+                    document.getElementById('projects-active').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                document.getElementById('projects-count').textContent = '?';
+                document.getElementById('projects-active').textContent = '?';
+            }
+        }
+
+        async function loadPages() {
+            try {
+                const response = await fetch('/api/pages');
+                const data = await response.json();
+                
+                // Update workspace data
+                workspaceData = data;
+                
+                if (data.totalPages !== undefined) {
+                    document.getElementById('total-pages').textContent = data.totalPages;
+                    document.getElementById('databases-count').textContent = data.databases;
+                } else {
+                    document.getElementById('total-pages').textContent = '0';
+                    document.getElementById('databases-count').textContent = '0';
+                }
+                
+                // Update workspace stats if available
+                if (data.workspaceStats) {
+                    document.getElementById('workspace-pages').textContent = data.workspaceStats.totalPages;
+                    document.getElementById('workspace-databases').textContent = 
+                        `${data.workspaceStats.configuredDatabases}/${data.workspaceStats.totalDatabases}`;
+                }
+                
+            } catch (error) {
+                console.error('Error loading pages:', error);
+                document.getElementById('total-pages').textContent = '?';
+                document.getElementById('databases-count').textContent = '?';
+                document.getElementById('workspace-pages').textContent = '?';
+                document.getElementById('workspace-databases').textContent = '?';
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const response = await fetch('/api/tasks');
+                const data = await response.json();
+                
+                if (data.tasks) {
+                    document.getElementById('tasks-count').textContent = data.tasks.length;
+                    document.getElementById('tasks-completed').textContent = data.completed || 0;
+                } else {
+                    document.getElementById('tasks-count').textContent = '0';
+                    document.getElementById('tasks-completed').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                document.getElementById('tasks-count').textContent = '?';
+                document.getElementById('tasks-completed').textContent = '?';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendCommand();
+            }
+        }
+
+        async function sendCommand(customCommand = null) {
+            const input = document.getElementById('command-input');
+            const command = customCommand || input.value.trim();
+            
+            if (!command) return;
+            
+            // Clear input if not custom command
+            if (!customCommand) {
+                input.value = '';
+            }
+            
+            // Add user message
+            addMessage(command, 'user');
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/command', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: command })
+                });
+                
+                const data = await response.json();
+                
+                // Add bot response
+                addMessage(data.response, 'bot');
+                
+                // Update stats if needed
+                if (command.includes('โปรเจค') || command.includes('สร้าง')) {
+                    setTimeout(loadProjects, 500);
+                }
+                if (command.includes('งาน') || command.includes('สร้าง')) {
+                    setTimeout(loadTasks, 500);
+                }
+                if (command.includes('หน้า') || command.includes('นับ')) {
+                    setTimeout(loadPages, 500);
+                }
+                
+            } catch (error) {
+                console.error('Error sending command:', error);
+                addMessage('❌ เกิดข้อผิดพลาด: ' + error.message, 'bot');
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function addMessage(content, type) {
+            const container = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('th-TH');
+            
+            messageDiv.innerHTML = `
+                <div>${content}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            loadProjects();
+            loadPages();
+            loadTasks();
+            checkSystemHealth();
+        }, 30000);
+    </script>
+</body>
+</html>
