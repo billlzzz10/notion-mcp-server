@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-07-17T04:42:04.588Z",
+  "fileAnalysis": {
+    "ashval-bot.js": {
+      "sizeKB": 10,
+      "lines": 260
+    },
+    "auto-cleanup.js": {
+      "sizeKB": 8,
+      "lines": 247
+    },
+    "auto-update-projects.js": {
+      "sizeKB": 26,
+      "lines": 594
+    },
+    "auto-update-roadmap.js": {
+      "sizeKB": 11,
+      "lines": 322
+    },
+    "check-data-quality.js": {
+      "sizeKB": 1,
+      "lines": 22
+    },
+    "check-db-schema.js": {
+      "sizeKB": 3,
+      "lines": 85
+    },
+    "check-status-options.js": {
+      "sizeKB": 2,
+      "lines": 62
+    },
+    "check-youtube-db-schema.js": {
+      "sizeKB": 4,
+      "lines": 105
+    },
+    "cleanup-duplicates.js": {
+      "sizeKB": 8,
+      "lines": 249
+    },
+    "complete-youtube-analyzer.js": {
+      "sizeKB": 0,
+      "lines": 1
+    },
+    "create-project-roadmap.js": {
+      "sizeKB": 15,
+      "lines": 578
+    },
+    "fetch-notion-pages.js": {
+      "sizeKB": 15,
+      "lines": 386
+    },
+    "subtasks-reports-agent.js": {
+      "sizeKB": 14,
+      "lines": 430
+    },
+    "version-manager.js": {
+      "sizeKB": 7,
+      "lines": 237
+    },
+    "webhook-test-server.js": {
+      "sizeKB": 0,
+      "lines": 1
+    }
+  },
+  "recommendations": [],
+  "totalSizeKB": 124,
+  "dependencyAnalysis": {
+    "production": 11,
+    "development": 4,
+    "total": 15
+  }
+}
