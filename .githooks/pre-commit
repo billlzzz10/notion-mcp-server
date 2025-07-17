@@ -1,13 +1,16 @@
 #!/bin/sh
 #
-# Pre-commit hook to update README.md with current tool status
-# This hook will run before each commit to ensure the README is up to date
+# Enhanced Pre-commit hook - ทำความสะอาดและอัปเดต README
+# This hook will run before each commit to cleanup and update docs
 
 # Skip if this is already a hook-generated commit
 if git log -1 --pretty=format:"%s" | grep -q "\[skip hook\]"; then
     echo "🔄 Skipping README update (hook-generated commit)"
     exit 0
 fi
+
+echo "🧹 กำลังทำความสะอาดไฟล์ทดสอบ..."
+npm run cleanup --silent 2>/dev/null || echo "⚠️ Cleanup failed, continuing..."
 
 echo "🔄 Updating README.md with current tool status..."
 

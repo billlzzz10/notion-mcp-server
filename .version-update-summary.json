@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-07-16T23:38:44.898Z",
+  "oldVersion": "3.0.0",
+  "newVersion": "3.0.1",
+  "bumpType": "patch",
+  "changes": [],
+  "files_updated": [
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ]
+}

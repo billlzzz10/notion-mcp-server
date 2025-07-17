@@ -1,0 +1,354 @@
+name: AI Code Review Assistant
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  ai-code-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Get Changed Files
+      id: changed-files
+      run: |
+        echo "🔍 Analyzing changed files..."
+        
+        # หาไฟล์ที่เปลี่ยนแปลง
+        git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} > changed-files.txt
+        
+        # กรองเฉพาะไฟล์ที่สำคัญ
+        grep -E '\.(js|ts|md|json)$' changed-files.txt > important-changes.txt || touch important-changes.txt
+        
+        CHANGED_COUNT=$(wc -l < important-changes.txt)
+        echo "changed-count=$CHANGED_COUNT" >> $GITHUB_OUTPUT
+        
+        echo "📊 Changed files: $CHANGED_COUNT"
+        cat important-changes.txt
+
+    - name: Analyze Code Quality
+      if: steps.changed-files.outputs.changed-count > 0
+      run: |
+        echo "🔬 Analyzing code quality..."
+        
+        node -e "
+        const fs = require('fs');
+        
+        const analysis = {
+          timestamp: new Date().toISOString(),
+          files: [],
+          recommendations: [],
+          risks: [],
+          score: 100
+        };
+        
+        try {
+          const changedFiles = fs.readFileSync('important-changes.txt', 'utf8')
+            .split('\n')
+            .filter(f => f.trim());
+          
+          changedFiles.forEach(file => {
+            if (!file.trim()) return;
+            
+            try {
+              const content = fs.readFileSync(file, 'utf8');
+              const lines = content.split('\n');
+              
+              const fileAnalysis = {
+                path: file,
+                lines: lines.length,
+                size: content.length,
+                issues: []
+              };
+              
+              // ตรวจสอบความยาวไฟล์
+              if (lines.length > 500) {
+                fileAnalysis.issues.push('File is quite large (' + lines.length + ' lines)');
+                analysis.recommendations.push('Consider breaking down ' + file);
+                analysis.score -= 5;
+              }
+              
+              // ตรวจสอบการใช้ console.log
+              const consoleLogs = content.match(/console\.log/g) || [];
+              if (consoleLogs.length > 10) {
+                fileAnalysis.issues.push('Many console.log statements (' + consoleLogs.length + ')');
+                analysis.recommendations.push('Consider using a proper logging system in ' + file);
+                analysis.score -= 3;
+              }
+              
+              // ตรวจสอบ TODO/FIXME
+              const todos = content.match(/(TODO|FIXME|XXX|HACK)/gi) || [];
+              if (todos.length > 0) {
+                fileAnalysis.issues.push('Contains ' + todos.length + ' TODO/FIXME comments');
+                analysis.recommendations.push('Address TODO/FIXME items in ' + file);
+                analysis.score -= 2;
+              }
+              
+              // ตรวจสอบ try-catch coverage (สำหรับ JS/TS)
+              if (file.match(/\.(js|ts)$/)) {
+                const tryBlocks = content.match(/try\s*{/g) || [];
+                const catchBlocks = content.match(/catch\s*\(/g) || [];
+                
+                if (tryBlocks.length !== catchBlocks.length) {
+                  fileAnalysis.issues.push('Mismatched try-catch blocks');
+                  analysis.risks.push('Error handling issue in ' + file);
+                  analysis.score -= 10;
+                }
+              }
+              
+              // ตรวจสอบ async/await patterns
+              if (file.match(/\.(js|ts)$/)) {
+                const asyncFunctions = content.match(/async\s+function|async\s+\w+\s*=>/g) || [];
+                const awaitCalls = content.match(/await\s+/g) || [];
+                
+                if (asyncFunctions.length > 0 && awaitCalls.length === 0) {
+                  fileAnalysis.issues.push('Async function without await');
+                  analysis.recommendations.push('Review async patterns in ' + file);
+                  analysis.score -= 5;
+                }
+              }
+              
+              analysis.files.push(fileAnalysis);
+              
+            } catch (e) {
+              console.log('⚠️ Could not analyze', file, ':', e.message);
+            }
+          });
+          
+          // คำนวณคะแนนรวม
+          if (analysis.score < 0) analysis.score = 0;
+          
+          analysis.summary = {
+            totalFiles: analysis.files.length,
+            totalIssues: analysis.files.reduce((sum, f) => sum + f.issues.length, 0),
+            overallScore: analysis.score
+          };
+          
+          fs.writeFileSync('.github/code-analysis.json', JSON.stringify(analysis, null, 2));
+          
+          console.log('🔬 Code Analysis Results:');
+          console.log('Files analyzed:', analysis.summary.totalFiles);
+          console.log('Issues found:', analysis.summary.totalIssues);
+          console.log('Overall score:', analysis.summary.overallScore + '/100');
+          
+        } catch (e) {
+          console.log('❌ Analysis failed:', e.message);
+        }
+        "
+
+    - name: Generate Review Report
+      if: steps.changed-files.outputs.changed-count > 0
+      run: |
+        echo "📝 Generating code review report..."
+        
+        node -e "
+        const fs = require('fs');
+        
+        try {
+          const analysis = JSON.parse(fs.readFileSync('.github/code-analysis.json', 'utf8'));
+          
+          let report = '# 🤖 AI Code Review Report\n\n';
+          report += \`**PR**: ${{ github.event.pull_request.title }}\n\`;
+          report += \`**Author**: ${{ github.event.pull_request.user.login }}\n\`;
+          report += \`**Generated**: \${new Date().toLocaleString('th-TH')}\n\n\`;
+          
+          // Overall score
+          const scoreEmoji = analysis.summary.overallScore >= 90 ? '🟢' : 
+                            analysis.summary.overallScore >= 70 ? '🟡' : '🔴';
+          
+          report += \`## \${scoreEmoji} Overall Score: \${analysis.summary.overallScore}/100\n\n\`;
+          
+          // Summary
+          report += '## 📊 Summary\n\n';
+          report += \`- **Files Analyzed**: \${analysis.summary.totalFiles}\n\`;
+          report += \`- **Issues Found**: \${analysis.summary.totalIssues}\n\`;
+          report += \`- **Recommendations**: \${analysis.recommendations.length}\n\`;
+          report += \`- **Risks**: \${analysis.risks.length}\n\n\`;
+          
+          // File details
+          if (analysis.files.length > 0) {
+            report += '## 📄 File Analysis\n\n';
+            analysis.files.forEach(file => {
+              report += \`### \${file.path}\n\`;
+              report += \`- **Size**: \${file.lines} lines, \${Math.round(file.size/1024)}KB\n\`;
+              
+              if (file.issues.length > 0) {
+                report += '- **Issues**:\n';
+                file.issues.forEach(issue => {
+                  report += \`  - ⚠️ \${issue}\n\`;
+                });
+              } else {
+                report += '- ✅ No issues found\n';
+              }
+              report += '\n';
+            });
+          }
+          
+          // Recommendations
+          if (analysis.recommendations.length > 0) {
+            report += '## 💡 Recommendations\n\n';
+            analysis.recommendations.forEach(rec => {
+              report += \`- \${rec}\n\`;
+            });
+            report += '\n';
+          }
+          
+          // Risks
+          if (analysis.risks.length > 0) {
+            report += '## ⚠️ Potential Risks\n\n';
+            analysis.risks.forEach(risk => {
+              report += \`- 🚨 \${risk}\n\`;
+            });
+            report += '\n';
+          }
+          
+          // Next steps
+          report += '## ✅ Next Steps\n\n';
+          if (analysis.summary.overallScore >= 90) {
+            report += '- Code quality looks excellent! 🎉\n';
+            report += '- Consider merging after final review\n';
+          } else if (analysis.summary.overallScore >= 70) {
+            report += '- Address minor issues if possible\n';
+            report += '- Code is generally good to merge\n';
+          } else {
+            report += '- Please address the identified issues\n';
+            report += '- Consider code review with team\n';
+          }
+          
+          fs.writeFileSync('.github/review-report.md', report);
+          console.log('📝 Review report generated');
+          
+        } catch (e) {
+          console.log('❌ Report generation failed:', e.message);
+        }
+        "
+
+    - name: Comment on PR
+      if: steps.changed-files.outputs.changed-count > 0
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          try {
+            const report = fs.readFileSync('.github/review-report.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+            
+            console.log('✅ Review comment posted');
+          } catch (error) {
+            console.log('❌ Failed to post comment:', error.message);
+          }
+
+    - name: Upload Analysis Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-review-analysis
+        path: .github/*analysis*.json
+
+  # === Project Structure Validation ===
+  validate-structure:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Validate Project Structure
+      run: |
+        echo "🏗️ Validating project structure..."
+        
+        node -e "
+        const fs = require('fs');
+        const path = require('path');
+        
+        const validation = {
+          timestamp: new Date().toISOString(),
+          valid: true,
+          issues: [],
+          recommendations: []
+        };
+        
+        // Expected structure
+        const expectedStructure = {
+          'package.json': 'required',
+          'README.md': 'required',
+          'src/': 'directory',
+          'server/': 'directory',
+          '.env.example': 'recommended',
+          '.gitignore': 'required'
+        };
+        
+        // Validate structure
+        Object.entries(expectedStructure).forEach(([item, type]) => {
+          try {
+            const exists = fs.existsSync(item);
+            
+            if (!exists && type === 'required') {
+              validation.issues.push(\`Missing required: \${item}\`);
+              validation.valid = false;
+            } else if (!exists && type === 'recommended') {
+              validation.recommendations.push(\`Consider adding: \${item}\`);
+            } else if (exists && type === 'directory') {
+              const stats = fs.statSync(item);
+              if (!stats.isDirectory()) {
+                validation.issues.push(\`\${item} should be a directory\`);
+                validation.valid = false;
+              }
+            }
+          } catch (e) {
+            validation.issues.push(\`Error checking \${item}: \${e.message}\`);
+          }
+        });
+        
+        // Check for common anti-patterns
+        const rootFiles = fs.readdirSync('.');
+        const suspiciousFiles = rootFiles.filter(f => 
+          f.match(/^(temp|tmp|test|debug|old|backup).*\.(js|md|json)$/) ||
+          f.match(/\.(log|tmp)$/)
+        );
+        
+        if (suspiciousFiles.length > 0) {
+          validation.recommendations.push('Clean up temporary files: ' + suspiciousFiles.join(', '));
+        }
+        
+        // Save validation result
+        fs.writeFileSync('.github/structure-validation.json', JSON.stringify(validation, null, 2));
+        
+        console.log('🏗️ Structure Validation:');
+        console.log('Valid:', validation.valid);
+        console.log('Issues:', validation.issues.length);
+        console.log('Recommendations:', validation.recommendations.length);
+        
+        if (validation.issues.length > 0) {
+          console.log('❌ Issues:');
+          validation.issues.forEach(issue => console.log('  -', issue));
+        }
+        
+        if (validation.recommendations.length > 0) {
+          console.log('💡 Recommendations:');
+          validation.recommendations.forEach(rec => console.log('  -', rec));
+        }
+        
+        if (!validation.valid) {
+          process.exit(1);
+        }
+        "

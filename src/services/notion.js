@@ -8,12 +8,24 @@ export { notion };
 
 /**
  * Generic Notion API fetch wrapper
- * @param {Function} apiCall - Notion API call function
- * @param {...any} args - Arguments for the API call
+ * @param {string} endpoint - API endpoint (e.g., '/pages', '/databases/query')
+ * @param {object} options - Request options including method, body, etc.
  */
-export async function notionFetch(apiCall, ...args) {
+export async function notionFetch(endpoint, options = {}) {
   try {
-    return await apiCall(...args);
+    const { method = 'GET', body, ...otherOptions } = options;
+    
+    if (endpoint === '/pages' && method === 'POST') {
+      return await notion.pages.create(JSON.parse(body));
+    } else if (endpoint.includes('/databases/') && endpoint.includes('/query')) {
+      const databaseId = endpoint.split('/')[2];
+      return await notion.databases.query({ 
+        database_id: databaseId,
+        ...JSON.parse(body || '{}')
+      });
+    } else {
+      throw new Error(`Unsupported endpoint: ${endpoint} with method: ${method}`);
+    }
   } catch (error) {
     console.error('❌ Notion API Error:', error);
     throw error;

@@ -4,7 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏰 Ashval Chat - Notion MCP Integration</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="dashboard.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,6 +31,20 @@
         </aside>
 
         <div class="app-container">
+            <!-- Dashboard Container -->
+            <div id="dashboard-container" class="dashboard-container hidden">
+                <div class="dashboard-header">
+                    <h2>📊 Notion Database Dashboard</h2>
+                    <div class="dashboard-controls">
+                        <button class="export-dashboard-button" onclick="exportDashboardData()">📥 Export</button>
+                        <button class="dashboard-toggle" onclick="toggleDashboard()">▼</button>
+                    </div>
+                </div>
+                <div class="dashboard-grid" id="dashboard-grid">
+                    <div class="loading-dashboard">🔄 กำลังโหลดข้อมูล...</div>
+                </div>
+            </div>
+
             <header class="app-header">
                 <button id="sidebar-toggle" class="icon-button" aria-label="Toggle sidebar">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
@@ -29,29 +52,52 @@
                 <h1 id="chat-title">🏰 Ashval Chat</h1>
                 <div class="header-actions">
                     <div class="header-action-container">
+                        <button type="button" id="dashboard-button" class="icon-button" aria-label="Toggle Dashboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        </button>
+                    </div>
+                    <div class="header-action-container">
+                        <button type="button" id="admin-button" class="icon-button" aria-label="Database Admin" onclick="window.open('admin/database-admin.html', '_blank')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+                        </button>
+                    </div>
+                    <div class="header-action-container">
+                        <button type="button" id="database-viewer-button" class="icon-button" aria-label="Database Viewer" onclick="window.open('database-viewer.html', '_blank')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+                        </button>
+                    </div>
+                    <div class="header-action-container">
                         <button type="button" id="share-button" class="icon-button" aria-label="Share chat">
-                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                         </button>
                     </div>
                      <div class="header-action-container">
                         <button type="button" id="theme-toggle-button" class="icon-button" aria-label="Toggle theme">
-                            <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.64 5.64zm12.72 12.72c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zM5.64 18.36l1.06-1.06c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0zM19.42 6.7l-1.06-1.06c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.03 0-1.41z"></path></svg>
-                            <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.38 2.03c.38-.28.81-.43 1.25-.43.43 0 .85.14 1.2.41.69.52.95 1.39.68 2.18-.23.68-.78 1.23-1.46 1.46-1.9.64-3.46 2.2-4.1 4.1-.23.68-.78 1.23-1.46 1.46-.79.27-1.66.02-2.18-.68-.69-.52-.95-1.39-.68-2.18C6.39 6.2 9.77 2.82 12.38 2.03zM11.5 8.5c.92 0 1.75.26 2.49.69.49.29.98.05 1.22-.48.24-.52.01-1.12-.5-1.34-1.3-.57-2.73-.87-4.21-.87-5.02 0-9.15 3.84-9.5 8.82-.03.45.3.85.75.88.45.03.85-.3.88-.75.29-4.01 3.52-7.24 7.53-7.53.52-.04.94-.48.94-1z"></path></svg>
+                            <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                         </button>
                     </div>
                     <div class="header-action-container">
-                        <button type="button" id="export-button" class="icon-button" aria-label="Export chat">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5 5-5z"></path></svg>
+                        <button type="button" id="export-button" class="icon-button" aria-label="Export chat" onclick="menuManager.toggleMenu('export-menu', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </button>
                         <div id="export-menu" class="actions-menu hidden">
-                            <a href="#" data-format="txt">as TXT</a>
-                            <a href="#" data-format="md">as MD</a>
-                            <a href="#" data-format="html">as HTML</a>
-                            <a href="#" data-format="pdf">as PDF</a>
+                            <a href="#" onclick="menuManager.exportAsText(); return false;">
+                                <i>📄</i> Export as TXT
+                            </a>
+                            <a href="#" onclick="menuManager.exportAsMarkdown(); return false;">
+                                <i>📝</i> Export as Markdown
+                            </a>
+                            <a href="#" onclick="menuManager.exportAsHTML(); return false;">
+                                <i>🌐</i> Export as HTML
+                            </a>
+                            <a href="#" onclick="menuManager.exportAsPDF(); return false;">
+                                <i>📁</i> Export as PDF
+                            </a>
                         </div>
                     </div>
                     <button type="button" id="settings-button" class="icon-button" aria-label="Settings">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
                 </div>
             </header>
@@ -115,6 +161,33 @@
                     <input type="text" id="locations-db-id" name="locationsDbId">
                 </fieldset>
                 
+                <fieldset>
+                    <legend>🚀 Smart Database Setup</legend>
+                    <p class="settings-description">
+                        วาง Notion Database URL และระบบจะตรวจหาข้อมูลให้อัตโนมัติ
+                    </p>
+                    <label for="notion-url">Notion Database URL</label>
+                    <input type="url" id="notion-url" name="notionUrl" placeholder="https://notion.so/your-database">
+                    <button type="button" id="auto-detect-button" class="button secondary">🔍 Auto Detect</button>
+                    
+                    <div id="detected-databases" class="detected-databases hidden">
+                        <h4>📊 พบฐานข้อมูลเหล่านี้:</h4>
+                        <div id="database-list"></div>
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>📁 Chat Organization</legend>
+                    <p class="settings-description">
+                        จัดระเบียบการสนทนาด้วยโฟลเดอร์
+                    </p>
+                    <div class="folder-controls">
+                        <input type="text" id="new-folder-name" placeholder="ชื่อโฟลเดอร์ใหม่">
+                        <button type="button" id="create-folder-button" class="button secondary">📁 สร้างโฟลเดอร์</button>
+                    </div>
+                    <div id="folder-list" class="folder-list"></div>
+                </fieldset>
+                
                 <button type="submit" class="button primary">💾 Save Settings</button>
             </form>
         </div>
@@ -135,6 +208,9 @@
   }
 }
 </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="enhanced-features.js"></script>
     <script type="module" src="index.tsx"></script>
+    <script type="module" src="dashboard.tsx"></script>
 </body>
 </html>

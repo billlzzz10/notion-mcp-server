@@ -15,8 +15,7 @@
     "html2canvas": "1.4.1",
     "jspdf": "3.0.1",
     "mammoth": "1.8.0",
-    "pdfjs-dist": "^5.3.93",
-    "xlsx": "0.18.5"
+    "pdfjs-dist": "^5.3.93"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

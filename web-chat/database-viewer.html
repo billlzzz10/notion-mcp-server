@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Database Viewer - Ashval Chat</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" type="image/png" href="favicon-32x32.png">
+</head>
+<body>
+    <div class="database-viewer-container">
+        <!-- Sidebar -->
+        <div class="database-viewer-sidebar">
+            <div class="database-viewer-sidebar-header">
+                <div class="database-viewer-title">📊 Database Viewer</div>
+                <button id="refresh-databases-btn" class="refresh-databases-btn" onclick="dashboardData.fetchDatabases()">
+                    <i>🔄</i> Refresh
+                </button>
+            </div>
+            
+            <div class="database-list" id="database-list">
+                <div class="loading-indicator" id="loading-indicator">
+                    <div>⏳ Loading databases...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="database-viewer-main">
+            <div id="database-content">
+                <div class="welcome-message">
+                    <h1>🎭 Ashval Database Viewer</h1>
+                    <p>Select a database from the sidebar to view its contents.</p>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">📋</div>
+                            <div class="feature-text">View all your Notion databases</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-text">Browse database entries</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-text">Analyze data structure</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard-data.js"></script>
+    <script>
+        // Auto-initialize when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Database viewer initializing...');
+            await dashboardData.init();
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                e.preventDefault();
+                dashboardData.fetchDatabases();
+            }
+        });
+    </script>
+
+    <style>
+        .welcome-message {
+            text-align: center;
+            padding: 60px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .welcome-message h1 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .welcome-message p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+        }
+
+        .feature-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .database-viewer-container {
+                flex-direction: column;
+            }
+            
+            .database-viewer-sidebar {
+                width: 100%;
+                height: 200px;
+            }
+            
+            .welcome-message {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</body>
+</html>

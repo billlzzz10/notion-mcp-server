@@ -1,0 +1,60 @@
+name: 'Push to Notion'
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_path:
+        description: 'Path to file in vault to sync (e.g., vault/My-Note.md)'
+        required: true
+      database_id:
+        description: 'Target Notion Database ID (optional - will use default)'
+        required: false
+        default: ''
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 'Install dependencies'
+        run: npm ci
+
+      - name: 'Validate file exists'
+        run: |
+          if [ ! -f "${{ github.event.inputs.file_path }}" ]; then
+            echo "❌ Error: File '${{ github.event.inputs.file_path }}' not found"
+            exit 1
+          fi
+          echo "✅ File found: ${{ github.event.inputs.file_path }}"
+
+      - name: 'Run Notion Push Script'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ github.event.inputs.database_id || secrets.NOTION_CHARACTERS_DB_ID }}
+          FILE_TO_SYNC: ${{ github.event.inputs.file_path }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+        run: node ./scripts/push-to-notion.js
+
+      - name: 'Update file metadata'
+        run: |
+          echo "📝 Updated sync metadata for: ${{ github.event.inputs.file_path }}"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          
+          # Add timestamp to file if sync was successful
+          if [ $? -eq 0 ]; then
+            echo "" >> "${{ github.event.inputs.file_path }}"
+            echo "<!-- Last synced to Notion: $(date -u +"%Y-%m-%d %H:%M:%S UTC") -->" >> "${{ github.event.inputs.file_path }}"
+            git add "${{ github.event.inputs.file_path }}"
+            git commit -m "📤 Sync: Push '${{ github.event.inputs.file_path }}' to Notion" || echo "No changes to commit"
+            git push || echo "Nothing to push"
+          fi

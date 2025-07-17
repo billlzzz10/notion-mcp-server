@@ -1,24 +1,68 @@
+# ========================================
+# Node.js & JavaScript/TypeScript
+# ========================================
 /node_modules
 /build
 /dist
 /coverage
 /logs
 /tmp
+*.tsbuildinfo
 
-# Environment files
+# ========================================
+# Environment & Configuration Files
+# ========================================
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Web chat build outputs
+# Configuration backups
+config/*.backup
+config/*.bak
+
+# ========================================
+# Documentation & Legacy Files
+# ========================================
+
+# Legacy documentation moved to docs/
+docs/README-legacy.md
+docs/README-v3.0.md
+
+# ========================================
+# Web Applications (Current & Future)
+# ========================================
+
+# Current Web Chat
 web-chat/node_modules/
 web-chat/dist/
 web-chat/web-build/
 web-chat/.env
 web-chat/.env.local
 web-chat/vite-env.d.ts
+
+# Future Frontend Apps (per roadmap)
+frontend-app/
+web-dashboard/
+mobile-app/
+admin-panel/
+agent-marketplace/
+workflow-designer/
+
+# Build outputs for any web apps
+*/node_modules/
+*/dist/
+*/build/
+*/.next/
+*/.nuxt/
+*/out/
+
+# ========================================
+# Development Tools & IDE
+# ========================================
 
 # Cursor AI files
 .cursor
@@ -29,63 +73,197 @@ web-chat/vite-env.d.ts
 .cursorignoreconfig
 .npmrc
 
-#Ignore vscode AI rules
-.github\copilot-instructions.md
-
-# Legacy/Deprecated folders
-web-interface/
-
 # VS Code
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# OS/Editor junk
-.DS_Store
-Thumbs.db
-*.log
-*.bak
-*.tmp
-*.swp
-*.swo
-~$*
+# JetBrains IDEs
+.idea/
+*.iml
 
-# TypeScript
-*.tsbuildinfo
+# ========================================
+# AI & Copilot Instructions (Security)
+# ========================================
+.github/copilot-instructions.md
+.github/copilot-rules/
+copilot-workspace.md
+ai-prompts/
+.ai/
 
-# Mac/Windows system files
-ehthumbs.db
-Icon?
+# ========================================
+# Gateway & Server Files
+# ========================================
 
-# Others
-*.orig
-*.rej
+# Gateway logs and temp files
+server/logs/
+server/*.log
+server/temp/
+server/cache/
 
-# Development/Debug files
-debug.log
-error.log
+# SSL certificates (if any)
+server/ssl/
+*.pem
+*.key
+*.crt
+
+# Database files (local dev)
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================================
+# Authentication & Security (Roadmap)
+# ========================================
+
+# JWT keys and certificates
+auth/keys/
+auth/certificates/
+jwt-private.key
+jwt-public.key
+
+# OAuth credentials
+oauth-config.json
+oauth-secrets.json
+
+# Session storage
+sessions/
+redis-data/
+
+# ========================================
+# Testing & Development Files
+# ========================================
+
+# Current test files
+check-db-structure.js
+simple-check.js
+test-tools.js
+create-test-task.js
+
+# Future test outputs
 test-results/
 coverage/
+e2e-results/
+performance-reports/
+load-test-reports/
 
-# Package manager files
+# Mock data
+mock-data/
+test-data/
+fixtures/
+
+# ========================================
+# Docker & Deployment
+# ========================================
+
+# Docker volumes and data
+docker-data/
+docker-volumes/
+docker-compose.override.yml
+
+# Kubernetes secrets
+k8s-secrets/
+*.secret.yaml
+
+# Deployment configs with secrets
+deploy-config.*.yml
+helm-values.*.yml
+
+# ========================================
+# Package Managers & Dependencies
+# ========================================
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+.pnp
+.pnp.js
 
-# Gateway server files
-server/logs/
-server/*.log
+# ========================================
+# Monitoring & Analytics (Roadmap)
+# ========================================
 
-# Testing files  
-check-db-structure.js
-simple-check.js
+# Log files
+*.log
+debug.log
+error.log
+access.log
+performance.log
 
-# AL (Business Central) files
+# Monitoring data
+monitoring-data/
+metrics/
+analytics/
+
+# ========================================
+# Cache & Temporary Files
+# ========================================
+
+# Various cache directories
+.cache/
+.parcel-cache/
+.nx/
+.turbo/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+~$*
+*.orig
+*.rej
+
+# ========================================
+# Operating System Files
+# ========================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ========================================
+# Legacy & Deprecated
+# ========================================
+web-interface/
+old-versions/
+deprecated/
+legacy/
+
+# ========================================
+# Business Central (AL) - If Applicable
+# ========================================
 .alpackages/
 .snapshots/
 
-# Cache directories
-.cache/
-.parcel-cache/
+# ========================================
+# Cloud & Production Secrets
+# ========================================
 
-# Testing files (temporary)
-test-tools.js
-create-test-task.js
+# Cloud configuration with secrets
+aws-config.json
+azure-config.json
+gcp-config.json
+
+# Production database dumps
+*.sql.gz
+*.dump
+backup-*.sql
+
+# SSL and HTTPS certificates
+*.pem
+*.p12
+*.pfx

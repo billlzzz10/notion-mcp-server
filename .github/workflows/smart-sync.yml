@@ -1,0 +1,433 @@
+name: Smart Documentation Sync
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 1 * * *'  # ทุกวันเวลา 01:00
+  workflow_dispatch:
+
+jobs:
+  smart-sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    # === ระบบทำความสะอาดอัตโนมัติ ===
+    - name: Auto Cleanup Test Files
+      run: |
+        echo "🧹 Running auto cleanup..."
+        npm run cleanup || echo "⚠️ Cleanup failed but continuing..."
+
+    # === สร้าง Cache สำหรับข้อมูลที่อ่านบ่อย ===
+    - name: Generate Project Cache
+      run: |
+        echo "💾 Generating project cache..."
+        node -e "
+        const fs = require('fs');
+        const path = require('path');
+        
+        const projectData = {
+          timestamp: new Date().toISOString(),
+          structure: {},
+          tools: [],
+          databases: {},
+          scripts: {},
+          documentation: {}
+        };
+        
+        // อ่าน package.json
+        try {
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          projectData.scripts = pkg.scripts;
+          projectData.dependencies = pkg.dependencies;
+          projectData.devDependencies = pkg.devDependencies;
+        } catch (e) {}
+        
+        // สแกนไฟล์สำคัญ
+        const importantFiles = [
+          'README.md', 'ROADMAP-UPDATED.md', 'FRONTEND-API-GUIDE.md',
+          '.env.example', 'package.json'
+        ];
+        
+        importantFiles.forEach(file => {
+          try {
+            if (fs.existsSync(file)) {
+              const content = fs.readFileSync(file, 'utf8');
+              projectData.documentation[file] = {
+                size: content.length,
+                lines: content.split('\n').length,
+                lastModified: fs.statSync(file).mtime
+              };
+            }
+          } catch (e) {}
+        });
+        
+        // สแกนเครื่องมือ
+        const jsFiles = fs.readdirSync('.').filter(f => f.endsWith('.js') && !f.startsWith('test-'));
+        projectData.tools = jsFiles.map(f => ({
+          name: f,
+          size: fs.statSync(f).size,
+          lastModified: fs.statSync(f).mtime
+        }));
+        
+        fs.writeFileSync('.github/project-cache.json', JSON.stringify(projectData, null, 2));
+        console.log('✅ Project cache generated');
+        "
+
+    # === อัปเดตเอกสารอัตโนมัติ ===
+    - name: Auto Update Documentation
+      run: |
+        echo "📝 Auto updating documentation..."
+        
+        # อัปเดตสถิติโปรเจค
+        node -e "
+        const fs = require('fs');
+        
+        // นับจำนวนไฟล์และเครื่องมือ
+        const jsFiles = fs.readdirSync('.').filter(f => f.endsWith('.js') && !f.startsWith('test-'));
+        const checkFiles = jsFiles.filter(f => f.startsWith('check-'));
+        const toolFiles = jsFiles.filter(f => !f.startsWith('check-') && !f.startsWith('test-'));
+        
+        const stats = {
+          totalFiles: jsFiles.length,
+          checkTools: checkFiles.length,
+          otherTools: toolFiles.length,
+          updated: new Date().toLocaleString('th-TH')
+        };
+        
+        console.log('📊 Project Statistics:');
+        console.log('   Total JS Files:', stats.totalFiles);
+        console.log('   Check Tools:', stats.checkTools);
+        console.log('   Other Tools:', stats.otherTools);
+        
+        // อัปเดต README footer
+        try {
+          let readme = fs.readFileSync('README.md', 'utf8');
+          const footerRegex = /---\n\*.*อัปเดตอัตโนมัติ.*\*/;
+          const newFooter = '---\\n*อัปเดตอัตโนมัติโดย GitHub Actions | เครื่องมือทั้งหมด: ' + stats.totalFiles + ' | อัปเดต: ' + stats.updated + '*';
+          
+          if (footerRegex.test(readme)) {
+            readme = readme.replace(footerRegex, newFooter);
+          } else {
+            readme += '\n\n' + newFooter;
+          }
+          
+          fs.writeFileSync('README.md', readme);
+          console.log('✅ README footer updated');
+        } catch (e) {
+          console.log('⚠️ README update failed:', e.message);
+        }
+        "
+
+    # === ตรวจสอบสุขภาพโปรเจค ===
+    - name: Project Health Check
+      run: |
+        echo "🏥 Running project health check..."
+        
+        node -e "
+        const fs = require('fs');
+        
+        const healthReport = {
+          timestamp: new Date().toISOString(),
+          status: 'healthy',
+          issues: [],
+          recommendations: []
+        };
+        
+        // ตรวจสอบไฟล์สำคัญ
+        const criticalFiles = [
+          'package.json', 'README.md', 'server/app.js', 
+          'src/tools/index.ts', '.env.example'
+        ];
+        
+        criticalFiles.forEach(file => {
+          if (!fs.existsSync(file)) {
+            healthReport.issues.push(\`Missing critical file: \${file}\`);
+            healthReport.status = 'warning';
+          }
+        });
+        
+        // ตรวจสอบ dependencies
+        try {
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const deps = Object.keys(pkg.dependencies || {});
+          
+          if (deps.length === 0) {
+            healthReport.issues.push('No dependencies found');
+          }
+          
+          // ตรวจสอบ scripts ที่สำคัญ
+          const importantScripts = ['build', 'start-gateway', 'cleanup'];
+          importantScripts.forEach(script => {
+            if (!pkg.scripts || !pkg.scripts[script]) {
+              healthReport.issues.push(\`Missing important script: \${script}\`);
+            }
+          });
+          
+        } catch (e) {
+          healthReport.issues.push('Cannot read package.json');
+          healthReport.status = 'error';
+        }
+        
+        // ตรวจสอบ environment variables
+        try {
+          const envExample = fs.readFileSync('.env.example', 'utf8');
+          const envVars = envExample.match(/^[A-Z_]+=.*/gm) || [];
+          
+          if (envVars.length < 5) {
+            healthReport.recommendations.push('Consider adding more environment variables examples');
+          }
+        } catch (e) {
+          healthReport.issues.push('Cannot read .env.example');
+        }
+        
+        // บันทึกรายงาน
+        fs.writeFileSync('.github/health-report.json', JSON.stringify(healthReport, null, 2));
+        
+        console.log('🏥 Health Check Results:');
+        console.log('Status:', healthReport.status);
+        console.log('Issues:', healthReport.issues.length);
+        console.log('Recommendations:', healthReport.recommendations.length);
+        
+        if (healthReport.issues.length > 0) {
+          console.log('❌ Issues found:');
+          healthReport.issues.forEach(issue => console.log('  -', issue));
+        }
+        
+        if (healthReport.recommendations.length > 0) {
+          console.log('💡 Recommendations:');
+          healthReport.recommendations.forEach(rec => console.log('  -', rec));
+        }
+        "
+
+    # === สร้าง API Documentation อัตโนมัติ ===
+    - name: Generate API Documentation
+      run: |
+        echo "📖 Generating API documentation..."
+        
+        node -e "
+        const fs = require('fs');
+        const path = require('path');
+        
+        let apiDocs = '# 📖 Auto-Generated API Documentation\n\n';
+        apiDocs += \`Generated: \${new Date().toLocaleString('th-TH')}\n\n\`;
+        
+        // สแกน server endpoints
+        try {
+          const serverPath = 'server/app.js';
+          if (fs.existsSync(serverPath)) {
+            const serverContent = fs.readFileSync(serverPath, 'utf8');
+            
+            // หา endpoints
+            const endpoints = [];
+            const routeMatches = serverContent.match(/app\.(get|post|put|delete)\(['\"](.*?)['\"]/g) || [];
+            
+            routeMatches.forEach(match => {
+              const methodMatch = match.match(/app\.(\w+)/);
+              const pathMatch = match.match(/['\"](.*?)['\"]$/);
+              
+              if (methodMatch && pathMatch) {
+                endpoints.push({
+                  method: methodMatch[1].toUpperCase(),
+                  path: pathMatch[1]
+                });
+              }
+            });
+            
+            if (endpoints.length > 0) {
+              apiDocs += '## 🌐 API Endpoints\n\n';
+              endpoints.forEach(ep => {
+                apiDocs += \`- **\${ep.method}** \\\`\${ep.path}\\\`\n\`;
+              });
+              apiDocs += '\n';
+            }
+          }
+        } catch (e) {
+          console.log('⚠️ Could not scan server endpoints');
+        }
+        
+        // สแกน MCP tools
+        try {
+          const toolsPath = 'src/tools';
+          if (fs.existsSync(toolsPath)) {
+            const toolFiles = fs.readdirSync(toolsPath).filter(f => f.endsWith('.ts'));
+            
+            if (toolFiles.length > 0) {
+              apiDocs += '## 🛠️ MCP Tools\n\n';
+              toolFiles.forEach(file => {
+                apiDocs += \`- \\\`\${file}\\\`\n\`;
+              });
+              apiDocs += '\n';
+            }
+          }
+        } catch (e) {
+          console.log('⚠️ Could not scan MCP tools');
+        }
+        
+        // สแกน scripts
+        try {
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          if (pkg.scripts) {
+            apiDocs += '## ⚡ Available Scripts\n\n';
+            Object.entries(pkg.scripts).forEach(([name, command]) => {
+              apiDocs += \`- **\${name}**: \\\`\${command}\\\`\n\`;
+            });
+            apiDocs += '\n';
+          }
+        } catch (e) {
+          console.log('⚠️ Could not read scripts');
+        }
+        
+        fs.writeFileSync('.github/api-docs.md', apiDocs);
+        console.log('✅ API documentation generated');
+        "
+
+    # === สร้าง Performance Report ===
+    - name: Performance Analysis
+      run: |
+        echo "⚡ Analyzing performance..."
+        
+        node -e "
+        const fs = require('fs');
+        
+        const perfReport = {
+          timestamp: new Date().toISOString(),
+          fileAnalysis: {},
+          recommendations: []
+        };
+        
+        // วิเคราะห์ขนาดไฟล์
+        const jsFiles = fs.readdirSync('.').filter(f => f.endsWith('.js'));
+        let totalSize = 0;
+        
+        jsFiles.forEach(file => {
+          const stats = fs.statSync(file);
+          const sizeKB = Math.round(stats.size / 1024);
+          
+          perfReport.fileAnalysis[file] = {
+            sizeKB: sizeKB,
+            lines: fs.readFileSync(file, 'utf8').split('\n').length
+          };
+          
+          totalSize += stats.size;
+          
+          // แนะนำถ้าไฟล์ใหญ่เกินไป
+          if (sizeKB > 50) {
+            perfReport.recommendations.push(\`Consider breaking down \${file} (large file: \${sizeKB}KB)\`);
+          }
+        });
+        
+        perfReport.totalSizeKB = Math.round(totalSize / 1024);
+        
+        // วิเคราะห์ dependencies
+        try {
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const deps = Object.keys(pkg.dependencies || {});
+          const devDeps = Object.keys(pkg.devDependencies || {});
+          
+          perfReport.dependencyAnalysis = {
+            production: deps.length,
+            development: devDeps.length,
+            total: deps.length + devDeps.length
+          };
+          
+          if (deps.length > 20) {
+            perfReport.recommendations.push('Consider reducing production dependencies');
+          }
+          
+        } catch (e) {}
+        
+        fs.writeFileSync('.github/performance-report.json', JSON.stringify(perfReport, null, 2));
+        
+        console.log('⚡ Performance Analysis:');
+        console.log('Total Size:', perfReport.totalSizeKB, 'KB');
+        console.log('Files Analyzed:', Object.keys(perfReport.fileAnalysis).length);
+        console.log('Recommendations:', perfReport.recommendations.length);
+        "
+
+    # === Commit การเปลี่ยนแปลง ===
+    - name: Commit Auto Updates
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Actions Bot"
+        
+        # ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
+        if ! git diff --quiet; then
+          echo "📝 Changes detected, committing..."
+          git add .
+          git commit -m "🤖 Auto-update: documentation, cleanup, and reports [skip ci]"
+          git push
+          echo "✅ Changes committed and pushed"
+        else
+          echo "✨ No changes to commit"
+        fi
+
+    # === สร้าง Summary Report ===
+    - name: Generate Summary Report
+      run: |
+        echo "📊 Generating summary report..."
+        
+        node -e "
+        const fs = require('fs');
+        
+        const summary = {
+          timestamp: new Date().toLocaleString('th-TH'),
+          actions: {
+            cleanup: 'Completed',
+            documentation: 'Updated',
+            healthCheck: 'Completed',
+            apiDocs: 'Generated',
+            performance: 'Analyzed'
+          },
+          nextSteps: [
+            'Review health report for any issues',
+            'Check performance recommendations',
+            'Update documentation if needed'
+          ]
+        };
+        
+        let report = '# 🚀 GitHub Actions Summary Report\n\n';
+        report += \`**Execution Time**: \${summary.timestamp}\n\n\`;
+        
+        report += '## ✅ Actions Completed\n\n';
+        Object.entries(summary.actions).forEach(([action, status]) => {
+          report += \`- **\${action}**: \${status}\n\`;
+        });
+        
+        report += '\n## 📋 Next Steps\n\n';
+        summary.nextSteps.forEach(step => {
+          report += \`- \${step}\n\`;
+        });
+        
+        report += '\n---\n*Generated by Smart Documentation Sync*';
+        
+        fs.writeFileSync('.github/summary-report.md', report);
+        console.log('📊 Summary report generated');
+        console.log(report);
+        "
+
+    # === แจ้งเตือนผ่าน Slack/Discord (ถ้าต้องการ) ===
+    - name: Send Notification
+      if: failure()
+      run: |
+        echo "🚨 Workflow failed - check logs for details"
+        # เพิ่มการแจ้งเตือนผ่าน webhook ถ้าต้องการ

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏰 Ashval Database Optimizer - Mobile Ready</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="shortcut icon" href="favicon.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .webhook-card {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .webhook-url {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            word-break: break-all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .webhook-url:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.02);
+        }
+        
+        .command-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .command-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .command-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .command-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .command-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .copy-status {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .copy-status.show {
+            opacity: 1;
+        }
+        
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        
+        .instructions {
+            background: linear-gradient(45deg, #FFC107, #FF9800);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 5px;
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .webhook-url {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏰 Ashval Database Optimizer</h1>
+        
+        <div class="instructions">
+            <h3>📱 วิธีใช้งานจากมือถือ/Make.com</h3>
+            <p>1. คัดลอก Webhook URL ด้านล่าง</p>
+            <p>2. ตั้งค่าใน Make.com หรือแอป HTTP Client</p>
+            <p>3. ส่งคำสั่งในรูปแบบ JSON</p>
+        </div>
+        
+        <div class="webhook-card">
+            <h3>🔗 Webhook URL</h3>
+            <div class="webhook-url" onclick="copyWebhookUrl()" id="webhook-url">
+                Loading...
+            </div>
+            <div>💡 กดเพื่อคัดลอก URL</div>
+        </div>
+        
+        <div class="command-section">
+            <h3>📝 คำสั่งที่ใช้ได้</h3>
+            
+            <div class="command-item" onclick="copyCommand(1)">
+                <div class="command-text">อัปเดตข้อมูลที่ยังไม่ครบถ้วน</div>
+                <div class="command-desc">ค้นหาและเติมข้อมูลที่ว่างเปล่าในฐานข้อมูล</div>
+            </div>
+            
+            <div class="command-item" onclick="copyCommand(2)">
+                <div class="command-text">วิเคราะห์คอลัมน์ที่ไม่จำเป็น</div>
+                <div class="command-desc">หาคอลัมน์ที่ใช้งานน้อยและไม่จำเป็น</div>
+            </div>
+            
+            <div class="command-item" onclick="copyCommand(3)">
+                <div class="command-text">ช่วยเช็คฐานข้อมูล</div>
+                <div class="command-desc">ตรวจสอบสถานะและคุณภาพของฐานข้อมูล</div>
+            </div>
+            
+            <div class="command-item" onclick="copyCommand(4)">
+                <div class="command-text">ออปติไมซ์ฐานข้อมูลทั้งหมด</div>
+                <div class="command-desc">รันการตรวจสอบและปรับปรุงครบทั้งระบบ</div>
+            </div>
+        </div>
+        
+        <div class="copy-status" id="copyStatus"></div>
+        
+        <div class="command-section">
+            <h3>📋 ตัวอย่าง JSON สำหรับ API Call</h3>
+            <div class="command-item" onclick="copyJsonExample()">
+                <div class="command-text">JSON Format</div>
+                <div class="command-desc">กดเพื่อคัดลอกตัวอย่าง JSON</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            🏰 Ashval Database Optimizer v1.0<br>
+            Smart AI Model Selection | Advanced Logging<br>
+            <br>
+            <strong>API Endpoints:</strong><br>
+            POST /api/agent/webhook/make<br>
+            POST /api/agent/database/fill-missing<br>
+            POST /api/agent/database/analyze-columns<br>
+            POST /api/agent/database/optimize
+        </div>
+    </div>
+
+    <script>
+        const commands = {
+            1: "อัปเดตข้อมูลที่ยังไม่ครบถ้วน",
+            2: "วิเคราะห์คอลัมน์ที่ไม่จำเป็น", 
+            3: "ช่วยเช็คฐานข้อมูล",
+            4: "ออปติไมซ์ฐานข้อมูลทั้งหมด"
+        };
+        
+        const webhookUrl = `${window.location.protocol}//${window.location.hostname}:3001/api/agent/webhook/make`;
+        
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('copyStatus');
+            status.textContent = message;
+            status.className = `copy-status show ${isError ? 'error' : 'success'}`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 2000);
+        }
+        
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showStatus('✅ คัดลอกสำเร็จ!');
+                }).catch(() => {
+                    showStatus('❌ ไม่สามารถคัดลอกได้', true);
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showStatus('✅ คัดลอกสำเร็จ!');
+                } catch (err) {
+                    showStatus('❌ ไม่สามารถคัดลอกได้', true);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+        
+        function copyWebhookUrl() {
+            copyToClipboard(webhookUrl);
+        }
+        
+        function copyCommand(commandId) {
+            const command = commands[commandId];
+            const jsonPayload = {
+                command: command,
+                context: {
+                    priority: "normal",
+                    type: "database_optimization",
+                    source: "mobile"
+                }
+            };
+            
+            copyToClipboard(JSON.stringify(jsonPayload, null, 2));
+        }
+        
+        function copyJsonExample() {
+            const example = {
+                command: "อัปเดตข้อมูลที่ยังไม่ครบถ้วน",
+                context: {
+                    priority: "high",
+                    type: "database_optimization",
+                    source: "make.com"
+                }
+            };
+            
+            copyToClipboard(JSON.stringify(example, null, 2));
+        }
+        
+        // เพิ่มการตอบสนองสำหรับ touch events บนมือถือ
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update webhook URL display
+            const webhookUrlElement = document.getElementById('webhook-url');
+            webhookUrlElement.textContent = webhookUrl;
+            
+            const commandItems = document.querySelectorAll('.command-item');
+            commandItems.forEach(item => {
+                item.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                item.addEventListener('touchend', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

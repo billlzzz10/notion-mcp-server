@@ -1,536 +1,457 @@
-# 🏰 Ashval Database Optimizer - Complete MCP Server Suite
+# 🏰 Notion MCP Server v3.1
 
-[![Build Status](https://github.com/billlzzz10/notion-mcp-server/workflows/CI/badge.svg)](https://github.com/billlzzz10/notion-mcp-server/actions)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Notion API](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)](https://developers.notion.com/)
-[![Gemini AI](https://img.shields.io/badge/Gemini-4285F4?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Telegram Bot](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://core.telegram.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen.svg)](https://nodejs.org/)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-blue.svg)](https://modelcontextprotocol.io/)
+[![Notion API](https://img.shields.io/badge/Notion%20API-2022--06--28-black.svg)](https://developers.notion.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)](ROADMAP-UPDATED.md)
 
-**🎯 Complete Database Optimization Suite with Smart AI Model Selection & Multi-Interface Support**  
-Comprehensive MCP Server for Notion API with automated world-building for "Ashval" fantasy universe, featuring Telegram Bot, Web Interface, Smart AI Model Router, and advanced database optimization tools with Gemini AI integration.
-
-**✨ Latest Update (January 2025):** Enhanced with Smart AI Model Selection, Advanced Gateway System, Database Optimizer, and Telegram Bot Integration!
+> **Advanced Notion MCP Server พร้อม AI Agents, Web Interface และ Gateway API**
+>
+> **โปรเจกต์ล่าสุด**: Ashval World Building System สำหรับนักเขียนและ Creative AI
+>
+> **สถานะ**: 90% เสร็จสมบูรณ์ - Phase 2 จบแล้ว | Enhanced Gateway v3.1 🚀
 
 ---
 
-## 🚀 เริ่มต้นใช้งาน
 
-### 🌟 **Ashval Chat v3.0 - Complete Integration Edition** (แนะนำ)
+
+## 🆕 ฟีเจอร์ใหม่ล่าสุด
+
+## ⚙️ **DevOps Automation**
+
+- ✅ **GitHub Actions:** Smart Sync, Dependency Management, AI Code Review, Security/Performance Monitoring และ Auto Deploy (เสร็จสมบูรณ์)
+
+*อัปเดต: 17/7/2568 06:21:46*
+
+
+## 🆕 ฟีเจอร์ใหม่ล่าสุด
+
+### 🔌 **Integration ที่พร้อมใช้**
+- ✅ **Notion API** (10 Databases)
+- ✅ **Gemini AI** (Smart Model Selection)
+- ✅ **Telegram Bot** 
+- ✅ **Make.com Webhook**
+- ✅ **Web Chat Interface** (port 3002)
+- ✅ **MCP Gateway** (port 3001)
+- ⚠️ **YouTube Analyzer** (ยังไม่ได้ทดสอบ)
+- 🚧 **TTS Integration (Google Colab)** (อยู่ระหว่างพัฒนา)
+
+*อัปเดต: 17/7/2568 06:09:47*
+
+
+## 🌟 Overview
+
+Notion MCP Server เป็นระบบ Model Context Protocol ขั้นสูงที่เชื่อมต่อ AI และ Notion API เพื่อสร้าง AI Agents ที่สามารถจัดการข้อมูลในฐานข้อมูล Notion ได้อย่างชาญฉลาด
+
+### 🎯 **Features Highlights**
+
+| ระบบ | คุณสมบัติ | สถานะ |
+|------|----------|-------|
+| 🤖 **AI Agents** | 6 Agents ที่ทำงานได้แล้ว | ✅ 90% |
+| 🗃️ **Database Management** | 10 Databases พร้อมใช้ | ✅ 95% |
+| 🔧 **Enhanced Gateway** | API v1, Rate Limiting, Error Handling | ✅ 85% |
+| 📱 **Web Interface** | React Chat App, Dashboard Viewer | ✅ 85% |
+| 🔐 **Security** | Rate Limiting, CORS, Request Logging | ✅ 70% |
+| 📊 **Performance** | 300-500% เร็วขึ้น, ประหยัด 60-80% | ✅ 85% |
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ **Installation**
 
 ```bash
-# 1. ติดตั้ง dependencies
-npm install
-
-# 2. ตั้งค่า environment variables
-cp .env.example .env
-# แก้ไข .env ใส่ API keys และ Database IDs
-
-# 3. Build MCP Server
-npm run build
-
-# 4. เริ่มใช้งาน (เลือกได้หลายวิธี)
-
-# Web Chat Interface
-npm run start-web-chat      # → http://localhost:8080
-
-# MCP Gateway 
-npm run start-gateway       # → http://localhost:3001
-
-# MCP Server (สำหรับ AI agents)
-npm start                   # → stdio MCP protocol
-```
-
----
-
-## 📁 โครงสร้างโปรเจกต์
-
-```
-notion-mcp-server/
-├── � src/                    # MCP Server source code
-│   ├── 📂 tools/             # เครื่องมือ MCP ทั้งหมด (17 ตัว)
-│   ├── 📂 server/            # MCP server configuration
-│   ├── � services/          # Notion API services
-│   └── index.ts              # MCP entry point
-├── 📂 server/                # Gateway & API server
-│   ├── � mcp-gateway/       # API gateway สำหรับ HTTP requests
-│   └── app.js                # Express server
-├── 📂 web-chat/              # Web interface
-│   ├── index.tsx             # React web chat app
-│   ├── index.html            # หน้าเว็บหลัก
-│   └── package.json          # Web dependencies
-├── 📂 docs/                  # คู่มือและเอกสาร
-│   ├── copilot-integration-guide.md
-│   ├── bot-integration-guide.md
-│   └── no-api-integration-guide.md
-├── 📂 demo/                  # ตัวอย่างการใช้งาน
-├── 📂 scripts/               # สคริปต์อรรถประโยชน์
-├── .env.example              # ตัวอย่างการตั้งค่า
-├── ASHVAL_GUIDE.md           # คู่มือโลก Ashval
-└── COMPLETION_SUMMARY.md     # สรุปความสำเร็จ
-```
-
----
-
-## 📊 สถานะเครื่องมือ MCP
-
-### ✅ Notion Base Tools (5/5 เครื่องมือ)
-
-- ✅ **notion_pages** - จัดการหน้า (สร้าง, อัปเดต, ค้นหา, เก็บถาวร)
-- ✅ **notion_blocks** - จัดการบล็อค (ดู, แก้ไข, ลบ, เพิ่ม)
-- ✅ **notion_database** - จัดการฐานข้อมูล (สร้าง, ค้นหา, อัปเดต)
-- ✅ **notion_comments** - จัดการความคิดเห็น (ดู, เพิ่ม)
-- ✅ **notion_users** - จัดการผู้ใช้ (ดูรายชื่อ, ข้อมูล)
-
-### ✅ Ashval World Building Tools (12/12 เครื่องมือ)
-
-- ✅ **ashval_version_control** - ติดตามและจัดการเวอร์ชันของข้อมูล
-- ✅ **ashval_timeline_analyzer** - วิเคราะห์ timeline และตรวจหาความขัดแย้งทางเวลา
-- ✅ **ashval_conflict_generator** - สร้างความขัดแย้งระหว่างตัวละครและสถานการณ์
-- ✅ **ashval_story_arc_analyzer** - วิเคราะห์ story arcs และความเชื่อมโยง
-- ✅ **ashval_smart_filter** - สร้าง views และ filters อัจฉริยะสำหรับฐานข้อมูล
-- ✅ **ashval_image_generator** - สร้างคำสั่งสำหรับ AI image generation
-- ✅ **ashval_consistency_checker** - ตรวจสอบความสอดคล้องของข้อมูลในโลก Ashval
-- ✅ **ashval_world_rules_query** - ค้นหาและตรวจสอบกฎของโลก Ashval
-- ✅ **ashval_advanced_prompt_generator** - สร้าง AI prompts ขั้นสูงสำหรับการเขียนเรื่อง
-- ✅ **ashval_story_structure_analyzer** - วิเคราะห์โครงสร้างเรื่องและ pacing
-- ✅ **ashval_character_dialogue_generator** - สร้างบทสนทนาระหว่างตัวละคร
-- ✅ **ashval_auto_tag_system** - ระบบป้ายกำกับอัตโนมัติสำหรับการจัดหมวดหมู่
-
-### 🟢 สถานะรวม: พร้อมใช้งาน (17/17 เครื่องมือ)
-
----
-
-## ⚡ Performance Optimization System (ใหม่!)
-
-### 🚀 เซิร์ฟเวอร์ที่เร็วขึ้น 300-500% พร้อมประหยัดค่าใช้จ่าย 60-80%
-
-ระบบปรับปรุงประสิทธิภาพขั้นสูงที่ลดเวลารอจาก 5-10 วินาที เหลือเพียง 1-2 วินาที!
-
-### 🎯 ผลการปรับปรุงที่ได้
-
-| ระบบ | การปรับปรุง | ประโยชน์ |
-|------|-------------|----------|
-| 🧠 **Smart Cache** | 100% เร็วขึ้น | ลดเวลาเข้าถึงข้อมูลซ้ำ |
-| 📦 **Batch Operations** | 53.7% เร็วขึ้น | ประมวลผลหลายรายการพร้อมกัน |
-| 🎨 **Token Optimization** | 40-60% ประหยัด | ลดค่าใช้จ่าย AI token |
-| ⚡ **Concurrent Processing** | 62.3% เร็วขึ้น | ประมวลผลแบบ parallel |
-| 🎛️ **Data Filtering** | 72.3% เร็วขึ้น | กรองข้อมูลอัจฉริยะ |
-
-### 🔧 ทดสอบประสิทธิภาพ
-
-```bash
-# ทดสอบระบบปรับปรุงประสิทธิภาพ
-npm run test:performance
-
-# ติดตามประสิทธิภาพแบบ real-time
-npm run monitor:performance
-```
-
-### 📋 คุณสมบัติหลัก
-
-- **Smart Cache System**: ระบบ cache อัจฉริยะที่จำข้อมูลและลดการโหลดซ้ำ
-- **Batch Processing**: ประมวลผลหลายรายการพร้อมกันแทนการทำทีละตัว
-- **Prompt Optimization**: ปรับปรุง AI prompts เพื่อประหยัด token สูงสุด
-- **Connection Pooling**: จัดการ API connections อย่างมีประสิทธิภาพ
-- **Memory Optimization**: ใช้ memory อย่างชาญฉลาดและลด memory leaks
-- **Performance Monitoring**: ติดตามประสิทธิภาพแบบ real-time พร้อมแจ้งเตือน
-
-### 💡 ประโยชน์ในการใช้งานจริง
-
-- ✅ **ลดเวลารอ**: จาก 5-10 วินาที → 1-2 วินาที
-- ✅ **ประหยัดค่าใช้จ่าย**: API costs ลดลง 60-80%
-- ✅ **เพิ่มความเร็ว**: ระบบเร็วขึ้น 300-500%
-- ✅ **ประหยัด Token**: AI token usage ลดลง 40-60%
-- ✅ **ใช้ทรัพยากรดี**: Memory และ CPU อย่างมีประสิทธิภาพ
-
-> 📊 **ข้อมูลจากการทดสอบ**: ระบบใหม่สามารถจัดการ requests ได้มากกว่าเดิม 5 เท่า พร้อมใช้ทรัพยากรน้อยกว่าเดิม 60%
-
-*Last updated: 2025-07-15*
-
----
-
-## 🌟 คุณสมบัติเด่น
-
-- รองรับการสร้าง/วิเคราะห์โครงสร้างเรื่อง, ตัวละคร, ฉาก, Arcana, Timeline, Conflict ฯลฯ
-- ใช้งานผ่าน Model Context Protocol (MCP) สำหรับ AI agents
-- ขยายฟีเจอร์ง่ายด้วยระบบ Tool Registration
-- เชื่อมต่อฐานข้อมูล Notion หลายตาราง (ดูรายละเอียดด้านล่าง)
-
----
-
-## 🚀 วิธีติดตั้งและใช้งาน
-
-### 1️⃣ ติดตั้งโปรเจกต์
-```bash
-git clone https://github.com/billlzzz10/notion-mcp-server.git
+# Clone repository
+git clone https://github.com/awkoy/notion-mcp-server.git
 cd notion-mcp-server
+
+# Install dependencies
 npm install
+
+# Setup environment
+cp .env.example .env
 ```
 
-### 2️⃣ สร้างฐานข้อมูลใน Notion
-
-คุณต้องสร้างฐานข้อมูลใน Notion ให้ครบถ้วนตามรายการด้านล่าง (ดูตัวอย่าง properties ในไฟล์ `.env.example`)
-
-#### 🗄️ รายการฐานข้อมูลที่ต้องมี (ภาษาไทย)
-
-**1. ฐานข้อมูลตัวละคร (Characters)**
-  - Name (Title)
-  - Role (Select): Protagonist, Antagonist, Supporting, Minor
-  - Arc Status (Select): Not Started, Developing, Complete
-  - Screen Time (Select): Major, Medium, Minor
-  - Goal (Rich Text)
-  - Personality (Rich Text)
-
-**2. ฐานข้อมูลฉาก (Scenes)**
-  - Title (Title)
-  - Chapter (Number)
-  - Order (Number)
-  - Summary (Rich Text)
-  - Purpose (Rich Text)
-  - Conflict (Rich Text)
-  - Tone (Select): มืดมัว, น่ากลัว, หวังใจ, ฯลฯ
-  - Emotional Arc (Select)
-  - Pacing (Select)
-  - Characters in Scene (Relation)
-
-**3. ฐานข้อมูลสถานที่ (Locations)**
-  - Name (Title)
-  - Description (Rich Text)
-  - Type (Select)
-
-**4. ฐานข้อมูลโลก (Worlds)**
-  - Name (Title)
-  - Description (Rich Text)
-
-**5. ฐานข้อมูลระบบพลัง (Power Systems)**
-  - Name (Title)
-  - Type (Select): Etheria, Umbra
-  - Description (Rich Text)
-
-**6. ฐานข้อมูล Arcana (Arcanas)**
-  - Name (Title)
-  - Description (Rich Text)
-
-**7. ฐานข้อมูลภารกิจ (Missions)**
-  - Name (Title)
-  - Status (Select)
-  - Description (Rich Text)
-
-**8. ฐานข้อมูล AI Prompts (AI Prompts)**
-  - Prompt (Rich Text)
-  - Type (Select)
-
-**9. ฐานข้อมูลประวัติการเปลี่ยนแปลง (Version History)**
-  - Title (Title)
-  - Entity Type (Select)
-  - Change Type (Select)
-  - New Value (Rich Text)
-  - Reason (Rich Text)
-  - AI Generated (Checkbox)
-
-**10. ฐานข้อมูลเส้นเวลาเรื่อง (Story Timeline)**
-  - Title (Title)
-  - Description (Rich Text)
-
-**11. ฐานข้อมูล Story Arcs (Story Arcs)**
-  - Arc Name (Title)
-  - Arc Type (Select)
-  - Theme (Select)
-  - Central Conflict (Rich Text)
-
-**12. ฐานข้อมูลกฎของโลก (World Rules)**
-  - Rule (Title)
-  - Description (Rich Text)
-
----
-
-### 3️⃣ ตั้งค่า Environment Variables
-
-คัดลอกไฟล์ `.env.example` เป็น `.env` แล้วกรอกข้อมูลจริง:
+### 2️⃣ **Environment Configuration**
 
 ```env
+# Notion Configuration
 NOTION_TOKEN=your_notion_integration_token
-NOTION_PAGE_ID=your_root_page_id
 NOTION_CHARACTERS_DB_ID=your_characters_database_id
 NOTION_SCENES_DB_ID=your_scenes_database_id
 NOTION_LOCATIONS_DB_ID=your_locations_database_id
-NOTION_WORLDS_DB_ID=your_worlds_database_id
-NOTION_POWER_SYSTEMS_DB_ID=your_power_systems_database_id
-NOTION_ARCANAS_DB_ID=your_arcanas_database_id
-NOTION_MISSIONS_DB_ID=your_missions_database_id
-NOTION_AI_PROMPTS_DB_ID=your_ai_prompts_database_id
-NOTION_VERSION_HISTORY_DB_ID=your_version_history_database_id
-NOTION_STORY_TIMELINE_DB_ID=your_story_timeline_database_id
-NOTION_STORY_ARCS_DB_ID=your_story_arcs_database_id
-NOTION_WORLD_RULES_DB_ID=your_world_rules_database_id
+
+# AI Configuration  
+GEMINI_API_KEY=your_gemini_api_key
+
+# Server Configuration
+PORT=3001
+WEB_PORT=3002
 ```
 
-**วิธีหา Database ID:**
-1. เปิดฐานข้อมูลใน Notion
-2. ดู URL เช่น `https://notion.so/workspace/12345678123456781234567812345678?v=...`
-3. ใช้เลข 32 หลักหลัง workspace เป็น Database ID
-
-**วิธีหา Integration Token:**
-1. ไปที่ [Notion Developers](https://developers.notion.com/)
-2. สร้าง Integration ใหม่และคัดลอก Token
-
----
-
-### 4️⃣ รันเซิร์ฟเวอร์
+### 3️⃣ **Start Services**
 
 ```bash
-npm run build
+# Start MCP Server
 npm start
-```
 
-หรือสำหรับโหมดพัฒนา:
-```bash
-npm run watch
-```
-
-### 5️⃣ ตั้งค่า Auto-update (ทางเลือก)
-
-สำหรับการอัปเดตสถานะ README อัตโนมัติ:
-
-```bash
-# ตั้งค่า git hooks เพื่ออัปเดต README ก่อน commit
-npm run setup-hooks
-
-# หรือทำการอัปเดตด้วยตนเอง
-npm run status
-```
-
----
-
-## 🆕 **ฟีเจอร์ใหม่ล่าสุด (มกราคม 2025)**
-
-### 🧠 **Smart AI Model Selection**
-- **Gemini Flash 2.5** สำหรับงานเบา (คำถามสั้น, การแชททั่วไป)
-- **Gemini Pro 2.5** สำหรับงานหนัก (การวิเคราะห์, รายงานซับซ้อน)
-- ระบบประเมินความซับซ้อนอัตโนมัติ
-
-### 🤖 **Telegram Bot Integration**
-```bash
-# รัน Telegram Bot
-node ashval-bot.js
-```
-- 💬 Chat กับ AI แบบ Smart Model Selection
-- 🗃️ อัปเดตฐานข้อมูล Notion ผ่าน Bot
-- 📊 วิเคราะห์และออปติไมซ์ข้อมูล
-- 📱 ใช้งานง่ายบนมือถือ
-
-### 🔧 **Database Optimizer Tools**
-- **Find Missing Data:** ค้นหาและเติมข้อมูลที่ยังไม่ครบถ้วน
-- **Analyze Columns:** วิเคราะห์คอลัมน์ที่ไม่จำเป็น
-- **Auto Optimization:** ปรับปรุงฐานข้อมูลอัตโนมัติ
-
-### 🌐 **Enhanced Gateway System**
-- **Advanced Logging:** บันทึกทุก transaction
-- **Security Manager:** ระบบป้องกันและตรวจสอบ
-- **Rate Limiter:** จำกัดอัตราการใช้งาน
-- **Make.com Integration:** รองรับ webhook
-
-### 📱 **Mobile-Ready Interface**
-- **Mobile HTML Interface:** ใช้งานบนมือถือได้ทันที
-- **Copy-to-Clipboard:** คัดลอกคำสั่งง่ายๆ
-- **Touch Optimized:** ออกแบบสำหรับหน้าจอสัมผัส
-
----
-
-## 🗂️ โครงสร้างโปรเจกต์
-
-```plaintext
-notion-mcp-server/
-├── src/
-│   ├── tools/                # MCP tools ทั้งหมด (Notion + Ashval)
-│   ├── schema/               # Zod schemas สำหรับ validation
-│   ├── services/             # Notion API integration
-│   ├── utils/                # ฟังก์ชันช่วยเหลือ
-│   ├── config/               # ค่าคงที่และ config
-│   └── index.ts              # Entry point
-├── .env                      # ตัวแปรสภาพแวดล้อม
-├── .env.example              # ตัวอย่างไฟล์ env
-├── package.json              # ข้อมูลแพ็คเกจและสคริปต์
-├── README.md                 # เอกสารโปรเจกต์
-└── .github/
-    └── copilot-instructions.md # กฎสำหรับ AI agent
-```
-
----
-
-## 🛠️ ฟีเจอร์หลักของ MCP Tools
-
-- วิเคราะห์โครงสร้างเรื่อง, pacing, character arcs, conflicts, timeline ฯลฯ
-- สร้าง/แก้ไข/ลบข้อมูลใน Notion ผ่าน API
-- รองรับ batch operations และการเชื่อมโยงข้อมูลข้ามฐานข้อมูล
-- สร้าง AI prompts สำหรับ world-building
-- บันทึกประวัติการเปลี่ยนแปลงอัตโนมัติ
-
----
-
-## ✨ **Features ใหม่ล่าสุด v3.0:**
-
-### 🌐 Web Chat Interface
-- **Auto-Schema Detection** - ตรวจจับโครงสร้างฐานข้อมูลอัตโนมัติ
-- **Dynamic Properties** - ปรับเครื่องมือตาม schema ที่ตรวจพบ
-- **File Upload Support** - รองรับไฟล์หลายประเภท (รูปภาพ, PDF, text)
-- **Real-time Chat** - สนทนากับ Gemini AI แบบ real-time
-- **Responsive Design** - รองรับทุกอุปกรณ์
-
-### 🔧 MCP Gateway
-- **HTTP API Endpoints** - เรียกใช้ MCP tools ผ่าน REST API
-- **Schema Cache** - เก็บ schema ใน memory เพื่อประสิทธิภาพ
-- **Error Handling** - จัดการข้อผิดพลาดอย่างชาญฉลาด
-- **Webhook Ready** - พร้อมรับ webhooks จาก Notion
-
-### 🤖 GitHub Copilot Integration
-- **VS Code Extension Ready** - ใช้งานผ่าน GitHub Copilot
-- **Natural Language** - สั่งงานด้วยภาษาธรรมดา
-- **Code Generation** - สร้างโค้ดด้วย AI
-- **Documentation** - คู่มือครบถ้วนใน `docs/`
-
----
-
-## 🗺️ Roadmap & Development Plan
-
-### Phase 1: Core System Enhancement (Current - Complete ✅)
-- ✅ **Smart Data Enhancement Agent** - AI-powered project analysis
-- ✅ **Auto Update Agent with Forecast** - Automated project updates
-- ✅ **Subtasks & Reports Management** - Complete task lifecycle
-- ✅ **Workspace Manager** - End-to-end project creation
-- ✅ **Multi-database Integration** - 7 connected databases
-- ✅ **Make.com Webhook Integration** - External notifications
-
-### Phase 2: Analytics & Intelligence (In Progress 🔄)
-- 🔄 **Dashboard/Analytics Module** - Project status summary, trend graphs, user behavior analytics
-- 🔄 **AI Recommendation Engine** - Smart task prioritization based on user patterns
-- 🔄 **Calendar Integration** - Google Calendar/Outlook sync for due dates
-- 🔄 **Feedback Loop System** - User correction system for AI-generated content
-
-### Phase 3: Visualization & Architecture (Planned 📋)
-- 📋 **Diagram Generator** - Auto-generate flow/architecture diagrams from Notion data
-- 📋 **Interactive Project Timeline** - Visual project progress tracking
-- 📋 **Dependency Mapping** - Automatic task relationship visualization
-- 📋 **Resource Allocation Charts** - Team workload distribution
-
-### Phase 4: Infrastructure & Performance (Future 🔮)
-- 🔮 **Node.js Express Migration** - Replace Azure Functions with custom Express server
-- 🔮 **Redis/RabbitMQ Integration** - Enhanced queue management
-- 🔮 **Multi-tenant Architecture** - Support multiple organizations
-- 🔮 **Real-time Collaboration** - WebSocket-based live updates
-
-### Phase 5: AI & Language Models (Long-term 🧠)
-- 🧠 **Thai Novel Writing AI** - Fine-tuned model for creative writing
-- 🧠 **Domain-Specific Models** - Task-specific AI training
-- 🧠 **Hugging Face Integration** - Local/cloud hybrid AI deployment
-- 🧠 **Custom Model Training Pipeline** - Automated model improvement
-
-### Phase 6: Advanced Features (Vision 🌟)
-- 🌟 **Voice Interface** - Speech-to-text task creation
-- 🌟 **Mobile App** - React Native companion app
-- 🌟 **API Marketplace** - Third-party integrations
-- 🌟 **Enterprise Features** - Advanced security, audit logs, compliance
-
----
-
-## 🤖 AI Model Recommendations
-
-### For Current Cloud Usage:
-- **Text Analysis**: Google Gemini 1.5 Flash (cost-effective)
-- **Creative Writing**: Claude 3.5 Sonnet (high quality)
-- **Code Generation**: GPT-4 Turbo (technical tasks)
-
-### For Future Hugging Face Integration:
-- **Thai Language**: `airesearch/wangchanberta-base-att-spm-uncased`
-- **Creative Writing**: `microsoft/DialoGPT-medium` (fine-tunable)
-- **Task Processing**: `facebook/bart-large-cnn` (summarization)
-- **Code Understanding**: `microsoft/codebert-base`
-
-### Custom Model Training Strategy:
-1. **Phase 1**: Collect Thai novel corpus and writing patterns
-2. **Phase 2**: Fine-tune existing models (BART, T5) for creative writing
-3. **Phase 3**: Train domain-specific embedding models
-4. **Phase 4**: Deploy hybrid cloud/local inference system
-
----
-
-## ⚡ Performance Optimization
-
-### 🚀 Speed Improvements Implemented
-
-**ผลการทดสอบประสิทธิภาพ (Performance Test Results):**
-
-- ✅ **Smart Cache System**: เร็วขึ้น **100%** - ลดเวลาการเข้าถึงข้อมูลซ้ำ
-- ✅ **Batch Operations**: เร็วขึ้น **53.7%** - ประมวลผลหลายรายการพร้อมกัน
-- ✅ **Token Optimization**: ประหยัด **40-60%** - ลดการใช้ AI tokens
-- ✅ **Concurrent Processing**: เร็วขึ้น **62.3%** - ประมวลผลแบบ parallel
-- ✅ **Data Filtering**: เร็วขึ้น **72.3%** - กรองข้อมูลอัจฉริยะ
-
-### 💰 Real-world Benefits
-
-- 🕐 **User Experience**: ลดเวลารอจาก 5-10 วินาที เหลือ 1-2 วินาที
-- 💰 **Cost Savings**: ประหยัดค่าใช้จ่าย API 60-80%
-- 📈 **Throughput**: เพิ่มความเร็วในการประมวลผล 300-500%
-- 🧠 **AI Efficiency**: ลดการใช้ AI token 40-60%
-- ⚙️ **Resources**: ใช้ memory และ CPU อย่างมีประสิทธิภาพ
-
-### 🔧 Performance Features
-
-1. **Smart Caching System** - เก็บข้อมูลที่เข้าถึงบ่อยไว้ใน cache
-2. **Batch Processing** - ประมวลผลหลายรายการพร้อมกัน
-3. **Prompt Optimization** - ปรับปรุง AI prompts เพื่อประหยัด token
-4. **Connection Pooling** - จัดการ API connections อย่างมีประสิทธิภาพ
-5. **Concurrent Operations** - ประมวลผลแบบ parallel พร้อม rate limiting
-6. **Data Filtering** - กรองข้อมูลก่อนประมวลผลเพื่อลดโหลด
-
-### 🧪 Testing Performance
-
-```bash
-# ทดสอบประสิทธิภาพระบบ
-node performance-demo.js
-
-# ผลที่ได้:
-# Smart Cache: 100% เร็วขึ้น
-# Batch Operations: 53.7% เร็วขึ้น  
-# Token Optimization: 40-60% ประหยัด
-# Concurrent Processing: 62.3% เร็วขึ้น
-# Data Filtering: 72.3% เร็วขึ้น
-```
-
----
-
-## 🗂️ การทดสอบเครื่องมือ
-
-```bash
-# ทดสอบการเชื่อมต่อและ schema
-node test-tools.js
-
-# ทดสอบการสร้างงานใหม่
-node create-test-task.js
-
-# ทดสอบ MCP Gateway
+# Start Enhanced Gateway (API Server)
 npm run start-gateway
-curl http://localhost:3001/api/schema/YOUR_DB_ID
+
+# Start Web Chat Interface
+cd web-chat && npm run dev
+```
+
+### 🌐 **Access Points**
+- **Enhanced Gateway API**: http://localhost:3001/api/v1
+- **Web Chat Interface**: http://localhost:3002  
+- **Health Check**: http://localhost:3001/health
+
+---
+
+## 🏗️ Architecture
+
+```
+notion-mcp-server/
+├── 📂 src/                   # MCP Server Core
+│   ├── 📂 tools/             # 17 MCP Tools
+│   ├── 📂 services/          # Notion API Services
+│   ├── 📂 server/            # MCP Configuration
+│   └── index.ts              # MCP Entry Point
+├── 📂 server/                # Enhanced Gateway v3.1
+│   ├── 📂 mcp-gateway/       # HTTP API Gateway
+│   └── app.js                # Express Server + Rate Limiting
+├── 📂 web-chat/              # Web Interface v2.1
+│   ├── index.tsx             # React Chat App
+│   ├── index.html            # Web Dashboard
+│   └── package.json          # Frontend Dependencies
+├── 📂 docs/                  # Documentation
+│   ├── FRONTEND-API-GUIDE.md # API Guide for External Teams
+│   ├── copilot-integration-guide.md
+│   └── bot-integration-guide.md
+├── 📂 demo/                  # Integration Examples
+├── 📂 scripts/               # Utility Scripts
+├── ASHVAL_GUIDE.md           # World Building Guide
+├── ROADMAP-UPDATED.md        # Development Roadmap
+└── .env.example              # Environment Template
 ```
 
 ---
 
-## 🩺 การแก้ไขปัญหา
+## 🛠️ **Enhanced Gateway v3.1** 
 
-- ตรวจสอบ token และ database ID ใน `.env` ว่าถูกต้อง
-- เช็คสถานะบริการภายนอก (Notion API, Line API)
-- ดู log ข้อผิดพลาดในคอนโซล
+### 🚀 **New Features**
+
+- ✅ **API Versioning**: `/api/v1/*` with backward compatibility
+- ✅ **Rate Limiting**: 100 req/15min (general), 50 req/15min (AI endpoints)
+- ✅ **Enhanced Health Check**: Memory, uptime, services status
+- ✅ **Request Logging**: Timestamp + IP tracking
+- ✅ **Global Error Handler**: 500, 404 with detailed responses
+- ✅ **Enhanced CORS**: Security headers included
+
+### 📡 **API Endpoints**
+
+| Endpoint | Method | Description | Rate Limit |
+|----------|--------|-------------|------------|
+| `/api/v1/health` | GET | Enhanced system health | 100/15min |
+| `/api/v1/agent/*` | POST | AI Agent endpoints | 50/15min |
+| `/api/v1/notion/*` | GET/POST | Notion operations | 100/15min |
+| `/api/v1/tools/*` | POST | MCP Tools access | 100/15min |
+
+### 📋 **Health Check Response**
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-01-17T10:30:00.000Z",
+  "uptime": 86400,
+  "memory": {
+    "used": "45.2 MB",
+    "total": "512 MB",
+    "percentage": 8.8
+  },
+  "services": {
+    "mcp": "connected",
+    "notion": "connected",
+    "gemini": "connected"
+  }
+}
+```
 
 ---
 
-## 🤝 การร่วมพัฒนา
+## 🤖 AI Agents System
 
-- Pull requests และ issue ใหม่ๆ ยินดีต้อนรับ!
-- โปรดอ่านและปฏิบัติตามแนวทาง contribution ของโปรเจกต์
+### 🎯 **Available Agents (6/6)**
+
+| Agent | Purpose | Database | Status |
+|-------|---------|----------|--------|
+| **Data Quality** | ตรวจสอบคุณภาพข้อมูล | All | ✅ Ready |
+| **Forecast** | พยากรณ์และวิเคราะห์แนวโน้ม | Projects, Tasks | ✅ Ready |
+| **Planner** | จัดการแผนงานและไทม์ไลน์ | Projects, Timeline | ✅ Ready |
+| **Decision Engine** | ตัดสินใจและเลือก AI Model | All | ✅ Ready |
+| **Reports** | สร้างรายงานอัตโนมัติ | All | ✅ Ready |
+| **Workspace Manager** | จัดการพื้นที่ทำงาน | All | ✅ Ready |
+
+### 🔧 **Agent Usage**
+
+```bash
+# Call specific agent
+curl -X POST http://localhost:3001/api/v1/agent/data-quality \
+  -H "Content-Type: application/json" \
+  -d '{"database": "characters", "check_type": "consistency"}'
+
+# Get agent status
+curl http://localhost:3001/api/v1/agent/status
+```
 
 ---
 
-## 📄 License
+## 📱 **Web Chat Interface v2.1**
 
-MIT
+### ✨ **Perfect UX Edition Features**
+
+- ✅ **Auto-load API Keys**: จาก .env ไม่ต้องกรอกทุกครั้ง
+- ✅ **Sidebar Toggle**: ปุ่มเบอร์เกอร์ (☰) ซ่อน/แสดง sidebar
+- ✅ **Responsive Design**: ใช้งานได้ทุกหน้าจอ
+- ✅ **File Support**: รองรับไฟล์ถึง 10MB (Text, Image, PDF, etc.)
+- ✅ **Chat Sharing & Export**: แชร์และส่งออกการสนทนา
+- ✅ **MCP Integration**: บันทึกคำตอบเข้า Notion Database
+
+### 📱 **Responsive Mobile Support**
+
+```html
+<!-- Mobile-ready interface included -->
+<file>mobile-ready.html</file>
+```
+
+---
+
+## 🗃️ **Notion Database Schema**
+
+### **Required Databases (10)**
+
+| Database | Purpose | Key Properties |
+|----------|---------|---------------|
+| **Characters** | ตัวละครในเรื่อง | Name, Role, Arc Status, Description |
+| **Scenes** | ฉากและเหตุการณ์ | Title, Summary, Characters, Location |
+| **Locations** | สถานที่ | Name, Description, Type, World |
+| **Worlds** | โลกและมิติ | Name, Description, Rules |
+| **Power Systems** | ระบบพลัง | Name, Description, Mechanics |
+| **Arcanas** | ระบบอาร์คานา | Name, Type, Description |
+| **Projects** | โครงการ | Title, Status, Priority, Timeline |
+| **Tasks** | งานย่อย | Title, Project, Status, Assignee |
+| **Notes** | บันทึกเพิ่มเติม | Title, Content, Tags |
+| **Timeline** | เหตุการณ์ตามเวลา | Event, Date, Characters, Impact |
+
+### 🔗 **Database Relations**
+
+```
+Characters ↔ Scenes ↔ Locations
+     ↓         ↓         ↓
+   Worlds ← Power Systems → Arcanas
+     ↓
+  Timeline → Projects → Tasks → Notes
+```
+
+---
+
+## ⚡ **Performance Optimization** 
+
+### 🚀 **300-500% Performance Boost**
+
+| System | Improvement | Benefit |
+|--------|-------------|---------|
+| 🧠 **Smart Cache** | 100% faster | Reduce duplicate data access |
+| 📦 **Batch Operations** | 53.7% faster | Process multiple items together |
+| 🎨 **Token Optimization** | 40-60% savings | Reduce AI costs |
+| ⚡ **Concurrent Processing** | 62.3% faster | Parallel processing |
+| 🎛️ **Data Filtering** | 72.3% faster | Smart data filtering |
+
+### 💡 **Real-world Benefits**
+
+- ✅ **Response Time**: 5-10 seconds → 1-2 seconds
+- ✅ **Cost Savings**: API costs reduced by 60-80%
+- ✅ **Speed Increase**: 300-500% faster overall
+- ✅ **Token Efficiency**: 40-60% reduction in AI tokens
+- ✅ **Resource Usage**: Memory and CPU optimized
+
+---
+
+## 🔌 **Integration Support**
+
+### ✅ **Active Integrations**
+
+- **Notion API** (10 Databases)
+- **Gemini AI** (Smart Model Selection)
+- **Telegram Bot** 
+- **Make.com Webhook**
+- **Web Chat Interface** (port 3002)
+- **MCP Gateway** (port 3001)
+
+### ⚠️ **Testing Required**
+
+- **YouTube Analyzer** (ยังไม่ได้ทดสอบ)
+- **TTS Integration** (อยู่ระหว่างพัฒนา)
+
+---
+
+## 📋 MCP Tools Reference
+
+### ✅ **Notion Base Tools (5/5)**
+
+| Tool | Purpose | Parameters |
+|------|---------|------------|
+| `notion_pages` | Page management | create, update, search, archive |
+| `notion_blocks` | Block operations | view, edit, delete, append |
+| `notion_database` | Database operations | create, query, update |
+| `notion_comments` | Comment management | view, add |
+| `notion_users` | User management | list, info |
+
+### ✅ **Ashval World Building Tools (12/12)**
+
+| Tool | Purpose | Use Case |
+|------|---------|----------|
+| `ashval_version_control` | Version tracking | Data consistency |
+| `ashval_timeline_analyzer` | Timeline analysis | Plot consistency |
+| `ashval_conflict_generator` | Conflict creation | Story development |
+| `ashval_story_arc_analyzer` | Arc analysis | Structure validation |
+| `ashval_smart_filter` | Smart filtering | Data organization |
+| `ashval_image_generator` | Image prompts | Visual content |
+| `ashval_consistency_checker` | Data validation | Quality assurance |
+| `ashval_world_rules_query` | Rules management | World consistency |
+| `ashval_advanced_prompt_generator` | AI prompts | Content generation |
+| `ashval_story_structure_analyzer` | Structure analysis | Pacing optimization |
+| `ashval_character_dialogue_generator` | Dialogue creation | Character development |
+| `ashval_auto_tag_system` | Auto-tagging | Content organization |
+
+---
+
+## 🧪 **Testing & Development**
+
+### 🔍 **Available Tests**
+
+```bash
+# Performance testing
+npm run test:performance
+
+# Performance monitoring
+npm run monitor:performance
+
+# Notion API testing
+npm run test:notion
+
+# Integration testing
+npm run test:integration
+```
+
+### 🛠️ **Development Scripts**
+
+```bash
+# Start development mode
+npm run dev
+
+# Start gateway only
+npm run start-gateway
+
+# Build for production
+npm run build
+
+# Run linting
+npm run lint
+```
+
+---
+
+## 📈 **Project Status & Roadmap**
+
+### ✅ **Phase 2 Complete (90%)**
+
+- [x] Enhanced Gateway v3.1 with rate limiting and versioning
+- [x] 6 AI Agents fully operational  
+- [x] Web Chat Interface v2.1 with perfect UX
+- [x] Performance optimization system (300-500% faster)
+- [x] Comprehensive documentation and API guide
+- [x] Production-ready security features
+
+### 🎯 **Phase 3 Planning (10% remaining)**
+
+- [ ] Advanced monitoring and analytics
+- [ ] Marketplace integration
+- [ ] Workflow designer
+- [ ] Advanced authentication system
+- [ ] Multi-tenant support
+
+> 📊 **Success Metrics**: 17/17 MCP Tools working, 6/6 AI Agents operational, 300-500% performance improvement, 60-80% cost reduction
+
+---
+
+## 🤝 **For External Teams**
+
+### 📖 **API Documentation**
+
+See [FRONTEND-API-GUIDE.md](docs/FRONTEND-API-GUIDE.md) for complete API documentation including:
+
+- API endpoints and authentication
+- Style guide with CSS variables  
+- Integration examples
+- Error handling patterns
+
+### 🎨 **Style Guide**
+
+```css
+:root {
+  --primary: #6366f1;
+  --secondary: #8b5cf6;
+  --accent: #06b6d4;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  
+  /* Thai Font Support */
+  --font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+```
+
+---
+
+## 📄 **License & Contributing**
+
+- **License**: MIT License - see [LICENSE](LICENSE) file
+- **Contributing**: PRs welcome! Please read contributing guidelines
+- **Issues**: Report bugs via GitHub Issues
+- **Documentation**: Comprehensive docs in `/docs` folder
+
+---
+
+## 🆘 **Support & Resources**
+
+### 📚 **Documentation**
+
+- [Ashval World Guide](ASHVAL_GUIDE.md) - Complete world building reference
+- [Copilot Integration](docs/copilot-integration-guide.md) - GitHub Copilot setup
+- [Bot Integration](docs/bot-integration-guide.md) - Telegram bot configuration  
+- [Frontend API Guide](docs/FRONTEND-API-GUIDE.md) - API documentation for developers
+
+### 🔗 **Quick Links**
+
+- [Live Demo](demo/) - Integration examples
+- [Roadmap](ROADMAP-UPDATED.md) - Development progress
+- [Change Log](COMPLETION_SUMMARY.md) - Recent updates
+- [Performance Report](PERFORMANCE-INTEGRATION-REPORT.md) - Optimization details
+
+---
+
+**Last Updated**: January 17, 2025  
+**Version**: v3.1 Enhanced Gateway Edition  
+**Maintainer**: [@awkoy](https://github.com/awkoy)
+
+---
+
+*🏰 Built for Ashval World Building Project - Where creativity meets AI technology*
