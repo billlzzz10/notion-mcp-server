@@ -1,4 +1,17 @@
-name: CI
+- name: Fix detached HEAD (checkout branch)
+  run: |
+    git fetch origin $GITHUB_REF_NAME
+    git checkout $GITHUB_REF_NAME
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+
+- name: Commit and push changes
+  run: |
+    git add .
+    git commit -m "🤖 Auto-update: documentation, cleanup, and reports [skip ci]" || exit 0
+    git push origin $GITHUB_REF_NAME
+
+- name: CI
 
 on:
   push:
