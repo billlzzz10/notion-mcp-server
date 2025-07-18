@@ -6,7 +6,7 @@
     "notion-mcp-server": "build/index.js"
   },
   "scripts": {
-    "build": "tsc && shx chmod +x build/*.js",
+    "build": "tsc",
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id",
@@ -66,9 +66,11 @@
     "build"
   ],
   "dependencies": {
+    "@google-cloud/text-to-speech": "^6.2.0",
     "@google/generative-ai": "^0.21.0",
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@notionhq/client": "^2.3.0",
+    "axios": "^1.10.0",
     "dotenv": "^17.2.0",
     "express": "^4.18.2",
     "express-rate-limit": "^8.0.0",

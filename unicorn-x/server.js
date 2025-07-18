@@ -241,13 +241,11 @@ async function countAllPages(notion) {
       filter: {
         property: 'object',
         value: 'page'
-      },
-      page_size: 100
+      }
     });
 
     return {
       databasePages: {
-        byDatabase: results,
         total: totalPages,
         databaseCount: totalDatabases
       },
@@ -262,7 +260,6 @@ async function countAllPages(notion) {
       recentPages: recentPages.slice(0, 10),
       lastUpdated: new Date().toISOString()
     };
-
   } catch (error) {
     console.error('Error counting pages:', error);
     return {
@@ -437,27 +434,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export default app;
-
-/**
- * Environment Variables
- */
-
-/# Notion API
-NOTION_TOKEN=your_notion_token
-
-# 10 ฐานข้อมูลหลัก
-NOTION_PROJECTS_DB_ID=your_projects_db_id
-NOTION_TASKS_DB_ID=your_tasks_db_id
-NOTION_CHARACTERS_DB_ID=your_characters_db_id
-NOTION_SCENES_DB_ID=your_scenes_db_id
-NOTION_LOCATIONS_DB_ID=your_locations_db_id
-NOTION_ITEMS_DB_ID=your_items_db_id
-NOTION_ORGANIZATIONS_DB_ID=your_organizations_db_id
-NOTION_EVENTS_DB_ID=your_events_db_id
-NOTION_RELATIONSHIPS_DB_ID=your_relationships_db_id
-NOTION_AI_PROMPTS_DB_ID=your_ai_prompts_db_id
-
-# Google Drive
-GDRIVE_CREDENTIALS=your_service_account_json
-GDRIVE_FOLDER_ID=your_folder_id
-*/
+    type: 'page'
+  

@@ -32,6 +32,6 @@ export async function checkAllNotionDatabases() {
 }
 
 // เรียกใช้ฟังก์ชันถ้ารันไฟล์นี้โดยตรง
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === new URL(import.meta.url).pathname) {
   checkAllNotionDatabases().catch(console.error);
 }
