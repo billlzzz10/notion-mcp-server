@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-18T14:48:18.830Z",
+  "timestamp": "2025-07-18T15:14:42.635Z",
   "fileAnalysis": {
     "ashval-bot.js": {
       "sizeKB": 10,
@@ -56,17 +56,13 @@
     "version-manager.js": {
       "sizeKB": 7,
       "lines": 237
-    },
-    "webhook-test-server.js": {
-      "sizeKB": 0,
-      "lines": 1
     }
   },
   "recommendations": [],
   "totalSizeKB": 124,
   "dependencyAnalysis": {
-    "production": 11,
+    "production": 13,
     "development": 4,
-    "total": 15
+    "total": 17
   }
 }

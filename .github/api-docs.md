@@ -1,6 +1,6 @@
 # 📖 Auto-Generated API Documentation
 
-Generated: 18/7/2568 14:48:18
+Generated: 18/7/2568 15:14:42
 
 ## 🌐 API Endpoints
 
@@ -50,7 +50,7 @@ Generated: 18/7/2568 14:48:18
 
 ## ⚡ Available Scripts
 
-- **build**: `tsc && shx chmod +x build/*.js`
+- **build**: `tsc`
 - **prepare**: `npm run build`
 - **watch**: `tsc --watch`
 - **inspector**: `npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id`
@@ -69,6 +69,7 @@ Generated: 18/7/2568 14:48:18
 - **demo**: `node demo/integration-demo.js`
 - **start-gateway**: `node server/app.js`
 - **test**: `echo "No tests available" && exit 0`
+- **unicorn**: `node unicorn-x/server-working.cjs`
 - **security-scan**: `npm audit --audit-level moderate`
 - **performance-test**: `echo "Running performance tests..." && node -e "console.log('Performance test completed')"`
 - **deploy:staging**: `echo "Deploying to staging..."`
@@ -84,5 +85,9 @@ Generated: 18/7/2568 14:48:18
 - **version:check**: `node scripts/version-manager.js check`
 - **notion:pull**: `node scripts/pull-from-notion.js`
 - **notion:push**: `node scripts/push-to-notion.js`
+- **gdrive:upload**: `node scripts/upload-to-drive.js`
+- **gdrive:test**: `node scripts/test-gdrive.js`
+- **backup:notion**: `npm run notion:pull && npm run gdrive:upload`
+- **backup:test**: `echo "Testing backup process..." && npm run gdrive:test`
 - **docs:update**: `echo "Updating documentation versions..." && node -e "console.log('Documentation updated')"`
 
