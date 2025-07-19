@@ -30,4 +30,5 @@
 Phase 4 (DevOps Automation) เสร็จสมบูรณ์แล้ว (17/7/2568).  Phase 3 (TTS Integration) เริ่ม 24 กรกฎาคม 2568 - 7 สิงหาคม 2568.  Phase 2.9 (Final Cleanup) ควรเสร็จสิ้นก่อนเริ่ม Phase 3
 
 ---
-*รายงานนี้สร้างโดย Auto Update Roadmap System*
+
+## รายงานนี้สร้างโดย Auto Update Roadmap System

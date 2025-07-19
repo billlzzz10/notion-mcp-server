@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Ashval Story Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; 
+            transition: all 0.2s ease;
+        }
+        .card {
+            @apply rounded-lg border bg-white text-gray-900 shadow-sm;
+        }
+        .dark .card {
+            @apply bg-gray-800 text-white border-gray-700;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .stats-card {
+            @apply bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow;
+        }
+        .dark .stats-card {
+            @apply bg-gray-800 border-gray-700;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                📖 Ashval Story Dashboard
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300">
+                ศูนย์ควบคุมการเขียนนวนิยาย Ashval - ระบบจัดการเนื้อหาแบบ AI-Powered
+            </p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card">
+                <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <h3 class="text-sm font-medium">ตัวละคร</h3>
+                    <i data-lucide="users" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="text-2xl font-bold">42</div>
+                <p class="text-xs text-gray-500">+2 ใหม่ในสัปดาห์นี้</p>
+            </div>
+
+            <div class="stats-card">
+                <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <h3 class="text-sm font-medium">ฉาก</h3>
+                    <i data-lucide="book-open" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="text-2xl font-bold">128</div>
+                <p class="text-xs text-gray-500">+12 ใหม่ในสัปดาห์นี้</p>
+            </div>
+
+            <div class="stats-card">
+                <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <h3 class="text-sm font-medium">สถานที่</h3>
+                    <i data-lucide="map-pin" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="text-2xl font-bold">36</div>
+                <p class="text-xs text-gray-500">+5 ใหม่ในสัปดาห์นี้</p>
+            </div>
+
+            <div class="stats-card">
+                <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <h3 class="text-sm font-medium">จำนวนคำ</h3>
+                    <i data-lucide="bar-chart-3" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="text-2xl font-bold">89,420</div>
+                <p class="text-xs text-gray-500">+3,420 ในสัปดาห์นี้</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">การดำเนินการด่วน</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card hover:shadow-lg transition-shadow p-6">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center mb-4">
+                        <i data-lucide="users" class="h-5 w-5"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">เพิ่มตัวละคร</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">สร้างตัวละครใหม่</p>
+                    <button class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        เริ่มต้น
+                    </button>
+                </div>
+
+                <div class="card hover:shadow-lg transition-shadow p-6">
+                    <div class="w-12 h-12 rounded-lg bg-green-500 hover:bg-green-600 text-white flex items-center justify-center mb-4">
+                        <i data-lucide="file-text" class="h-5 w-5"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">เขียนฉากใหม่</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">เพิ่มฉากใหม่</p>
+                    <button class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        เริ่มต้น
+                    </button>
+                </div>
+
+                <div class="card hover:shadow-lg transition-shadow p-6">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500 hover:bg-purple-600 text-white flex items-center justify-center mb-4">
+                        <i data-lucide="map-pin" class="h-5 w-5"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">สร้างสถานที่</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">เพิ่มสถานที่ใหม่</p>
+                    <button class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        เริ่มต้น
+                    </button>
+                </div>
+
+                <div class="card hover:shadow-lg transition-shadow p-6">
+                    <div class="w-12 h-12 rounded-lg bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center mb-4">
+                        <i data-lucide="brain" class="h-5 w-5"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">วิเคราะห์เนื้อหา</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">AI วิเคราะห์ความสอดคล้อง</p>
+                    <button class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        เริ่มต้น
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Features -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">🚀 ฟีเจอร์ที่กำลังจะมา</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-2">🎨 Workflow Canvas</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">จัดการโครงเรื่องแบบ visual</p>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        กำลังพัฒนา
+                    </span>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-2">🤖 AI Co-Pilot</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">ผู้ช่วย AI สำหรับการเขียน</p>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        กำลังพัฒนา
+                    </span>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-2">📚 Creative Prompt Library</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">คลังไอเดียและ prompt</p>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        กำลังพัฒนา
+                    </span>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-2">📊 Dynamic Asset Tracker</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">ติดตามความสอดคล้องของเนื้อหา</p>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        กำลังพัฒนา
+                    </span>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-2">💡 Psychology-Informed Nudges</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">คำแนะนำที่ปรับตามจิตวิทยา</p>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-200">
+                        กำลังพัฒนา
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Progress -->
+        <div class="card p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="target" class="h-5 w-5"></i>
+                <h2 class="text-xl font-bold">ความคืบหน้าปัจจุบัน</h2>
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+                Phase 3: Data Analysis & Visualization (กำลังดำเนินการ)
+            </p>
+            
+            <div class="space-y-6">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium">วิเคราะห์ไฟล์ Vault</span>
+                        <span class="text-sm text-gray-500">528 ไฟล์ | กำลังวิเคราะห์...</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium">Google Sheets Integration</span>
+                        <span class="text-sm text-green-600">✓ เสร็จสิ้น</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium">Image Generation Service</span>
+                        <span class="text-sm text-green-600">✓ เสร็จสิ้น</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-gray-500 dark:text-gray-400">
+            <p class="text-sm">
+                🎯 <strong>Next Steps:</strong> Dashboard Implementation → 5 Major Features Development → Quality Assurance
+            </p>
+            <p class="text-xs mt-2">
+                Built with Next.js, Tailwind CSS, and AI-Powered Analysis | Version 0.1.0
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Simple dark mode toggle (future enhancement)
+        console.log('🎨 Ashval Dashboard Demo Ready!');
+        console.log('📊 Stats: Characters: 42, Scenes: 128, Locations: 36');
+        console.log('🚀 Features in Development: Workflow Canvas, AI Co-Pilot, Creative Prompt Library, Dynamic Asset Tracker, Psychology-Informed Nudges');
+    </script>
+</body>
+</html>

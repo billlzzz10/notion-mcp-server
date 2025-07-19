@@ -1,5 +1,7 @@
 import { notion } from "../services/notion.js";
 import dotenv from "dotenv";
+import { fileURLToPath } from 'url';
+import { resolve } from 'path';
 
 dotenv.config();
 
@@ -32,6 +34,9 @@ export async function checkAllNotionDatabases() {
 }
 
 // เรียกใช้ฟังก์ชันถ้ารันไฟล์นี้โดยตรง
-if (process.argv[1] === new URL(import.meta.url).pathname) {
+const currentFile = fileURLToPath(import.meta.url);
+const executedFile = resolve(process.argv[1]);
+
+if (currentFile === executedFile) {
   checkAllNotionDatabases().catch(console.error);
 }

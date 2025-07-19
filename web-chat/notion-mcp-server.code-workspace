@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": ".."
+		},
+		{
+			"path": "../../../01_WRI/ROF"
+		},
+		{
+			"path": "../GraphicAI"
 		}
 	],
 	"settings": {

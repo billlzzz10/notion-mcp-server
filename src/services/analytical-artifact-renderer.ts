@@ -46,13 +46,20 @@ export function renderFishbone(data: FishboneData): string {
   } else {
     return renderTextFishbone(data);
   }
-}
-
-export interface FiveWhysData {
+}export interface FiveWhysData {
   problem: string;
   whys: string[];
 }
 
+export function renderFiveWhys(data: FiveWhysData): string {
+  let text = `ปัญหา: ${data.problem}\n`;
+  data.whys.forEach((why, index) => {
+    text += `Why ${index + 1}: ${why}\n`;
+  });
+  return text;
+}
+
+// 2. SWOT Analysis
 export interface SWOTData {
   strengths: string[];
   weaknesses: string[];
@@ -61,55 +68,19 @@ export interface SWOTData {
 }
 
 export function renderSWOT(data: SWOTData): string {
+  const formatList = (items: string[]) => items.map(item => `- ${item}`).join('<br>');
+
   return `
 ## SWOT Analysis
 
-| **Strengths** | **Weaknesses** |
-|---------------|----------------|
-| ${data.strengths.map(s => `• ${s}`).join('<br>')} | ${data.weaknesses.map(w => `• ${w}`).join('<br>')} |
+| Strengths | Weaknesses |
+|-----------|------------|
+| ${formatList(data.strengths)} | ${formatList(data.weaknesses)} |
 
-| **Opportunities** | **Threats** |
-|-------------------|-------------|
-| ${data.opportunities.map(o => `• ${o}`).join('<br>')} | ${data.threats.map(t => `• ${t}`).join('<br>')} |
+<br>
+
+| Opportunities | Threats |
+|---------------|---------|
+| ${formatList(data.opportunities)} | ${formatList(data.threats)} |
 `;
-}
-
-// 3. Five Whys
-export function renderFiveWhys(data: FiveWhysData): string {
-  let text = `## Five Whys Analysis\n**Problem:** ${data.problem}\n\n`;
-  data.whys.forEach((why, index) => {
-    text += `**Why ${index + 1}:** ${why}\n`;
-  });
-  return text;
-}
-
-// 4. Framework Selector
-export function selectFrameworkByIntent(intent: string): string {
-  const intentLower = intent.toLowerCase();
-  
-  if (intentLower.includes('สาเหตุ') || intentLower.includes('cause') || intentLower.includes('fishbone')) {
-    return 'fishbone';
-  }
-  if (intentLower.includes('swot') || intentLower.includes('จุดแข็ง') || intentLower.includes('strengths')) {
-    return 'swot';
-  }
-  if (intentLower.includes('why') || intentLower.includes('ทำไม') || intentLower.includes('root cause')) {
-    return 'five-whys';
-  }
-  
-  return 'fishbone'; // default
-}
-
-// 5. Master Render Function
-export function renderAnalyticalFramework(type: string, data: any): string {
-  switch (type) {
-    case 'fishbone':
-      return renderFishbone(data as FishboneData);
-    case 'swot':
-      return renderSWOT(data as SWOTData);
-    case 'five-whys':
-      return renderFiveWhys(data as FiveWhysData);
-    default:
-      throw new Error(`Unsupported framework type: ${type}`);
-  }
 }
