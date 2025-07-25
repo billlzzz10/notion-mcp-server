@@ -1,6 +1,6 @@
 # 📖 Auto-Generated API Documentation
 
-Generated: 24/7/2568 03:00:23
+Generated: 25/7/2568 03:00:28
 
 ## 🌐 API Endpoints
 
