@@ -1,98 +1,52 @@
-# For most projects, this workflow file will not need changing; you simply need
-# to commit it to your repository.
-#
-# You may wish to alter this file to override the set of languages analyzed,
-# or to provide custom queries or build logic.
-#
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
-name: "CodeQL Advanced"
+name: "CodeQL Advanced" # ชื่อของ workflow ที่จะแสดงใน GitHub Actions
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # รันเมื่อมีการ push code เข้า branch main
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # รันเมื่อมีการ pull request ไปยัง branch main
   schedule:
-    - cron: '39 22 * * 1'
+    - cron: '39 22 * * 1' # รันอัตโนมัติทุกวันจันทร์ เวลา 22:39 UTC
 
 jobs:
   analyze:
-    name: Analyze (${{ matrix.language }})
-    # Runner size impacts CodeQL analysis time. To learn more, please see:
-    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
-    #   - https://gh.io/supported-runners-and-hardware-resources
-    #   - https://gh.io/using-larger-runners (GitHub.com only)
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    name: Analyze (${{ matrix.language }}) # ชื่อ job พร้อมระบุภาษาที่วิเคราะห์
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }} # ใช้ runner Ubuntu ถ้าไม่ใช่ Swift
     permissions:
-      # required for all workflows
-      security-events: write
-
-      # required to fetch internal or private CodeQL packs
-      packages: read
-
-      # only required for workflows in private repositories
-      actions: read
-      contents: read
+      security-events: write # ให้สิทธิ์เขียน event ด้าน security (จำเป็นสำหรับ CodeQL)
+      packages: read         # ให้สิทธิ์อ่าน package (ใช้ในกรณีมี dependencies)
+      actions: read          # ให้สิทธิ์อ่าน actions (จำเป็นใน repo ส่วนตัว)
+      contents: read         # ให้สิทธิ์อ่านเนื้อหา repo (จำเป็นใน repo ส่วนตัว)
 
     strategy:
-      fail-fast: false
+      fail-fast: false # ถ้ามี error จะไม่หยุดทั้งหมด รันภาษาอื่นต่อได้
       matrix:
         include:
-        - language: javascript-typescript
-          build-mode: none
-        # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
-        # Use `c-cpp` to analyze code written in C, C++ or both
-        # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
-        # Use 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
-        # To learn more about changing the languages that are analyzed or customizing the build mode for your analysis,
-        # see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning.
-        # If you are analyzing a compiled language, you can modify the 'build-mode' for that language to customize how
-        # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
+        - language: javascript-typescript # เลือกภาษา JavaScript/TypeScript สำหรับวิเคราะห์
+          build-mode: none               # ไม่ต้อง build code ก่อนเพราะใช้ scripting language
+
     steps:
-    - name: Checkout repository
+    - name: Checkout repository # ดึงซอร์สโค้ดจาก repo
       uses: actions/checkout@v4
 
-    # Add any setup steps before running the `github/codeql-action/init` action.
-    # This includes steps like installing compilers or runtimes (`actions/setup-node`
-    # or others). This is typically only required for manual builds.
-    # - name: Setup runtime (example)
-    #   uses: actions/setup-example@v1
+    # ถ้าต้องการ setup runtime เพิ่มเติมสำหรับ manual build ให้เพิ่มขั้นตอนตรงนี้
+    # - name: Setup runtime (ตัวอย่าง)
+    #   uses: actions/setup-node@v4
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
+    - name: Initialize CodeQL # เตรียมเครื่องมือ CodeQL สำหรับสแกน
       uses: github/codeql-action/init@v3
       with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
+        languages: ${{ matrix.language }}    # ระบุภาษาที่จะสแกนจาก matrix
+        build-mode: ${{ matrix.build-mode }} # ระบุ build-mode สำหรับแต่ละภาษา
 
-        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        # queries: security-extended,security-and-quality
-
-    # If the analyze step fails for one of the languages you are analyzing with
-    # "We were unable to automatically build your code", modify the matrix above
-    # to set the build mode to "manual" for that language. Then modify this step
-    # to build your code.
-    # ℹ️ Command-line programs to run using the OS shell.
-    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+    # กรณีต้อง build แบบ manual (compile ก่อน) ให้ใส่คำสั่ง build ที่นี่
     - if: matrix.build-mode == 'manual'
       shell: bash
       run: |
-        echo 'If you are using a "manual" build mode for one or more of the' \
-          'languages you are analyzing, replace this with the commands to build' \
-          'your code, for example:'
-        echo '  make bootstrap'
-        echo '  make release'
+        echo 'ถ้าต้อง build แบบ manual ให้ใส่คำสั่ง build ตรงนี้ เช่น npm run build หรือ make'
         exit 1
 
-    - name: Perform CodeQL Analysis
+    - name: Perform CodeQL Analysis # เริ่มวิเคราะห์โค้ดและแจ้งผลกลับไปยัง Security
       uses: github/codeql-action/analyze@v3
       with:
-        category: "/language:${{matrix.language}}"
+        category: "/language:${{ matrix.language }}"
