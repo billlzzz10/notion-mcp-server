@@ -534,7 +534,7 @@ export class AIGatewayBridge {
         try {
           listener(data);
         } catch (error) {
-          console.error(`Error in event listener for ${eventName}:`, error);
+          console.error('Error in event listener for %s:', eventName, error);
         }
       });
     }
