@@ -1,76 +1,76 @@
 {
-  "timestamp": "2025-07-26T07:37:58.301Z",
+  "timestamp": "2025-07-26T07:54:20.127Z",
   "structure": {},
   "tools": [
     {
       "name": "ashval-bot.js",
       "size": 10489,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     {
       "name": "auto-cleanup.js",
       "size": 7783,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     {
       "name": "auto-update-projects.js",
       "size": 26469,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     {
       "name": "auto-update-roadmap.js",
       "size": 11371,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "check-data-quality.js",
       "size": 782,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "check-db-schema.js",
       "size": 2794,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "check-status-options.js",
       "size": 2337,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "check-youtube-db-schema.js",
       "size": 4045,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "cleanup-duplicates.js",
       "size": 8284,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "complete-youtube-analyzer.js",
       "size": 0,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "create-project-roadmap.js",
       "size": 15846,
-      "lastModified": "2025-07-26T07:37:38.526Z"
+      "lastModified": "2025-07-26T07:54:04.457Z"
     },
     {
       "name": "fetch-notion-pages.js",
       "size": 15284,
-      "lastModified": "2025-07-26T07:37:38.526Z"
+      "lastModified": "2025-07-26T07:54:04.458Z"
     },
     {
       "name": "subtasks-reports-agent.js",
       "size": 14672,
-      "lastModified": "2025-07-26T07:37:38.536Z"
+      "lastModified": "2025-07-26T07:54:04.467Z"
     },
     {
       "name": "version-manager.js",
       "size": 6894,
-      "lastModified": "2025-07-26T07:37:38.539Z"
+      "lastModified": "2025-07-26T07:54:04.470Z"
     }
   ],
   "databases": {},
@@ -120,27 +120,27 @@
     "README.md": {
       "size": 13525,
       "lines": 483,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     "ROADMAP-UPDATED.md": {
       "size": 12374,
       "lines": 382,
-      "lastModified": "2025-07-26T07:37:38.525Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     "FRONTEND-API-GUIDE.md": {
       "size": 57221,
       "lines": 1916,
-      "lastModified": "2025-07-26T07:37:38.524Z"
+      "lastModified": "2025-07-26T07:54:04.456Z"
     },
     ".env.example": {
       "size": 2082,
       "lines": 60,
-      "lastModified": "2025-07-26T07:37:38.522Z"
+      "lastModified": "2025-07-26T07:54:04.453Z"
     },
     "package.json": {
       "size": 3636,
       "lines": 96,
-      "lastModified": "2025-07-26T07:37:38.527Z"
+      "lastModified": "2025-07-26T07:54:04.459Z"
     }
   },
   "dependencies": {
