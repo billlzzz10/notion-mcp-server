@@ -363,7 +363,7 @@ jobs:
 
     # === Commit การเปลี่ยนแปลง ===
     - name: Commit Auto Updates
-      if: github.event_name == 'push' # Run only on push events
+      if: github.event_name == 'push' # Run only on push events to avoid issues with PRs
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Actions Bot"
@@ -371,8 +371,8 @@ jobs:
         # ตรวจสอบว่ามีการเปลี่ยนแปลงหรือไม่
         if ! git diff --quiet; then
           echo "📝 Changes detected, committing..."
-          # Checkout (or create) the correct branch before committing
-          git checkout -B "${{ github.ref_name }}"
+          # Checkout the correct branch before committing
+          git checkout ${{ github.ref_name }}
           git add .
           git commit -m "🤖 Auto-update: documentation, cleanup, and reports [skip ci]"
           git push
