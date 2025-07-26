@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { Client } = require('@notionhq/client');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3000;
@@ -552,7 +553,13 @@ app.post('/api/command', async (req, res) => {
 });
 
 // Main dashboard page
-app.get('/', (req, res) => {
+const dashboardLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 30, // limit each IP to 30 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.get('/', dashboardLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
