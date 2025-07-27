@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = 3000;
 
@@ -126,7 +127,12 @@ app.post('/api/command', (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
+const homePageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.get('/', homePageLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

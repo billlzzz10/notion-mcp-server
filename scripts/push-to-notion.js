@@ -90,9 +90,15 @@ function parseMarkdownFile(content, filePath) {
   }
 
   // Clean content (remove title and metadata sections)
-  const cleanContent = content
-    .replace(/^#\s+.+$/m, '') // Remove title
-    .replace(/<!--[\s\S]*?-->/g, '') // Remove comments
+  let cleanContent = content
+    .replace(/^#\s+.+$/m, ''); // Remove title
+  // Remove all HTML comments, even if nested or overlapping
+  let prevContent;
+  do {
+    prevContent = cleanContent;
+    cleanContent = cleanContent.replace(/<!--[\s\S]*?-->/g, '');
+  } while (cleanContent !== prevContent);
+  cleanContent = cleanContent
     .replace(/\*\*[^*]+\*\*:\s*.+$/gm, '') // Remove metadata lines
     .replace(/^---$/gm, '') // Remove separators
     .replace(/^\*Synced from.*$/gm, '') // Remove sync notices
