@@ -1,4 +1,7 @@
 {
+  // 🚫 ห้ามเพิ่ม codacy-cli หรือ codacy-analysis-cli
+  // ✅ ให้ใช้เฉพาะ ESLint (JS/TS) หรือ Flake8 (Python) สำหรับ static analysis
+  // Workflow หรือ PR ใดที่ใช้ Codacy จะถูกปฏิเสธทันที
   "name": "notion-mcp-server",
   "version": "3.0.1",
   "type": "module",

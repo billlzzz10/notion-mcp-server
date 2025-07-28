@@ -1,3 +1,21 @@
+# 🚫 [สำคัญ] ห้ามใส่หรือ generate Codacy CLI/Scanner ใน workflow นี้
+# ✅ [บังคับ] ใช้ ESLint (JS/TS) หรือ Flake8 (Python) เท่านั้นสำหรับ static analysis
+# หากพบ Codacy, PR จะถูกปฏิเสธทันที
+#
+# ตัวอย่าง Workflow ที่ถูกต้อง (สำหรับ JS/TS):
+# name: Lint & Static Analysis
+# on: [push, pull_request]
+# jobs:
+#   lint:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#       - run: npm ci
+#       - run: npx eslint . --ext .js,.ts --max-warnings=0
+
 # For most projects, this workflow file will not need changing; you simply need
 # to commit it to your repository.
 #

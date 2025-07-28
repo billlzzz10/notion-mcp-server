@@ -1,3 +1,26 @@
+# 🛑 ห้ามใช้ Codacy ในทุก workflow
+ห้าม generate หรือเพิ่ม Codacy CLI, Codacy Scanner, หรือ Codacy Analysis ใน workflow, script, หรือ pipeline ใดๆ
+- เหตุผล: ปัญหา compatibility กับ Windows และ CI/CD
+- **ให้ใช้ ESLint (JS/TS), Flake8 (Python) แทน**
+
+PR ที่พบการใช้ Codacy จะถูก reject ทันที
+
+ตัวอย่าง Workflow ที่ถูกต้อง (JS/TS):
+```yaml
+name: Lint & Static Analysis
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx eslint . --ext .js,.ts --max-warnings=0
+```
+
 # 🏰 Notion MCP Server v3.1
 
 [![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen.svg)](https://nodejs.org/)

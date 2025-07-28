@@ -140,6 +140,50 @@
             padding-top: 15px;
             border-top: 1px solid #eee;
         }
+
+        .search-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #bbb;
+            font-size: 1em;
+        }
+        .refresh-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .refresh-btn:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+        .stats-section {
+            background: #f3f6fa;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            color: #333;
+            font-size: 0.98em;
+        }
+        .help-section {
+            background: #fffbe7;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            color: #7a5c00;
+            font-size: 0.98em;
+            border: 1px solid #ffe082;
+        }
         
         @media (max-width: 480px) {
             .container {
@@ -162,7 +206,21 @@
 <body>
     <div class="container">
         <h1>🏰 Ashval Database Optimizer</h1>
-        
+
+        <div class="search-section">
+            <input class="search-input" id="searchInput" type="text" placeholder="🔍 ค้นหาคำสั่งหรือข้อมูล...">
+            <button class="refresh-btn" onclick="refreshStats()">🔄 รีเฟรช</button>
+        </div>
+
+        <div class="stats-section" id="statsSection">
+            <strong>ข้อมูลล่าสุด:</strong> <span id="statsText">Loading...</span>
+        </div>
+
+        <div class="help-section">
+            <strong>🛈 วิธีใช้งาน:</strong> สามารถค้นหาคำสั่งหรือข้อมูลได้ทันที, กดปุ่มรีเฟรชเพื่อโหลดข้อมูลล่าสุด, และดูตัวอย่างการใช้งานในแต่ละ section ด้านล่าง<br>
+            <span style="font-size:0.95em;">รองรับการใช้งานบนมือถือและเดสก์ท็อป</span>
+        </div>
+
         <div class="instructions">
             <h3>📱 วิธีใช้งานจากมือถือ/Make.com</h3>
             <p>1. คัดลอก Webhook URL ด้านล่าง</p>
@@ -225,6 +283,32 @@
     </div>
 
     <script>
+        // --- Stats Section (Mockup, replace with real API if needed) ---
+        function loadStats() {
+            // ตัวอย่าง: mock ข้อมูลล่าสุด
+            const stats = {
+                lastSync: new Date().toLocaleString('th-TH'),
+                totalRecords: 1234,
+                lastUser: 'admin',
+            };
+            document.getElementById('statsText').textContent = `ซิงค์ล่าสุด: ${stats.lastSync} | ข้อมูลทั้งหมด: ${stats.totalRecords} | ผู้ใช้ล่าสุด: ${stats.lastUser}`;
+        }
+        function refreshStats() {
+            loadStats();
+        }
+        document.addEventListener('DOMContentLoaded', loadStats);
+
+        // --- Search Section ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                document.querySelectorAll('.command-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(val) ? '' : 'none';
+                });
+            });
+        });
         const commands = {
             1: "อัปเดตข้อมูลที่ยังไม่ครบถ้วน",
             2: "วิเคราะห์คอลัมน์ที่ไม่จำเป็น", 
@@ -308,7 +392,6 @@
                 item.addEventListener('touchstart', function() {
                     this.style.transform = 'scale(0.98)';
                 });
-                
                 item.addEventListener('touchend', function() {
                     this.style.transform = 'translateY(-2px)';
                 });

@@ -1,10 +1,27 @@
+# 🚫 [สำคัญ] ห้ามใส่หรือ generate Codacy CLI/Scanner ใน workflow นี้
+# ✅ [บังคับ] ใช้ ESLint (JS/TS) หรือ Flake8 (Python) เท่านั้นสำหรับ static analysis
+# หากพบ Codacy, PR จะถูกปฏิเสธทันที
+#
+# ตัวอย่าง Workflow ที่ถูกต้อง (สำหรับ JS/TS):
+# name: Lint & Static Analysis
+# on: [push, pull_request]
+# jobs:
+#   lint:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#       - run: npm ci
+#       - run: npx eslint . --ext .js,.ts --max-warnings=0
+
 name: Smart Documentation Sync
 
 on:
   push:
     branches: [main, develop]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
     
 jobs:
   smart-sync:
@@ -431,3 +448,12 @@ jobs:
       run: |
         echo "🚨 Workflow failed - check logs for details"
         # เพิ่มการแจ้งเตือนผ่าน webhook ถ้าต้องการ
+
+    # === Fix detached HEAD (checkout branch) ===
+    - name: Fix detached HEAD (checkout branch)
+      run: |
+        BRANCH_NAME="${GITHUB_REF_NAME:-main}"
+        git fetch origin $BRANCH_NAME
+        git checkout $BRANCH_NAME || git checkout -b $BRANCH_NAME origin/$BRANCH_NAME
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
