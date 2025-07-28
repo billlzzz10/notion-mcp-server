@@ -1,7 +1,5 @@
 import { notion } from "./notion.js";
-import { Client } from "@notionhq/client";
-import type { GetDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
-
+import type { GetDatabaseResponse } from "@notionhq/client";
 // Function to get the schema of a Notion database
 export async function getDatabaseSchema(databaseId: string): Promise<GetDatabaseResponse> {
   try {

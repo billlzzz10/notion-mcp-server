@@ -31,4 +31,7 @@ Phase 4 (DevOps Automation) เสร็จสมบูรณ์แล้ว (17
 
 ---
 
+## หมายเหตุ
+โฟลเดอร์ `ROF` เป็นงานเขียนของผู้ใช้ ใช้สำหรับทดสอบระบบ RAG (Retrieval-Augmented Generation) ที่พัฒนาในโปรเจคนี้
+
 ## รายงานนี้สร้างโดย Auto Update Roadmap System
