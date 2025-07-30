@@ -1,7 +1,4 @@
 {
-  // 🚫 ห้ามเพิ่ม codacy-cli หรือ codacy-analysis-cli
-  // ✅ ให้ใช้เฉพาะ ESLint (JS/TS) หรือ Flake8 (Python) สำหรับ static analysis
-  // Workflow หรือ PR ใดที่ใช้ Codacy จะถูกปฏิเสธทันที
   "name": "notion-mcp-server",
   "version": "3.0.1",
   "type": "module",
@@ -9,6 +6,7 @@
     "notion-mcp-server": "build/index.js"
   },
   "scripts": {
+    "dev": "npm-run-all --parallel start-gateway start-web",
     "build": "tsc",
     "prepare": "npm run build",
     "watch": "tsc --watch",
@@ -70,9 +68,12 @@
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.2.0",
     "@google/generative-ai": "^0.21.0",
+    "@langchain/community": "^0.3.49",
+    "@langchain/google-genai": "^0.2.16",
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@notionhq/client": "^2.3.0",
     "axios": "^1.10.0",
+    "chromadb": "^3.0.10",
     "dotenv": "^17.2.0",
     "express": "^4.18.2",
     "express-rate-limit": "^8.0.0",
@@ -80,6 +81,8 @@
     "node-cache": "^5.1.2",
     "node-fetch": "^3.3.2",
     "node-telegram-bot-api": "^0.66.0",
+    "tailwindcss": "^4.1.11",
+    "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -87,6 +90,27 @@
     "@types/node-telegram-bot-api": "^0.64.0",
     "shx": "^0.3.4",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^6.2.0",
+    "@google/generative-ai": "^0.21.0",
+    "@langchain/community": "^0.3.49",
+    "@langchain/google-genai": "^0.2.16",
+    "@modelcontextprotocol/sdk": "^1.9.0",
+    "@notionhq/client": "^2.3.0",
+    "axios": "^1.10.0",
+    "chromadb": "^3.0.10",
+    "dotenv": "^17.2.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.0.0",
+    "googleapis": "^152.0.0",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "tailwindcss": "^4.1.11",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.2",
+    "npm-run-all": "^4.1.5"
   },
   "engines": {
     "node": ">=18"

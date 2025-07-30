@@ -1,5 +1,8 @@
 import { notion } from "./notion.js";
 import type { GetDatabaseResponse } from "@notionhq/client";
+import { Client, APIResponseError } from "@notionhq/client";
+import type { DatabaseObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
 // Function to get the schema of a Notion database
 export async function getDatabaseSchema(databaseId: string): Promise<GetDatabaseResponse> {
   try {
@@ -69,4 +72,8 @@ export async function mapDataToNotionSchema(databaseId: string, dataToMap: Recor
   }
 
   return payload;
+}
+
+async function getDatabase(): Promise<DatabaseObjectResponse> {
+  // ...your code to fetch the database...
 }
