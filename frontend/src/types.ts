@@ -189,3 +189,4 @@ export interface ExportTemplate {
 }
 
 export interface AppDataType {
+}
