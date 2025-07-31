@@ -269,3 +269,10 @@ backup-*.sql
 *.pem
 *.p12
 *.pfx
+
+# Temporary files
+*.log
+*.tmp
+all_untracked.txt
+cleanup-report.md
+chat-log.md
