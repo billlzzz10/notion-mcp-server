@@ -1,2 +1,0 @@
-- name: Terraform Plan Visualizer
-  uses: GarvitBanga/tf-plan-visualizer@v0.1.0
