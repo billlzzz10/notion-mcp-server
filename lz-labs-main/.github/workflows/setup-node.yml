@@ -1,0 +1,37 @@
+name: Setup Node.js Environment
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup-node:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.9.1
+        with:
+          node-version: '18.x'                # กำหนดเวอร์ชัน Node.js ที่ต้องการ (ตัวอย่าง: 18.x)
+          cache: 'npm'                        # เปิดใช้ npm cache เพื่อความเร็ว (ปรับเป็น yarn/pnpm ได้)
+          always-auth: false                  # ตัวเลือก auth (default: false)
+          # registry-url: ''                  # ถ้าต้องการใช้งาน registry ส่วนตัว ให้ใส่ URL ที่นี่
+          # scope: ''                         # ระบุ scope หากใช้งานกับ private registry
+          # node-version-file: ''             # ถ้าใช้ไฟล์ .nvmrc หรืออื่น ๆ สามารถระบุ path ได้
+          # architecture: ''                  # กำหนดสถาปัตยกรรม (x64 ฯลฯ) ถ้าจำเป็น
+          # check-latest: false               # ตรวจสอบเวอร์ชันล่าสุดที่ตรง spec
+          # cache-dependency-path: ''         # ระบุ path ของไฟล์ dependency ถ้ามีหลายไฟล์หรือ wildcards
+
+      - name: Install dependencies
+        run: npm install
+
+      # เพิ่มขั้นตอนรันเทส/บิลด์อื่น ๆ ได้ตามต้องการ

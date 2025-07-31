@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ashval Writer's Suite</title>
+    <link rel="icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
+
+        :root {
+            --c-bg: #FFFFFF;
+            --c-bg-subtle: #F9F9FB;
+            --c-surface: #F2F2F7;
+            --c-border: #E5E5EA;
+            --c-text-primary: #1C1C1E;
+            --c-text-secondary: #8E8E93;
+            --c-text-disabled: #AEAEB2;
+            --c-primary: #007AFF;
+            --c-primary-hover: #3395FF;
+            --c-primary-active: #005ECC;
+            --c-secondary: #AF52DE;
+            --c-secondary-hover: #C473E4;
+            --c-secondary-active: #953DC6;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1);
+            --shadow-card: var(--shadow-md);
+            --shadow-btn-primary: 0 1px 2px rgba(0,122,255,0.3), 0 2px 6px rgba(0,122,255,0.15);
+            --shadow-btn-accent-hover: 0 0 10px rgba(0,122,255,0.4);
+            --c-paper-bg: #FEFDF3;
+            --c-paper-text: #423B2B;
+        }
+
+        .dark {
+            --c-bg: #1A1A1A;
+            --c-bg-subtle: #222224;
+            --c-surface: #2A2A2A;
+            --c-border: #3A3A3C;
+            --c-text-primary: #F0F0F0;
+            --c-text-secondary: #A0A0A0;
+            --c-text-disabled: #5A5A5F;
+            --c-primary: #3B82F6;
+            --c-primary-hover: #60A5FA;
+            --c-primary-active: #2563EB;
+            --c-secondary: #BF5AF2;
+            --c-secondary-hover: #D07EF3;
+            --c-secondary-active: #A541DD;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.5);
+            --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
+            --shadow-btn-primary: 0 1px 2px rgba(59, 130, 246, 0.3), 0 2px 8px rgba(59, 130, 246, 0.2);
+            --shadow-btn-accent-hover: 0 0 15px rgba(59, 130, 246, 0.5);
+            --c-paper-bg: #2A2A2A;
+            --c-paper-text: #F0F0F0;
+        }
+        
+        body {
+            background-color: var(--c-bg);
+            background-image: 
+                radial-gradient(circle at 1px 1px, var(--c-surface) 1px, transparent 0);
+            background-size: 24px 24px;
+            background-attachment: fixed;
+            font-family: 'Inter', 'Noto Sans Thai', 'sans-serif';
+        }
+        .dark body {
+            background: linear-gradient(45deg, #1A1A1A, #222222);
+            background-size: 400% 400%;
+            animation: gradient-bg 15s ease infinite;
+        }
+
+        .body-gradient, .body-shimmer {
+            display: none;
+        }
+
+        main {
+            background-color: transparent;
+        }
+        
+        .btn-textured-primary {
+             @apply bg-primary text-white font-semibold shadow-btn-primary rounded-full;
+             transition-property: transform, box-shadow, background-color;
+             transition-timing-function: ease-in-out;
+             transition-duration: 200ms;
+        }
+        .btn-textured-primary:hover {
+            @apply bg-primary-hover shadow-btn-accent-hover;
+            transform: translateY(-2px);
+        }
+        .btn-textured-primary:active {
+            @apply bg-primary-active;
+            transform: translateY(0px);
+            box-shadow: none;
+        }

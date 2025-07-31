@@ -1,0 +1,14 @@
+#Ignore vscode AI rules
+.github\copilot-instructions.md
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "jsx": "react",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src", "App.tsx"]
+}

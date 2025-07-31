@@ -1,0 +1,258 @@
+<!-- Import map no longer needed - using npm packages -->
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashval Writer's Suite - ชุดเครื่องมือนักเขียน AI</title>
+    <!-- SEO & Social Share -->
+    <meta name="description" content="Ashval Writer's Suite: เครื่องมือ AI สำหรับนักเขียน วางแผนและสร้างสรรค์เนื้อหา บูรณาการ UnicornXOSW2.1.0">
+    <meta property="og:title" content="Ashval Writer's Suite - ชุดเครื่องมือนักเขียน AI">
+    <meta property="og:description" content="AI-powered writing, planning, and worldbuilding tools.">
+    <meta property="og:image" content="/og-image.png">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="th_TH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Ashval Writer's Suite - ชุดเครื่องมือนักเขียน AI">
+    <meta name="twitter:description" content="AI-powered writing, planning, and worldbuilding tools.">
+    <meta name="twitter:image" content="/og-image.png">
+    <!-- Favicon & Mobile Icons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+    <!-- Preconnect Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Manrope:wght@700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                        heading: ['Manrope', 'Noto Sans Thai', 'sans-serif'],
+                    },
+                    colors: {
+                        bg: 'var(--c-bg)',
+                        'bg-subtle': 'var(--c-bg-subtle)',
+                        surface: 'var(--c-surface)',
+                        border: 'var(--c-border)',
+                        'text-primary': 'var(--c-text-primary)',
+                        'text-secondary': 'var(--c-text-secondary)',
+                        'text-disabled': 'var(--c-text-disabled)',
+                        primary: {
+                            DEFAULT: 'var(--c-primary)',
+                            hover: 'var(--c-primary-hover)',
+                            active: 'var(--c-primary-active)',
+                        },
+                        secondary: {
+                            DEFAULT: 'var(--c-secondary)',
+                            hover: 'var(--c-secondary-hover)',
+                            active: 'var(--c-secondary-active)',
+                        },
+                        success: { DEFAULT: '#34C759', bg: '#D7F9E0', dark: '#30D158', 'dark-bg': '#1E4729'},
+                        warning: { DEFAULT: '#FF9500', bg: '#FFF3D6', dark: '#FF9F0A', 'dark-bg': '#5A3D0C'},
+                        error: { DEFAULT: '#FF3B30', bg: '#FFD6D4', dark: '#FF453A', 'dark-bg': '#5A1E1A'},
+                        info: { DEFAULT: '#007AFF', bg: '#CCE5FF', dark: '#0A84FF', 'dark-bg': '#002D5A'},
+                        'paper-bg': 'var(--c-paper-bg)',
+                        'paper-text': 'var(--c-paper-text)',
+                    },
+                    borderRadius: {
+                        'sm': '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '20px',
+                        'full': '9999px',
+                    },
+                    boxShadow: {
+                        'sm': 'var(--shadow-sm)',
+                        'md': 'var(--shadow-md)',
+                        'lg': 'var(--shadow-lg)',
+                        'card': 'var(--shadow-card)',
+                        'btn-primary': 'var(--shadow-btn-primary)',
+                        'btn-accent-hover': 'var(--shadow-btn-accent-hover)',
+                    },
+                    scale: { '103': '1.03', },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-in': 'slideIn 0.35s ease-out forwards',
+                        'view-enter': 'viewEnter 0.4s ease-out forwards',
+                        'modal-enter': 'modalEnter 0.3s ease-out forwards',
+                        'pulse-icon': 'pulseIcon 1.5s ease-in-out infinite',
+                        'gradient-bg': 'gradientBG 15s ease infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { 'from': { opacity: '0' }, 'to': { opacity: '1' }, },
+                        slideIn: { 'from': { transform: 'translateY(5px) scale(0.98)', opacity: '0' }, 'to': { transform: 'translateY(0) scale(1)', opacity: '1' }, },
+                        viewEnter: { 'from': { opacity: '0', transform: 'translateX(20px)' }, 'to': { opacity: '1', transform: 'translateX(0)' } },
+                        modalEnter: { 'from': { opacity: '0', transform: 'scale(0.95) translateY(10px)' }, 'to': { opacity: '1', transform: 'scale(1) translateY(0)' } },
+                        pulseIcon: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.6' }, },
+                        gradientBG: { '0%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' }, '100%': { backgroundPosition: '0% 50%' }, },
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(142, 142, 147, 0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(142, 142, 147, 0.6); }
+        .dark ::-webkit-scrollbar-thumb { background: rgba(90, 90, 95, 0.4); }
+        .dark ::-webkit-scrollbar-thumb:hover { background: rgba(90, 90, 95, 0.6); }
+        
+        *, *::before, *::after { 
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, transform 0.2s ease; 
+        }
+
+        :root {
+            --c-bg: #FFFFFF;
+            --c-bg-subtle: #F9F9FB;
+            --c-surface: #F2F2F7;
+            --c-border: #E5E5EA;
+            --c-text-primary: #1C1C1E;
+            --c-text-secondary: #8E8E93;
+            --c-text-disabled: #AEAEB2;
+            --c-primary: #007AFF;
+            --c-primary-hover: #3395FF;
+            --c-primary-active: #005ECC;
+            --c-secondary: #AF52DE;
+            --c-secondary-hover: #C473E4;
+            --c-secondary-active: #953DC6;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.1);
+            --shadow-card: var(--shadow-md);
+            --shadow-btn-primary: 0 1px 2px rgba(0,122,255,0.3), 0 2px 6px rgba(0,122,255,0.15);
+            --shadow-btn-accent-hover: 0 0 10px rgba(0,122,255,0.4);
+            --c-paper-bg: #FEFDF3;
+            --c-paper-text: #423B2B;
+        }
+
+        .dark {
+            --c-bg: #1A1A1A;
+            --c-bg-subtle: #222224;
+            --c-surface: #2A2A2A;
+            --c-border: #3A3A3C;
+            --c-text-primary: #F0F0F0;
+            --c-text-secondary: #A0A0A0;
+            --c-text-disabled: #5A5A5F;
+            --c-primary: #3B82F6;
+            --c-primary-hover: #60A5FA;
+            --c-primary-active: #2563EB;
+            --c-secondary: #BF5AF2;
+            --c-secondary-hover: #D07EF3;
+            --c-secondary-active: #A541DD;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 8px 0 rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 16px 0 rgba(0,0,0,0.5);
+            --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
+            --shadow-btn-primary: 0 1px 2px rgba(59, 130, 246, 0.3), 0 2px 8px rgba(59, 130, 246, 0.2);
+            --shadow-btn-accent-hover: 0 0 15px rgba(59, 130, 246, 0.5);
+            --c-paper-bg: #2A2A2A;
+            --c-paper-text: #F0F0F0;
+        }
+        
+        body {
+            background-color: var(--c-bg);
+            background-image: 
+                radial-gradient(circle at 1px 1px, var(--c-surface) 1px, transparent 0);
+            background-size: 24px 24px;
+            background-attachment: fixed;
+            font-family: 'Inter', 'Noto Sans Thai', 'sans-serif';
+        }
+        .dark body {
+            background: linear-gradient(45deg, #1A1A1A, #222222);
+            background-size: 400% 400%;
+            animation: gradient-bg 15s ease infinite;
+        }
+
+        .body-gradient, .body-shimmer {
+            display: none;
+        }
+
+        main {
+            background-color: transparent;
+        }
+        
+        .btn-textured-primary {
+             @apply bg-primary text-white font-semibold shadow-btn-primary rounded-full;
+             transition-property: transform, box-shadow, background-color;
+             transition-timing-function: ease-in-out;
+             transition-duration: 200ms;
+        }
+        .btn-textured-primary:hover {
+            @apply bg-primary-hover shadow-btn-accent-hover;
+            transform: translateY(-2px);
+        }
+        .btn-textured-primary:active {
+            @apply bg-primary-active;
+            transform: translateY(0px);
+            box-shadow: none;
+        }
+        
+        .task-checkbox { 
+            position: relative; cursor: pointer; width: 20px; height: 20px; appearance: none; 
+            border: 2px solid var(--c-border); border-radius: 4px; background-color: var(--c-bg); 
+            transition: all 0.2s ease; 
+        }
+        .task-checkbox:checked { 
+            background-color: var(--c-primary); border-color: var(--c-primary); 
+        }
+        .task-checkbox:checked::after { 
+            content: ""; position: absolute; top: 2px; left: 6px; width: 5px; height: 10px; 
+            border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); 
+        }
+
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { @apply font-heading; }
+        .markdown-content h1 { @apply text-2xl font-bold mt-6 mb-4; color: var(--c-text-primary); border-bottom: 1px solid var(--c-border); padding-bottom: 0.3em; } 
+        .markdown-content h2 { @apply text-xl font-bold mt-5 mb-3; color: var(--c-text-primary); } 
+        .markdown-content h3 { @apply text-lg font-bold mt-4 mb-2; color: var(--c-text-primary); } 
+        .markdown-content p { @apply mb-4 leading-relaxed; }
+        .markdown-content strong { @apply font-bold; color: var(--c-text-primary); }
+        .markdown-content ul, .markdown-content ol { @apply list-inside pl-4 mb-4 space-y-2; }
+        .markdown-content li { @apply mb-1; }
+        .markdown-content a { color: var(--c-primary); @apply underline hover:opacity-80; }
+        .markdown-content blockquote { @apply border-l-4 pl-4 italic my-4; border-color: var(--c-border); color: var(--c-text-secondary); }
+        .markdown-content code { @apply px-1.5 py-0.5 rounded-md text-sm; background-color: var(--c-surface); color: var(--c-secondary); }
+        .markdown-content pre > code { @apply p-0 bg-transparent; }
+        .markdown-content pre { @apply p-4 rounded-lg my-4 overflow-x-auto; background-color: var(--c-surface); }
+
+        .notification-badge {
+            @apply bg-error text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center absolute -top-1 -right-1;
+            transform: scale(0.8);
+        }
+
+        .note-card {
+            position: relative;
+        }
+        .dark .note-card:hover::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10%;
+            bottom: 10%;
+            width: 3px;
+            background-color: var(--c-primary);
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body class="font-sans antialiased">
+    <div class="body-gradient"></div>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
