@@ -1,18 +1,20 @@
 import { notion } from "./notion.js";
-import type { GetDatabaseResponse } from "@notionhq/client";
+// import type { GetDatabaseResponse } from "@notionhq/client";
 import { Client, APIResponseError } from "@notionhq/client";
-import type { DatabaseObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
+
 
 // Function to get the schema of a Notion database
-export async function getDatabaseSchema(databaseId: string): Promise<GetDatabaseResponse> {
+export async function getDatabaseSchema(databaseId: string): Promise<any> {
   try {
     const response = await notion.databases.retrieve({ database_id: databaseId });
-    return response;
+    return response as any; // fallback to any if type is not available
   } catch (error: any) {
     console.error(`Error retrieving database schema for ID ${databaseId}:`, error.body || error.message);
     throw error;
   }
 }
+
 
 // Function to map data to the Notion schema to create a valid payload
 export async function mapDataToNotionSchema(databaseId: string, dataToMap: Record<string, any>): Promise<Record<string, any>> {
@@ -74,6 +76,3 @@ export async function mapDataToNotionSchema(databaseId: string, dataToMap: Recor
   return payload;
 }
 
-async function getDatabase(): Promise<DatabaseObjectResponse> {
-  // ...your code to fetch the database...
-}

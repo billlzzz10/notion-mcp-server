@@ -3,7 +3,7 @@ import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { TextLoader } from "langchain/document_loaders/fs/text";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Chroma } from "@langchain/community/vectorstores/chroma";
-import { GoogleGenerativeAiEmbeddings } from "@langchain/google-genai";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -44,7 +44,7 @@ export async function initializeRAG() {
     const splitDocs = await splitter.splitDocuments(docs);
     console.log(`✂️ Split into ${splitDocs.length} chunks.`);
 
-    const embeddings = new GoogleGenerativeAiEmbeddings({
+    const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.GEMINI_API_KEY,
       model: "embedding-001",
     });
@@ -58,7 +58,7 @@ export async function initializeRAG() {
   } catch (error) {
     console.error("❌ Failed to initialize RAG service:", error);
   }
-}
+} // Closing bracket for initializeRAG
 
 export async function queryRAG(query: string): Promise<any[]> {
   if (!vectorStore) {
@@ -70,8 +70,16 @@ export async function queryRAG(query: string): Promise<any[]> {
     }
   }
 
-  console.log(`🔍 Querying RAG for: "${query}"`);
-  const results = await vectorStore.similaritySearch(query, 5);
+  const k = 5;
+  let results: any[] = [];
+  if (typeof (vectorStore as any).similaritySearch === "function") {
+    results = await (vectorStore as any).similaritySearch(query, k);
+  } else if (typeof (vectorStore as any).similaritySearchVectorWithScore === "function") {
+    results = await (vectorStore as any).similaritySearchVectorWithScore(query, k);
+  } else {
+    console.error("No similarity search method found on vectorStore.");
+    return [];
+  }
   console.log(`✨ Found ${results.length} relevant documents.`);
   return results;
 }

@@ -23,16 +23,21 @@ jobs:
           credentials: ${{ secrets.GCLOUD_SERVICE_KEY }}
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - name: Build and push Docker image
+      - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker
-          docker build -t gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.CLOUDRUN_SERVICE }}:${{ github.sha }} .
-          docker push gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.CLOUDRUN_SERVICE }}:${{ github.sha }}
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      - name: Build and push Docker image to Artifact Registry
+        run: |
+          IMAGE_URI="asia-southeast1-docker.pkg.dev/mythic-labs-467413-k3/lz-labs-mcp-280725/notion-mcp-server:${{ github.sha }}"
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
 
       - name: Deploy to Cloud Run
         run: |
+          IMAGE_URI="asia-southeast1-docker.pkg.dev/mythic-labs-467413-k3/lz-labs-mcp-280725/notion-mcp-server:${{ github.sha }}"
           gcloud run deploy ${{ secrets.CLOUDRUN_SERVICE }} \
-            --image gcr.io/${{ secrets.GCLOUD_PROJECT_ID }}/${{ secrets.CLOUDRUN_SERVICE }}:${{ github.sha }} \
+            --image $IMAGE_URI \
             --region ${{ secrets.GCLOUD_REGION }} \
             --platform managed \
             --allow-unauthenticated \
