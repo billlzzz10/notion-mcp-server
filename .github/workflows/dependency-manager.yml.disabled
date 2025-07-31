@@ -2,7 +2,7 @@ name: Smart Dependency Manager
 
 on:
   schedule:
-    - cron: '0 2 * * 1'  # ทุกวันจันทร์เวลา 02:00
+    - cron: 
   workflow_dispatch:
     inputs:
       update_type:
