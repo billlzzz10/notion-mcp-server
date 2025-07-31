@@ -478,6 +478,12 @@ jobs:
         
         // อ่าน package.json
         try {
+          const packageJsonPath = path.resolve(__dirname, 'package.json');
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+          projectData.structure = packageJson;
+        } catch (error) {
+          console.error('❌ Error reading package.json:', error);
+        }
     # === แจ้งเตือนผ่าน Slack/Discord (ถ้าต้องการ) ===
 
     - name: Send Notification
