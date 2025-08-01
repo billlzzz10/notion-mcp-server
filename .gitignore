@@ -3,7 +3,8 @@ ROF/
 # ========================================
 # Node.js & JavaScript/TypeScript
 # ========================================
-/node_modules
+node_modules/
+**/node_modules/
 /build
 /dist
 /coverage
@@ -39,7 +40,6 @@ docs/README-v3.0.md
 # ========================================
 
 # Current Web Chat
-web-chat/node_modules/
 web-chat/dist/
 web-chat/web-build/
 web-chat/.env
@@ -55,7 +55,6 @@ agent-marketplace/
 workflow-designer/
 
 # Build outputs for any web apps
-*/node_modules/
 */dist/
 */build/
 */.next/
@@ -176,7 +175,6 @@ helm-values.*.yml
 # ========================================
 # Package Managers & Dependencies
 # ========================================
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 .pnp
