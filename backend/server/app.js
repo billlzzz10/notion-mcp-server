@@ -68,6 +68,18 @@ app.use('/api/agent', agentLimiter, agentRoutes);
 app.use('/api/writer', limiter, writerRoutes);
 app.use('/api/agent', webhookHandler); // Legacy webhook routes
 
+// Root route for Railway debugging
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Notion MCP Server Railway Deployment',
+    version: '3.0.1',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    port: port
+  });
+});
+
 // Enhanced health check endpoint
 app.get('/health', (req, res) => {
   const healthData = {
