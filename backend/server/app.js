@@ -11,6 +11,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT ? +process.env.PORT : 8080;
 
+console.log(`🔥 Railway Deploy Test - ${new Date().toISOString()}`);
+console.log(`🔥 Environment: ${process.env.NODE_ENV}`);
+console.log(`🔥 Port: ${port}`);
+
 // Rate limiting configuration
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -71,12 +75,13 @@ app.use('/api/agent', webhookHandler); // Legacy webhook routes
 // Root route for Railway debugging
 app.get('/', (req, res) => {
   res.json({
-    status: 'ok',
-    message: 'Notion MCP Server Railway Deployment',
+    status: 'RAILWAY_DEPLOY_SUCCESS',
+    message: 'Notion MCP Server Railway Deployment - BUILD ' + Date.now(),
     version: '3.0.1',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    port: port
+    port: port,
+    hasNotionToken: !!process.env.NOTION_TOKEN
   });
 });
 
