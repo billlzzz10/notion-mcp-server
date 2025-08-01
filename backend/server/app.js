@@ -9,7 +9,7 @@ import webhookHandler from './mcp-gateway/webhook-handler.js';
 dotenv.config();
 
 const app = express();
-const port = parseInt(process.env.RAILWAY_PORT) || parseInt(process.env.PORT) || parseInt(process.env.GATEWAY_PORT) || 3001;
+const port = process.env.PORT ? +process.env.PORT : 8080;
 
 // Rate limiting configuration
 const limiter = rateLimit({
