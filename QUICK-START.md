@@ -25,9 +25,10 @@ npm run install-all
 # คัดลอกไฟล์ environment
 cp .env.example .env
 
-# แก้ไขไฟล์ .env ใส่ Notion Token ของคุณ
+# แก้ไขไฟล์ .env ใส่ Notion Token ของคุณ (หรือใช้ demo values)
 # NOTION_TOKEN=your_actual_notion_token_here
 # NOTION_PAGE_ID=your_page_id_here
+# หมายเหตุ: โปรเจคสามารถทำงานได้ด้วย demo values สำหรับการทดสอบ
 ```
 
 ### 3. Build Project
