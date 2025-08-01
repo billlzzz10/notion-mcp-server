@@ -9,9 +9,7 @@ healthcheckTimeout = 300
 restartPolicyType = "always"
 
 [environments.production]
-PORT = "${{ RAILWAY_PORT }}"
 NODE_ENV = "production"
-GATEWAY_PORT = "${{ RAILWAY_PORT }}"
 
 # Required Environment Variables (จะต้องตั้งใน Railway Dashboard)
 # NOTION_TOKEN
