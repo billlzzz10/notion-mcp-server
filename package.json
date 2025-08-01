@@ -32,7 +32,15 @@
     "deploy-mcp-direct": "./deploy-mcp.sh direct",
     "stop-mcp": "./deploy-mcp.sh stop",
     "status-mcp": "./deploy-mcp.sh status",
-    "restart-mcp": "./deploy-mcp.sh restart"
+    "restart-mcp": "./deploy-mcp.sh restart",
+    "docker": "./docker-manager.sh",
+    "docker:codespaces": "./docker-manager.sh codespaces",
+    "docker:dev": "./docker-manager.sh dev",
+    "docker:mcp": "./docker-manager.sh mcp",
+    "docker:build": "./docker-manager.sh build",
+    "docker:clean": "./docker-manager.sh clean",
+    "docker:status": "./docker-manager.sh status",
+    "docker:health": "./docker-manager.sh health"
   },
   "keywords": [
     "notion",

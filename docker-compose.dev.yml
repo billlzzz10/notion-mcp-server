@@ -1,0 +1,30 @@
+services:
+  # Simple development environment
+  notion-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: notion-dev-simple
+    ports:
+      - "3001:3001"  # API Gateway
+      - "3002:3002"  # Web Interface
+      - "8080:8080"  # MCP Server
+    environment:
+      - NODE_ENV=development
+      - GATEWAY_PORT=3001
+      - WEB_PORT=3002
+      - MCP_PORT=8080
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/backend/node_modules
+      - /app/frontend/modern/lz-labs-main/web-chat/node_modules
+    networks:
+      - dev-network
+    restart: unless-stopped
+
+networks:
+  dev-network:
+    driver: bridge

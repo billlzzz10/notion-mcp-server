@@ -1,0 +1,132 @@
+# ========================================================
+# Codespaces & Development Environment Optimized Docker
+# ========================================================
+# This Dockerfile is optimized for GitHub Codespaces and development
+# environments with all tools, hot reload, and development features
+
+FROM node:20-bookworm
+
+# Set environment variables for development
+ENV NODE_ENV=development
+ENV GATEWAY_PORT=3001
+ENV MCP_PORT=8080
+ENV WEB_PORT=3002
+
+# Install system dependencies and development tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    nano \
+    vim \
+    htop \
+    jq \
+    wget \
+    unzip \
+    build-essential \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install global npm packages for development
+RUN npm install -g \
+    nodemon \
+    ts-node \
+    typescript \
+    concurrently \
+    npm-run-all
+
+# Set working directory
+WORKDIR /workspace
+
+# Copy package files for caching
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+COPY frontend/modern/lz-labs-main/web-chat/package*.json ./frontend/modern/lz-labs-main/web-chat/
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Install backend dependencies
+WORKDIR /workspace/backend
+RUN npm install
+
+# Install frontend dependencies
+WORKDIR /workspace/frontend/modern/lz-labs-main/web-chat
+RUN npm install
+
+# Return to workspace root
+WORKDIR /workspace
+
+# Copy all source code
+COPY . .
+
+# Create environment file if it doesn't exist
+RUN if [ ! -f .env ]; then cp .env.example .env; fi
+
+# Build TypeScript for initial setup
+RUN cd backend && npm run build
+
+# Create development startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "🚀 Starting Full Development Environment"\n\
+echo "📦 Node.js: $(node --version)"\n\
+echo "📦 NPM: $(npm --version)"\n\
+echo "🔧 Environment: $NODE_ENV"\n\
+echo "🌐 Gateway: http://localhost:$GATEWAY_PORT"\n\
+echo "🎨 Web Chat: http://localhost:$WEB_PORT"\n\
+echo "📡 MCP Server: http://localhost:$MCP_PORT"\n\
+echo ""\n\
+\n\
+# Function to handle shutdown\n\
+cleanup() {\n\
+    echo "🛑 Shutting down all services..."\n\
+    pkill -f "node" || true\n\
+    pkill -f "npm" || true\n\
+    exit 0\n\
+}\n\
+\n\
+# Set up signal handlers\n\
+trap cleanup SIGTERM SIGINT\n\
+\n\
+# Start all services with npm-run-all\n\
+echo "🔄 Starting all services..."\n\
+npm run dev &\n\
+DEV_PID=$!\n\
+\n\
+echo "✅ Development environment started!"\n\
+echo "📊 Health Check: http://localhost:$GATEWAY_PORT/health"\n\
+echo "🎨 Web Interface: http://localhost:$WEB_PORT"\n\
+echo "🔧 API Gateway: http://localhost:$GATEWAY_PORT/api/v1"\n\
+echo "📝 Writer API: http://localhost:$GATEWAY_PORT/api/v1/writer"\n\
+echo "🤖 Agent API: http://localhost:$GATEWAY_PORT/api/v1/agent"\n\
+echo "📡 MCP Server: Direct connection on port $MCP_PORT"\n\
+echo ""\n\
+echo "🔥 Hot reload enabled for all services"\n\
+echo "📁 Workspace mounted at /workspace"\n\
+\n\
+# Keep container running\n\
+wait $DEV_PID\n\
+' > start-dev.sh && chmod +x start-dev.sh
+
+# Create health check script for development
+RUN echo '#!/bin/bash\n\
+# Check if any of the main services are running\n\
+if pgrep -f "node.*app.js" > /dev/null || \\\n\
+   pgrep -f "node.*index.js" > /dev/null || \\\n\
+   pgrep -f "npm.*dev" > /dev/null; then\n\
+    exit 0\n\
+else\n\
+    exit 1\n\
+fi\n\
+' > healthcheck-dev.sh && chmod +x healthcheck-dev.sh
+
+# Expose all development ports
+EXPOSE 3001 3002 8080 5173 4173
+
+# Health check for development environment
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD ./healthcheck-dev.sh
+
+# Default command for development
+CMD ["./start-dev.sh"]

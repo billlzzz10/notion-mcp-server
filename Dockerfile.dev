@@ -1,0 +1,48 @@
+# =============================================
+# Development Environment Docker
+# =============================================
+# Lightweight development container with hot reload
+
+FROM node:20-slim
+
+# Install development tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    nano \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install global development tools
+RUN npm install -g nodemon typescript ts-node
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files for better caching
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+COPY frontend/modern/lz-labs-main/web-chat/package*.json ./frontend/modern/lz-labs-main/web-chat/
+
+# Install dependencies
+RUN npm install && \
+    cd backend && npm install && \
+    cd ../frontend/modern/lz-labs-main/web-chat && npm install
+
+# Copy source code
+COPY . .
+
+# Build initial TypeScript
+RUN cd backend && npm run build
+
+# Create simple dev startup script
+RUN echo '#!/bin/bash\n\
+echo "🚀 Starting Development Server"\n\
+exec npm run dev\n\
+' > start.sh && chmod +x start.sh
+
+# Expose ports
+EXPOSE 3001 3002 8080
+
+# Start development server
+CMD ["./start.sh"]
