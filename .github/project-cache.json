@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-01T14:29:52.423Z",
+  "timestamp": "2025-08-01T16:07:58.689Z",
   "structure": {},
   "tools": [],
   "databases": {},
@@ -10,6 +10,7 @@
     "prepare": "cd backend && npm run build",
     "start": "cd backend && node build/index.js",
     "start-gateway": "node backend/server/app.js",
+    "start-railway": "node backend/server/app.js",
     "start-mcp": "cd backend && node build/index.js",
     "start-web": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
     "start-web-chat": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
@@ -34,22 +35,22 @@
     "README.md": {
       "size": 16127,
       "lines": 580,
-      "lastModified": "2025-08-01T14:29:21.803Z"
+      "lastModified": "2025-08-01T16:07:29.402Z"
     },
     "ROADMAP-UPDATED.md": {
       "size": 13588,
       "lines": 408,
-      "lastModified": "2025-08-01T14:29:21.804Z"
+      "lastModified": "2025-08-01T16:07:29.402Z"
     },
     ".env.example": {
       "size": 2082,
       "lines": 60,
-      "lastModified": "2025-08-01T14:29:21.794Z"
+      "lastModified": "2025-08-01T16:07:29.393Z"
     },
     "package.json": {
-      "size": 2505,
-      "lines": 66,
-      "lastModified": "2025-08-01T14:29:21.820Z"
+      "size": 2556,
+      "lines": 67,
+      "lastModified": "2025-08-01T16:07:29.422Z"
     }
   },
   "devDependencies": {

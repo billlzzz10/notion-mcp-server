@@ -1,6 +1,6 @@
 # 📖 Auto-Generated API Documentation
 
-Generated: 1/8/2568 14:29:52
+Generated: 1/8/2568 16:07:58
 
 ## ⚡ Available Scripts
 
@@ -10,6 +10,7 @@ Generated: 1/8/2568 14:29:52
 - **prepare**: `cd backend && npm run build`
 - **start**: `cd backend && node build/index.js`
 - **start-gateway**: `node backend/server/app.js`
+- **start-railway**: `node backend/server/app.js`
 - **start-mcp**: `cd backend && node build/index.js`
 - **start-web**: `cd frontend/modern/lz-labs-main/web-chat && npm run dev`
 - **start-web-chat**: `cd frontend/modern/lz-labs-main/web-chat && npm run dev`
