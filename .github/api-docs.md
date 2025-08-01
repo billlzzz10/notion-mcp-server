@@ -1,6 +1,6 @@
 # 📖 Auto-Generated API Documentation
 
-Generated: 1/8/2568 17:09:00
+Generated: 1/8/2568 17:12:23
 
 ## ⚡ Available Scripts
 
