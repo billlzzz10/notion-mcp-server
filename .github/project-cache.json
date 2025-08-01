@@ -1,167 +1,58 @@
 {
-  "timestamp": "2025-07-27T08:11:39.305Z",
+  "timestamp": "2025-08-01T14:14:25.106Z",
   "structure": {},
-  "tools": [
-    {
-      "name": "ashval-bot.js",
-      "size": 10489,
-      "lastModified": "2025-07-27T08:11:14.829Z"
-    },
-    {
-      "name": "auto-cleanup.js",
-      "size": 7783,
-      "lastModified": "2025-07-27T08:11:14.829Z"
-    },
-    {
-      "name": "auto-update-projects.js",
-      "size": 26469,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "auto-update-roadmap.js",
-      "size": 11371,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "check-data-quality.js",
-      "size": 782,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "check-db-schema.js",
-      "size": 2794,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "check-status-options.js",
-      "size": 2337,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "check-youtube-db-schema.js",
-      "size": 4045,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "cleanup-duplicates.js",
-      "size": 8284,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "complete-youtube-analyzer.js",
-      "size": 0,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "create-project-roadmap.js",
-      "size": 15846,
-      "lastModified": "2025-07-27T08:11:14.830Z"
-    },
-    {
-      "name": "fetch-notion-pages.js",
-      "size": 15284,
-      "lastModified": "2025-07-27T08:11:14.831Z"
-    },
-    {
-      "name": "subtasks-reports-agent.js",
-      "size": 14672,
-      "lastModified": "2025-07-27T08:11:14.840Z"
-    },
-    {
-      "name": "version-manager.js",
-      "size": 6894,
-      "lastModified": "2025-07-27T08:11:14.843Z"
-    }
-  ],
+  "tools": [],
   "databases": {},
   "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
-    "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id",
-    "update-readme": "node scripts/update-readme.js",
-    "status": "node scripts/update-readme.js",
-    "setup-hooks": "node scripts/setup-hooks.js",
-    "cleanup": "node auto-cleanup.js",
-    "update-roadmap": "node auto-update-roadmap.js",
-    "add-idea": "node auto-update-roadmap.js",
-    "start-bot": "node build/bot/index.js",
-    "start-web": "cd web-chat && npx vite",
-    "start-web-chat": "cd web-chat && npx vite",
-    "build-web-chat": "cd web-chat && npm run build",
-    "serve-web": "cd web-chat && npx vite preview",
-    "dev-bot": "tsc && node build/bot/index.js",
+    "dev": "npm-run-all --parallel start-gateway start-web",
+    "dev-mcp-only": "npm-run-all --parallel start-gateway start-mcp",
+    "build": "cd backend && npm run build",
+    "prepare": "cd backend && npm run build",
+    "start": "cd backend && node build/index.js",
+    "start-gateway": "node backend/server/app.js",
+    "start-mcp": "cd backend && node build/index.js",
+    "start-web": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
+    "start-web-chat": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
+    "build-web-chat": "cd frontend/modern/lz-labs-main/web-chat && npm run build",
+    "serve-web": "cd frontend/modern/lz-labs-main/web-chat && npm run preview",
+    "start-bot": "cd backend && node build/bot/index.js",
     "demo": "node demo/integration-demo.js",
-    "start-gateway": "node server/app.js",
     "test": "echo \"No tests available\" && exit 0",
-    "unicorn": "node unicorn-x/server-working.cjs",
-    "security-scan": "npm audit --audit-level moderate",
-    "performance-test": "echo \"Running performance tests...\" && node -e \"console.log('Performance test completed')\"",
-    "deploy:staging": "echo \"Deploying to staging...\"",
-    "deploy:production": "echo \"Deploying to production...\"",
+    "security-scan": "cd backend && npm audit --audit-level moderate",
     "health-check": "curl -f http://localhost:3001/health || echo \"Health check failed\"",
     "validate": "npm run build && npm run test && npm run security-scan",
-    "version:patch": "node scripts/version-manager.js patch",
-    "version:minor": "node scripts/version-manager.js minor",
-    "version:major": "node scripts/version-manager.js major",
-    "version:auto": "node scripts/version-manager.js auto",
-    "version:set": "node scripts/version-manager.js set",
-    "version:quick": "node scripts/version-manager.js quick",
-    "version:check": "node scripts/version-manager.js check",
-    "notion:pull": "node scripts/pull-from-notion.js",
-    "notion:push": "node scripts/push-to-notion.js",
-    "gdrive:upload": "node scripts/upload-to-drive.js",
-    "gdrive:test": "node scripts/test-gdrive.js",
-    "backup:notion": "npm run notion:pull && npm run gdrive:upload",
-    "backup:test": "echo \"Testing backup process...\" && npm run gdrive:test",
-    "docs:update": "echo \"Updating documentation versions...\" && node -e \"console.log('Documentation updated')\""
+    "setup": "npm run install-all && npm run build",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend/modern/lz-labs-main/web-chat && npm install",
+    "clean": "rm -rf backend/build && rm -rf frontend/modern/lz-labs-main/web-chat/dist",
+    "deploy-mcp": "./deploy-mcp.sh docker",
+    "deploy-mcp-direct": "./deploy-mcp.sh direct",
+    "stop-mcp": "./deploy-mcp.sh stop",
+    "status-mcp": "./deploy-mcp.sh status",
+    "restart-mcp": "./deploy-mcp.sh restart"
   },
   "documentation": {
     "README.md": {
-      "size": 13525,
-      "lines": 483,
-      "lastModified": "2025-07-27T08:11:14.829Z"
+      "size": 16129,
+      "lines": 580,
+      "lastModified": "2025-08-01T14:13:58.258Z"
     },
     "ROADMAP-UPDATED.md": {
-      "size": 12374,
-      "lines": 382,
-      "lastModified": "2025-07-27T08:11:14.829Z"
-    },
-    "FRONTEND-API-GUIDE.md": {
-      "size": 57221,
-      "lines": 1916,
-      "lastModified": "2025-07-27T08:11:14.829Z"
+      "size": 13588,
+      "lines": 408,
+      "lastModified": "2025-08-01T14:13:58.258Z"
     },
     ".env.example": {
       "size": 2082,
       "lines": 60,
-      "lastModified": "2025-07-27T08:11:14.827Z"
+      "lastModified": "2025-08-01T14:13:58.257Z"
     },
     "package.json": {
-      "size": 3636,
-      "lines": 96,
-      "lastModified": "2025-07-27T08:11:14.832Z"
+      "size": 2505,
+      "lines": 66,
+      "lastModified": "2025-08-01T14:13:58.274Z"
     }
   },
-  "dependencies": {
-    "@google-cloud/text-to-speech": "^6.2.0",
-    "@google/generative-ai": "^0.21.0",
-    "@modelcontextprotocol/sdk": "^1.9.0",
-    "@notionhq/client": "^2.3.0",
-    "axios": "^1.10.0",
-    "dotenv": "^17.2.0",
-    "express": "^4.18.2",
-    "express-rate-limit": "^8.0.0",
-    "googleapis": "^152.0.0",
-    "node-cache": "^5.1.2",
-    "node-fetch": "^3.3.2",
-    "node-telegram-bot-api": "^0.63.0",
-    "zod": "^3.24.2"
-  },
   "devDependencies": {
-    "@types/node": "^22.13.10",
-    "@types/node-telegram-bot-api": "^0.64.0",
-    "shx": "^0.3.4",
-    "typescript": "^5.8.2"
+    "npm-run-all": "^4.1.5"
   }
 }

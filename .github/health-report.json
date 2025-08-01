@@ -1,6 +1,11 @@
 {
-  "timestamp": "2025-07-27T08:11:40.170Z",
-  "status": "healthy",
-  "issues": [],
+  "timestamp": "2025-08-01T14:14:25.254Z",
+  "status": "warning",
+  "issues": [
+    "Missing critical file: server/app.js",
+    "Missing critical file: src/tools/index.ts",
+    "No dependencies found",
+    "Missing important script: cleanup"
+  ],
   "recommendations": []
 }
