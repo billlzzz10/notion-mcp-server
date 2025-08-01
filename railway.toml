@@ -1,0 +1,25 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "node backend/server/app.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "always"
+
+[[services]]
+name = "mcp-gateway"
+source = "."
+
+[environments.production]
+PORT = "${{ RAILWAY_PORT }}"
+NODE_ENV = "production"
+GATEWAY_PORT = "${{ RAILWAY_PORT }}"
+
+# Required Environment Variables (จะต้องตั้งใน Railway Dashboard)
+# NOTION_TOKEN
+# NOTION_CHARACTERS_DB_ID  
+# NOTION_SCENES_DB_ID
+# NOTION_PROJECTS_DB_ID
+# NOTION_TASKS_DB_ID
+# GEMINI_API_KEY

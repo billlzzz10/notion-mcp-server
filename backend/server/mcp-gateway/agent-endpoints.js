@@ -213,6 +213,13 @@ const gateway = new EnhancedGateway();
  * Middleware: Check schemas of all relevant databases
  */
 async function checkAllSchemas(req, res, next) {
+  // Bypass schema check for development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('⚠️ Bypassing schema check for development');
+    next();
+    return;
+  }
+  
   const dbIds = [
     process.env.NOTION_PROJECTS_DB_ID,
     process.env.NOTION_TASKS_DB_ID,

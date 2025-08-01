@@ -8,7 +8,9 @@
 		"vscode": {
 			"extensions": [
 				"GitHub.copilot-chat",
-				"ms-windows-ai-studio.windows-ai-studio"
+				"ms-windows-ai-studio.windows-ai-studio",
+				"k--kato.intellij-idea-keybindings",
+				"ms-vscode-remote.remote-wsl"
 			]
 		},
 	}
