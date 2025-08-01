@@ -1,0 +1,59 @@
+{
+  "name": "notion-mcp-server",
+  "version": "3.0.1",
+  "type": "module",
+  "description": "Advanced Notion MCP Server with AI Agents, Web Interface and Gateway API",
+  "main": "backend/build/index.js",
+  "bin": {
+    "notion-mcp-server": "backend/build/index.js"
+  },
+  "scripts": {
+    "dev": "npm-run-all --parallel start-gateway start-web",
+    "build": "cd backend && npm run build",
+    "prepare": "cd backend && npm run build",
+    "start": "cd backend && node build/index.js",
+    "start-gateway": "node backend/server/app.js",
+    "start-web": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
+    "start-web-chat": "cd frontend/modern/lz-labs-main/web-chat && npm run dev",
+    "build-web-chat": "cd frontend/modern/lz-labs-main/web-chat && npm run build",
+    "serve-web": "cd frontend/modern/lz-labs-main/web-chat && npm run preview",
+    "start-bot": "cd backend && node build/bot/index.js",
+    "demo": "node demo/integration-demo.js",
+    "test": "echo \"No tests available\" && exit 0",
+    "security-scan": "cd backend && npm audit --audit-level moderate",
+    "health-check": "curl -f http://localhost:3001/health || echo \"Health check failed\"",
+    "validate": "npm run build && npm run test && npm run security-scan",
+    "setup": "npm run install-all && npm run build",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend/modern/lz-labs-main/web-chat && npm install",
+    "clean": "rm -rf backend/build && rm -rf frontend/modern/lz-labs-main/web-chat/dist"
+  },
+  "keywords": [
+    "notion",
+    "mcp",
+    "modelcontextprotocol",
+    "ai",
+    "performance",
+    "optimization",
+    "cache",
+    "batch-processing",
+    "ashval",
+    "world-building"
+  ],
+  "author": "Yaroslav Boiko <y.boikodeveloper@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/billlzzz10/notion-mcp-server.git"
+  },
+  "homepage": "https://github.com/billlzzz10/notion-mcp-server#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "workspaces": [
+    "backend",
+    "frontend/modern/lz-labs-main/web-chat"
+  ],
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
