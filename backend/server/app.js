@@ -3,6 +3,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import gateway from './mcp-gateway/request-gateway.js';
 import agentRoutes from './mcp-gateway/agent-endpoints.js';
+import writerRoutes from './mcp-gateway/writer-endpoints.js';
 import webhookHandler from './mcp-gateway/webhook-handler.js';
 
 dotenv.config();
@@ -58,11 +59,13 @@ app.use((req, res, next) => {
 // Routes with versioning and rate limiting
 app.use('/api/v1', limiter, gateway);
 app.use('/api/v1/agent', agentLimiter, agentRoutes);
+app.use('/api/v1/writer', limiter, writerRoutes);
 app.use('/api/v1/agent', webhookHandler); // Webhook routes (less restrictive)
 
 // Default routes (backwards compatibility)
 app.use('/api', limiter, gateway);
 app.use('/api/agent', agentLimiter, agentRoutes);
+app.use('/api/writer', limiter, writerRoutes);
 app.use('/api/agent', webhookHandler); // Legacy webhook routes
 
 // Enhanced health check endpoint
@@ -85,11 +88,13 @@ app.get('/health', (req, res) => {
     endpoints: {
       api_v1: '/api/v1/*',
       agent_v1: '/api/v1/agent/*',
+      writer_v1: '/api/v1/writer/*',
       webhook_make: '/api/v1/agent/webhook/make',
       webhook_test: '/api/v1/agent/webhook/test',
       webhook_status: '/api/v1/agent/webhook/status',
       legacy_api: '/api/*',
-      legacy_agent: '/api/agent/*'
+      legacy_agent: '/api/agent/*',
+      legacy_writer: '/api/writer/*'
     }
   };
   
@@ -126,7 +131,12 @@ app.use('*', (req, res) => {
         'POST /api/v1/agent/webhook/make',
         'POST /api/v1/agent/webhook/test',
         'GET /api/v1/agent/webhook/status',
-        'GET /api/v1/agent/system-stats'
+        'GET /api/v1/agent/system-stats',
+        'POST /api/v1/writer/projects',
+        'GET /api/v1/writer/projects',
+        'POST /api/v1/writer/projects/:projectId/notes',
+        'GET /api/v1/writer/projects/:projectId/notes',
+        'GET /api/v1/writer/projects/:projectId/stats'
       ]
     }
   });

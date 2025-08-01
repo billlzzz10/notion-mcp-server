@@ -41,12 +41,25 @@ npm run build
 node test-project.js
 ```
 
-## 🚀 Start Services
+## 🚀 Deployment Options
 
-### เริ่มทุกอย่างพร้อมกัน:
+### Option A: Full System (Frontend + Backend)
+เริ่มทุกอย่างพร้อมกัน:
 ```bash
 npm run dev
 ```
+
+### Option B: MCP-Only Deployment (Backend เท่านั้น)
+สำหรับ production หรือใช้ผ่าน API เท่านั้น:
+```bash
+# Docker deployment
+npm run deploy-mcp
+
+# หรือ Direct deployment
+npm run deploy-mcp-direct
+```
+
+📚 **ดู [MCP-DEPLOYMENT.md](./MCP-DEPLOYMENT.md) สำหรับคู่มือการ deploy แบบ backend-only แบบละเอียด**
 
 ### หรือเริ่มแยกกัน:
 
