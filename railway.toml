@@ -2,14 +2,10 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "node backend/server/app.js"
+startCommand = "npm run start-railway"
 healthcheckPath = "/health"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicyType = "always"
-
-[[services]]
-name = "mcp-gateway"
-source = "."
 
 [environments.production]
 PORT = "${{ RAILWAY_PORT }}"
