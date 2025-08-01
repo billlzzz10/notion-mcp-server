@@ -1,9 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && npm install"
+buildCommand = "npm install --production && npm install --prefix backend --production"
 
 [deploy]
-startCommand = "npm run start-railway"
+startCommand = "node backend/server/app.js"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "always"
