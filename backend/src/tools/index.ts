@@ -24,6 +24,7 @@ import { storyStructureAnalyzerTool, handleStoryStructureAnalysis } from "./stor
 import { databaseAnalyzerTool, handleDatabaseAnalysis } from "./databaseAnalyzer.js";
 import { dataCompletionAssistantTool, handleDataCompletionAssistance } from "./dataCompletionAssistant.js";
 import { projectsTools, handleProjectsTools } from "./projects.js";
+import { writerAppTools, writerAppHandlers } from "./writerApp.js";
 
 export const registerAllTools = () => {
   // Register combined pages operation tool
@@ -161,5 +162,18 @@ export const registerAllTools = () => {
         return await handleProjectsTools(tool.name, args);
       }
     );
+  }
+
+  // Register Writer App Tools
+  for (const tool of writerAppTools) {
+    const handler = (writerAppHandlers as any)[tool.name];
+    if (handler) {
+      server.tool(
+        tool.name,
+        tool.description || "Writer app tool",
+        tool.inputSchema as any,
+        handler
+      );
+    }
   }
 };

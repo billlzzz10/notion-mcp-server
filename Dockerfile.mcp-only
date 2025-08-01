@@ -1,0 +1,103 @@
+# ===================================
+# MCP-Only Deployment Configuration
+# ===================================
+# This Dockerfile builds and runs only the MCP server components
+# (backend + gateway) without the frontend web interface
+
+FROM node:20-slim
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Install basic utilities
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install dependencies - root level for workspace management
+RUN npm ci --only=production
+
+# Install backend dependencies
+WORKDIR /usr/src/app/backend
+RUN npm ci --only=production
+
+# Copy source code
+WORKDIR /usr/src/app
+COPY backend ./backend
+COPY .env* ./
+
+# Build TypeScript backend
+WORKDIR /usr/src/app/backend
+RUN npm run build
+
+# Copy server gateway files
+COPY backend/server ./server
+
+# Create startup script
+WORKDIR /usr/src/app
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "🚀 Starting MCP System (Backend Only)"\n\
+echo "📦 Node.js version: $(node --version)"\n\
+echo "📦 NPM version: $(npm --version)"\n\
+echo "🔧 Environment: ${NODE_ENV:-development}"\n\
+echo "🌐 Gateway Port: ${GATEWAY_PORT:-3001}"\n\
+echo "📡 MCP Server Port: ${MCP_PORT:-8080}"\n\
+\n\
+# Start MCP Server in background\n\
+echo "🔄 Starting MCP Server..."\n\
+cd backend && node build/index.js &\n\
+MCP_PID=$!\n\
+\n\
+# Wait a moment for MCP server to start\n\
+sleep 3\n\
+\n\
+# Start API Gateway\n\
+echo "🔄 Starting API Gateway..."\n\
+node backend/server/app.js &\n\
+GATEWAY_PID=$!\n\
+\n\
+# Function to handle shutdown\n\
+cleanup() {\n\
+    echo "🛑 Shutting down MCP System..."\n\
+    kill $MCP_PID $GATEWAY_PID 2>/dev/null || true\n\
+    exit 0\n\
+}\n\
+\n\
+# Set up signal handlers\n\
+trap cleanup SIGTERM SIGINT\n\
+\n\
+echo "✅ MCP System started successfully!"\n\
+echo "📊 Health Check: http://localhost:${GATEWAY_PORT:-3001}/health"\n\
+echo "🔧 API Gateway: http://localhost:${GATEWAY_PORT:-3001}/api/v1"\n\
+echo "📝 Writer API: http://localhost:${GATEWAY_PORT:-3001}/api/v1/writer"\n\
+echo "🤖 Agent API: http://localhost:${GATEWAY_PORT:-3001}/api/v1/agent"\n\
+\n\
+# Wait for background processes\n\
+wait $MCP_PID $GATEWAY_PID\n\
+' > start-mcp.sh && chmod +x start-mcp.sh
+
+# Health check script
+RUN echo '#!/bin/bash\n\
+curl -f http://localhost:${GATEWAY_PORT:-3001}/health || exit 1\n\
+' > healthcheck.sh && chmod +x healthcheck.sh
+
+# Expose ports
+EXPOSE 3001 8080
+
+# Environment variables
+ENV NODE_ENV=production
+ENV GATEWAY_PORT=3001
+ENV MCP_PORT=8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD ./healthcheck.sh
+
+# Start command
+CMD ["./start-mcp.sh"]
