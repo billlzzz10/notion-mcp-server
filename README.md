@@ -307,6 +307,34 @@ npm run performance-test
 | **Telegram Bot** | Notifications | `backend/src/bot/notificationBot.ts` |
 | **MCP Inspector** | Tool Testing | Built-in support |
 
+### 🧠 **Enhanced AI Features (ใหม่!)**
+
+| Feature | Tool | Description |
+|---------|------|-------------|
+| **Vector Search** | `semantic_search` | ค้นหาแบบ semantic ใน characters/scenes/locations |
+| **Content Recommendations** | `get_content_recommendations` | คำแนะนำเนื้อหาระหว่างการเขียน |
+| **Plot Hole Detection** | `detect_plot_holes` | ตรวจหาช่องโหว่ในโครงเรื่อง |
+| **Similar Content** | `find_similar_content` | หาเนื้อหาที่คล้ายกัน |
+
+### 🚀 **Technology Enhancement**
+
+**เพิ่งเพิ่ม**: รองรับเทคโนโลジีใหม่สำหรับยกระดับประสิทธิภาพ
+
+- **Vector Database**: ChromaDB + Pinecone สำหรับ semantic search
+- **Real-time Collaboration**: WebSocket + Redis (พร้อม implement)
+- **Advanced Monitoring**: Sentry + Prometheus สำหรับ production monitoring
+- **Enhanced Content Processing**: TTS, PDF parsing, Image processing
+
+```bash
+# ติดตั้งเทคโนโลยีใหม่
+./scripts/install-enhancements.sh
+
+# ตรวจสอบการติดตั้ง
+./scripts/verify-enhanced-installation.js
+```
+
+📚 **เอกสารเพิ่มเติม**: `docs/TECHNOLOGY-ENHANCEMENT-PROPOSAL.md`
+
 ## 🏗️ Architecture
 
 ```
