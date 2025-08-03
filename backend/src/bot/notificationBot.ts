@@ -224,10 +224,11 @@ export class TelegramNotificationBot implements NotificationBot {
   private async sendPerformanceStatus(ctx: Context): Promise<void> {
     const memory = process.memoryUsage();
     const uptime = process.uptime();
+    const cpuPercent = await this.getCPUUsagePercent();
     
     const message = 
       `📈 *Performance Metrics*\n\n` +
-      `⚡ CPU: ${Math.random() * 20 + 5}%\n` +
+      `⚡ CPU: ${cpuPercent}%\n` +
       `💾 Memory: ${Math.round(memory.heapUsed / 1024 / 1024)}MB / ${Math.round(memory.heapTotal / 1024 / 1024)}MB\n` +
       `🕐 Uptime: ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m\n` +
       `📊 Requests: ${Math.floor(Math.random() * 1000)} today\n` +
