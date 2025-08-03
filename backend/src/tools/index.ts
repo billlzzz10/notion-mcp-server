@@ -26,6 +26,18 @@ import { dataCompletionAssistantTool, handleDataCompletionAssistance } from "./d
 import { projectsTools, handleProjectsTools } from "./projects.js";
 import { writerAppTools, writerAppHandlers } from "./writerApp.js";
 
+// Import Enhanced AI Tools
+import { 
+  semanticSearchTool, 
+  findSimilarContentTool, 
+  getContentRecommendationsTool, 
+  detectPlotHolesTool,
+  handleSemanticSearch,
+  handleFindSimilarContent,
+  handleGetContentRecommendations,
+  handleDetectPlotHoles
+} from "./semanticSearchTool.js";
+
 export const registerAllTools = () => {
   // Register combined pages operation tool
   server.tool(
@@ -176,4 +188,33 @@ export const registerAllTools = () => {
       );
     }
   }
+
+  // Register Enhanced AI Tools
+  server.tool(
+    "semantic_search",
+    "ค้นหาเนื้อหาแบบ semantic ใน Ashval databases โดยใช้ AI",
+    semanticSearchTool.inputSchema as any,
+    handleSemanticSearch as any
+  );
+
+  server.tool(
+    "find_similar_content",
+    "ค้นหาเนื้อหาที่คล้ายกับ character, scene หรือ location ที่ระบุ",
+    findSimilarContentTool.inputSchema as any,
+    handleFindSimilarContent as any
+  );
+
+  server.tool(
+    "get_content_recommendations",
+    "ได้รับคำแนะนำเนื้อหาตามบริบทปัจจุบันในการเขียน",
+    getContentRecommendationsTool.inputSchema as any,
+    handleGetContentRecommendations as any
+  );
+
+  server.tool(
+    "detect_plot_holes",
+    "ตรวจหาช่องโหว่ในโครงเรื่องและความไม่สอดคล้องในเนื้อหา",
+    detectPlotHolesTool.inputSchema as any,
+    handleDetectPlotHoles as any
+  );
 };
