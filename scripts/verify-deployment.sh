@@ -113,7 +113,7 @@ check_deployment_component \
 
 # Test MCP server startup (quick test)
 log "Testing MCP Server startup..."
-timeout 10 node backend/build/index.js >/dev/null 2>&1 &
+run_with_timeout 10 node backend/build/index.js >/dev/null 2>&1 &
 MCP_PID=$!
 sleep 3
 
