@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# 🚀 Enhanced Technology Installation Script
-# สำหรับติดตั้งเทคโนโลยีใหม่ในระบบ Notion MCP Server
+# 🚀 Notion MCP Server - Technology Enhancement Installation
+# สคริปต์ติดตั้งเทคโนโลยีใหม่แบบครอบคลุม
+# Based on user feedback from PR comments asking for technology improvements
 
 set -e
 
-echo "🚀 Starting Enhanced Technology Installation..."
+echo "🚀 Installing Enhanced Technology Stack for Notion MCP Server..."
+echo "การติดตั้งเทคโนโลยีขั้นสูงสำหรับ Notion MCP Server"
+echo "Implementing suggestions from GitHub PR comments..."
 
 # Colors for output
 RED='\033[0;31m'

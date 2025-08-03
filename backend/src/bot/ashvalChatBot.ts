@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import TelegramBot from "node-telegram-bot-api";
+import { Bot, Context } from "grammy";
 
 export class AshvalChatBot {
   private gemini: GoogleGenerativeAI;
-  private bot: TelegramBot;
+  private bot: Bot;
   private model: any;
   private conversationHistory = new Map<string, any[]>();
 
@@ -17,21 +17,20 @@ export class AshvalChatBot {
     this.gemini = new GoogleGenerativeAI(geminiApiKey);
     this.model = this.gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Initialize Telegram Bot
+    // Initialize Telegram Bot with grammy
     const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
     if (!telegramToken) {
       throw new Error("TELEGRAM_BOT_TOKEN environment variable is required");
     }
     
-    this.bot = new TelegramBot(telegramToken, { polling: true });
+    this.bot = new Bot(telegramToken);
     this.setupBotHandlers();
   }
 
   private setupBotHandlers() {
     // Start command
-    this.bot.onText(/\/start/, (msg) => {
-      const chatId = msg.chat.id;
-      this.bot.sendMessage(chatId, `
+    this.bot.command("start", async (ctx: Context) => {
+      await ctx.reply(`
 🏰 **ยินดีต้อนรับสู่ Ashval Chat Bot!**
 
 ฉันเป็น AI ผู้ช่วยที่จะช่วยคุณจัดการโลก Ashval ผ่าน Notion Database

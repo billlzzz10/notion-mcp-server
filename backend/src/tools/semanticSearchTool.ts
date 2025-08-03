@@ -310,8 +310,7 @@ export async function handleGetContentRecommendations(args: any): Promise<CallTo
 
     const recommendations = await vectorSearchService.getContentRecommendations(
       currentContent, 
-      recommendationType, 
-      limit
+      recommendationType as 'character' | 'scene' | 'location'
     );
 
     if (recommendations.length === 0) {

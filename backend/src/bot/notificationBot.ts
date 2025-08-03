@@ -224,7 +224,7 @@ export class TelegramNotificationBot implements NotificationBot {
   private async sendPerformanceStatus(ctx: Context): Promise<void> {
     const memory = process.memoryUsage();
     const uptime = process.uptime();
-    const cpuPercent = await this.getCPUUsagePercent();
+    const cpuPercent = await this.getCPUUsage();
     
     const message = 
       `📈 *Performance Metrics*\n\n` +
@@ -248,6 +248,18 @@ export class TelegramNotificationBot implements NotificationBot {
       `⚠️ Vulnerabilities: 0 detected`;
 
     await ctx.reply(message, { parse_mode: 'Markdown' });
+  }
+
+  private async getCPUUsage(): Promise<number> {
+    return new Promise((resolve) => {
+      const startUsage = process.cpuUsage();
+      setTimeout(() => {
+        const endUsage = process.cpuUsage(startUsage);
+        const totalUsage = endUsage.user + endUsage.system;
+        const percentage = Math.round((totalUsage / 1000) / 10); // Convert to rough percentage
+        resolve(Math.min(percentage, 100));
+      }, 100);
+    });
   }
 }
 
