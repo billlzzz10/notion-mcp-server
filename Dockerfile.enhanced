@@ -1,0 +1,297 @@
+# ===================================
+# Enhanced MCP-Only Deployment Configuration  
+# Multi-stage build for optimized production deployment
+# ===================================
+
+# Build stage
+FROM node:20-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git \
+    curl
+
+WORKDIR /usr/src/app
+
+# Copy package files for better caching
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install all dependencies (including devDependencies for building)
+RUN npm ci
+WORKDIR /usr/src/app/backend
+RUN npm ci
+
+# Copy source code
+WORKDIR /usr/src/app
+COPY backend ./backend
+
+# Build TypeScript backend
+WORKDIR /usr/src/app/backend
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Install security updates and essential tools
+RUN apk update && apk add --no-cache \
+    curl \
+    bash \
+    tini \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S mcp -u 1001 -G nodejs
+
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install only production dependencies
+RUN npm ci --only=production --no-optional && npm cache clean --force
+WORKDIR /usr/src/app/backend
+RUN npm ci --only=production --no-optional && npm cache clean --force
+
+# Copy built application and necessary files
+WORKDIR /usr/src/app
+COPY --from=builder /usr/src/app/backend/build ./backend/build
+COPY backend/server ./backend/server
+COPY backend/src ./backend/src
+COPY .env* ./
+
+# Create enhanced startup script with monitoring
+RUN cat > start-mcp.sh << 'EOF'
+#!/bin/bash
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log() {
+    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1"
+}
+
+success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+log "🚀 Starting Enhanced MCP System (Production Mode)"
+log "📦 Node.js version: $(node --version)"
+log "📦 NPM version: $(npm --version)"
+log "🔧 Environment: ${NODE_ENV:-production}"
+log "🌐 Gateway Port: ${GATEWAY_PORT:-3001}"
+log "📡 MCP Server Port: ${MCP_PORT:-8080}"
+
+# Validate environment
+if [ -z "${NOTION_TOKEN:-}" ]; then
+    warning "NOTION_TOKEN not set - some features may not work"
+fi
+
+if [ -z "${GEMINI_API_KEY:-}" ]; then
+    warning "GEMINI_API_KEY not set - AI features disabled"
+fi
+
+# Health check function
+health_check() {
+    local service=$1
+    local port=$2
+    local max_attempts=30
+    local attempt=1
+
+    # Check if curl is available
+    if ! command -v curl > /dev/null 2>&1; then
+        error "curl is not installed. Cannot perform health check for $service."
+        return 2
+    fi
+
+    while [ $attempt -le $max_attempts ]; do
+        # Try to reach the health endpoint and capture error if any
+        output=$(curl -f -s "http://localhost:$port/health" 2>&1)
+        exit_code=$?
+        if [ $exit_code -eq 0 ]; then
+            success "$service is healthy"
+            return 0
+        else
+            if echo "$output" | grep -q "Failed to connect"; then
+                warning "$service health check: Connection to localhost:$port refused (attempt $attempt/$max_attempts)"
+            elif echo "$output" | grep -q "Connection timed out"; then
+                warning "$service health check: Connection to localhost:$port timed out (attempt $attempt/$max_attempts)"
+            elif [ $exit_code -eq 22 ]; then
+                warning "$service health check: HTTP error from localhost:$port/health (attempt $attempt/$max_attempts)"
+            else
+                warning "$service health check: curl error (exit code $exit_code): $output (attempt $attempt/$max_attempts)"
+            fi
+        fi
+        log "Waiting for $service to be ready... (attempt $attempt/$max_attempts)"
+        sleep 2
+        ((attempt++))
+    done
+    error "$service failed to start after $max_attempts attempts"
+    return 1
+}
+
+# Start MCP Server
+log "🔄 Starting MCP Server..."
+cd backend
+node build/index.js &
+MCP_PID=$!
+cd ..
+
+# Wait for MCP server to initialize
+sleep 5
+
+# Start API Gateway
+log "🔄 Starting API Gateway..."
+node backend/server/app.js &
+GATEWAY_PID=$!
+
+# Wait for services to be ready
+log "🔍 Performing health checks..."
+sleep 10
+
+if health_check "Gateway" "${GATEWAY_PORT:-3001}"; then
+    success "All services started successfully!"
+else
+    error "Service health check failed"
+    exit 1
+fi
+
+# Cleanup function
+cleanup() {
+    log "🛑 Gracefully shutting down MCP System..."
+    
+    # Send SIGTERM to processes
+    kill -TERM $GATEWAY_PID $MCP_PID 2>/dev/null || true
+    
+    # Wait for graceful shutdown
+    local timeout=30
+    while [ $timeout -gt 0 ] && (kill -0 $GATEWAY_PID 2>/dev/null || kill -0 $MCP_PID 2>/dev/null); do
+        sleep 1
+        ((timeout--))
+    done
+    
+    # Force kill if still running
+    kill -KILL $GATEWAY_PID $MCP_PID 2>/dev/null || true
+    
+    success "MCP System shutdown complete"
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGTERM SIGINT SIGQUIT
+
+success "🎉 MCP System is running!"
+log "📊 Health Check: http://localhost:${GATEWAY_PORT:-3001}/health"
+log "🔧 API Gateway: http://localhost:${GATEWAY_PORT:-3001}/api/v1"
+log "📝 Writer API: http://localhost:${GATEWAY_PORT:-3001}/api/v1/writer"  
+log "🤖 Agent API: http://localhost:${GATEWAY_PORT:-3001}/api/v1/agent"
+log "📖 Documentation: http://localhost:${GATEWAY_PORT:-3001}/docs"
+
+# Send startup notification if Telegram is configured
+if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_ADMIN_CHAT_ID:-}" ]; then
+    STARTUP_MESSAGE="🚀 *MCP System Started*
+
+Environment: \`${NODE_ENV:-production}\`
+Gateway: \`http://localhost:${GATEWAY_PORT:-3001}\`
+Health: \`http://localhost:${GATEWAY_PORT:-3001}/health\`
+
+✅ All services are running
+🕐 Started: $(date '+%Y-%m-%d %H:%M:%S')"
+
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"chat_id\": \"${TELEGRAM_ADMIN_CHAT_ID}\",
+            \"text\": \"$STARTUP_MESSAGE\",
+            \"parse_mode\": \"Markdown\"
+        }" > /dev/null 2>&1 || warning "Failed to send startup notification"
+fi
+
+# Monitor processes
+while true; do
+    if ! kill -0 $MCP_PID 2>/dev/null; then
+        error "MCP Server process died!"
+        exit 1
+    fi
+    
+    if ! kill -0 $GATEWAY_PID 2>/dev/null; then
+        error "Gateway process died!"
+        exit 1
+    fi
+    
+    sleep 30
+done
+EOF
+
+# Enhanced health check script
+RUN cat > healthcheck.sh << 'EOF'
+#!/bin/bash
+set -e
+
+GATEWAY_PORT=${GATEWAY_PORT:-3001}
+HEALTH_URL="http://localhost:$GATEWAY_PORT/health"
+
+# Basic connectivity check
+if ! curl -f -s --max-time 10 "$HEALTH_URL" > /dev/null; then
+    echo "Health check failed: Gateway not responding"
+    exit 1
+fi
+
+# Parse health response
+HEALTH_RESPONSE=$(curl -s --max-time 10 "$HEALTH_URL")
+
+# Check if response contains "healthy" status
+if echo "$HEALTH_RESPONSE" | grep -q '"status":"healthy"'; then
+    echo "Health check passed: System is healthy"
+    exit 0
+else
+    echo "Health check failed: System not healthy"
+    echo "Response: $HEALTH_RESPONSE"
+    exit 1
+fi
+EOF
+
+# Make scripts executable
+RUN chmod +x start-mcp.sh healthcheck.sh
+
+# Change ownership to non-root user
+RUN chown -R mcp:nodejs /usr/src/app
+
+# Switch to non-root user
+USER mcp
+
+# Expose ports
+EXPOSE 3001 8080
+
+# Environment variables with better defaults
+ENV NODE_ENV=production \
+    GATEWAY_PORT=3001 \
+    MCP_PORT=8080 \
+    NODE_OPTIONS="--max-old-space-size=512" \
+    UV_THREADPOOL_SIZE=4
+
+# Enhanced health check with longer intervals for production
+HEALTHCHECK --interval=60s --timeout=15s --start-period=60s --retries=3 \
+    CMD ./healthcheck.sh
+
+# Use tini as PID 1 for proper signal handling
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["./start-mcp.sh"]

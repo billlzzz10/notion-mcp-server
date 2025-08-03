@@ -1,20 +1,30 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm ci --omit=dev && cd backend && npm ci --omit=dev"
+buildCommand = "npm ci && npm run build && cd backend && npm ci && npm run build"
 
 [deploy]
-startCommand = "node backend/server/app.js"
+startCommand = "npm run start-gateway"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "always"
 
 [environments.production]
 NODE_ENV = "production"
+PORT = "$PORT"
+GATEWAY_PORT = "$PORT"
 
 # Required Environment Variables (จะต้องตั้งใน Railway Dashboard)
-# NOTION_TOKEN
-# NOTION_CHARACTERS_DB_ID  
-# NOTION_SCENES_DB_ID
-# NOTION_PROJECTS_DB_ID
-# NOTION_TASKS_DB_ID
-# GEMINI_API_KEY
+# NOTION_TOKEN - Notion Integration Token
+# NOTION_CHARACTERS_DB_ID - Characters Database ID
+# NOTION_SCENES_DB_ID - Scenes Database ID  
+# NOTION_LOCATIONS_DB_ID - Locations Database ID
+# NOTION_PROJECTS_DB_ID - Projects Database ID
+# NOTION_TASKS_DB_ID - Tasks Database ID
+# NOTION_NOTES_DB_ID - Notes Database ID
+# NOTION_TIMELINE_DB_ID - Timeline Database ID
+# NOTION_WORLDS_DB_ID - Worlds Database ID
+# NOTION_POWER_SYSTEMS_DB_ID - Power Systems Database ID
+# NOTION_ARCANAS_DB_ID - Arcanas Database ID
+# GEMINI_API_KEY - Google Gemini AI API Key
+# TELEGRAM_BOT_TOKEN - Telegram Bot Token (Optional)
+# YOUTUBE_API_KEY - YouTube API Key (Optional)
