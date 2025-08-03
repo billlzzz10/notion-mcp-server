@@ -81,16 +81,25 @@ clean_install() {
     fi
     
     # Install dependencies
-    if npm ci 2>/dev/null; then
+    local npm_err
+    npm_err=$(mktemp)
+    if npm ci 2> "$npm_err"; then
         success "Clean install completed for $name"
-    elif npm install; then
+    elif npm install 2>> "$npm_err"; then
         success "Install completed for $name"
     else
         error "Failed to install dependencies for $name"
+        if [ -s "$npm_err" ]; then
+            echo -e "${RED}--- npm error output for $name ---${NC}"
+            cat "$npm_err"
+            echo -e "${RED}--- end npm error output ---${NC}"
+        fi
+        rm -f "$npm_err"
         return 1
     fi
-    
-    cd - > /dev/null
+   rm -f "$npm_err"
+   
+   cd - > /dev/null
 }
 
 # Security audit and fix
