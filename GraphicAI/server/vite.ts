@@ -46,7 +46,7 @@ export async function setupVite(app: Express, server: Server) {
   // Rate limiter for Vite index.html handler
   const viteLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 50, // limit each IP to 50 requests per windowMs
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   });
