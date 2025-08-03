@@ -115,17 +115,35 @@ health_check() {
     local port=$2
     local max_attempts=30
     local attempt=1
-    
+
+    # Check if curl is available
+    if ! command -v curl > /dev/null 2>&1; then
+        error "curl is not installed. Cannot perform health check for $service."
+        return 2
+    fi
+
     while [ $attempt -le $max_attempts ]; do
-        if curl -f -s "http://localhost:$port/health" > /dev/null 2>&1; then
+        # Try to reach the health endpoint and capture error if any
+        output=$(curl -f -s "http://localhost:$port/health" 2>&1)
+        exit_code=$?
+        if [ $exit_code -eq 0 ]; then
             success "$service is healthy"
             return 0
+        else
+            if echo "$output" | grep -q "Failed to connect"; then
+                warning "$service health check: Connection to localhost:$port refused (attempt $attempt/$max_attempts)"
+            elif echo "$output" | grep -q "Connection timed out"; then
+                warning "$service health check: Connection to localhost:$port timed out (attempt $attempt/$max_attempts)"
+            elif [ $exit_code -eq 22 ]; then
+                warning "$service health check: HTTP error from localhost:$port/health (attempt $attempt/$max_attempts)"
+            else
+                warning "$service health check: curl error (exit code $exit_code): $output (attempt $attempt/$max_attempts)"
+            fi
         fi
         log "Waiting for $service to be ready... (attempt $attempt/$max_attempts)"
         sleep 2
         ((attempt++))
     done
-    
     error "$service failed to start after $max_attempts attempts"
     return 1
 }
