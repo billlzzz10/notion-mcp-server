@@ -59,7 +59,11 @@ This report analyzes the current AI tool integration capabilities and identifies
 EOF
 
 # Replace date placeholder
-sed -i "s/DATE_PLACEHOLDER/$(date '+%Y-%m-%d %H:%M:%S')/" "$REPORT_FILE"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/DATE_PLACEHOLDER/$(date '+%Y-%m-%d %H:%M:%S')/" "$REPORT_FILE"
+else
+    sed -i "s/DATE_PLACEHOLDER/$(date '+%Y-%m-%d %H:%M:%S')/" "$REPORT_FILE"
+fi
 
 section "Scanning Current AI Integrations"
 
