@@ -1,0 +1,136 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/**'
+      - 'web-chat/**'
+      - 'docs/**'
+      - '.github/workflows/deploy-pages.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/**'
+      - 'web-chat/**'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+
+      - name: Build web interface
+        run: |
+          # Check if web-chat exists in frontend or backend
+          if [ -d "frontend/modern/lz-labs-main/web-chat" ]; then
+            cd frontend/modern/lz-labs-main/web-chat
+            npm ci
+            npm run build
+            mkdir -p ../../../../dist
+            cp -r dist/* ../../../../dist/
+          elif [ -d "backend/web-chat" ]; then
+            cd backend/web-chat
+            npm ci
+            npm run build
+            mkdir -p ../../dist
+            cp -r dist/* ../../dist/
+          elif [ -d "web-chat" ]; then
+            cd web-chat
+            npm ci
+            npm run build
+            mkdir -p ../dist
+            cp -r dist/* ../dist/
+          fi
+
+      - name: Build documentation site
+        run: |
+          mkdir -p dist/docs
+          # Create a simple documentation index
+          cat > dist/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Notion MCP Server</title>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          </head>
+          <body class="bg-gray-100">
+            <div class="container mx-auto px-4 py-8">
+              <h1 class="text-4xl font-bold text-center mb-8">🏰 Notion MCP Server</h1>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                  <h2 class="text-2xl font-semibold mb-4">🚀 Quick Start</h2>
+                  <p class="text-gray-600 mb-4">Advanced Notion MCP Server with AI Agents, Web Interface และ Gateway API</p>
+                  <a href="https://github.com/billlzzz10/notion-mcp-server" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">View on GitHub</a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                  <h2 class="text-2xl font-semibold mb-4">📖 Documentation</h2>
+                  <ul class="space-y-2">
+                    <li><a href="docs/README.html" class="text-blue-500 hover:underline">README (English)</a></li>
+                    <li><a href="docs/README-th.html" class="text-blue-500 hover:underline">README (ภาษาไทย)</a></li>
+                    <li><a href="docs/mcp-usage.html" class="text-blue-500 hover:underline">MCP Usage Guide</a></li>
+                    <li><a href="docs/api-reference.html" class="text-blue-500 hover:underline">API Reference</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+          
+          # Copy documentation files
+          if [ -d "docs" ]; then
+            cp -r docs/* dist/docs/
+          fi
+          
+          # Convert README to HTML
+          if command -v pandoc &> /dev/null; then
+            pandoc README.md -o dist/docs/README.html --template=github
+          else
+            cp README.md dist/docs/
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

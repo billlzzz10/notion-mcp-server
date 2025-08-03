@@ -378,6 +378,49 @@ jobs:
         console.log('Recommendations:', perfReport.recommendations.length);
         "
 
+    # === Send Telegram Notification ===
+    - name: Send Telegram Notification
+      run: |
+        echo "📱 Sending Telegram notification..."
+        
+        # Send notification if webhook URL is available
+        if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}" ]; then
+          TELEGRAM_URL="https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+          
+          # Create message
+          MESSAGE="🤖 *GitHub Actions Completed*
+          
+Repository: \`${{ github.repository }}\`
+Branch: \`${{ github.ref_name }}\`
+Commit: \`${{ github.sha }}\`
+Trigger: ${{ github.event_name }}
+
+✅ Actions Completed:
+• 🧹 Auto Cleanup
+• 📝 Documentation Update  
+• 🏥 Health Check
+• 📖 API Documentation
+• ⚡ Performance Analysis
+
+🕐 Time: $(date '+%Y-%m-%d %H:%M:%S')
+
+🔗 [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
+          # Send to Telegram
+          curl -s -X POST "$TELEGRAM_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"chat_id\": \"${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}\",
+              \"text\": \"$MESSAGE\",
+              \"parse_mode\": \"Markdown\",
+              \"disable_web_page_preview\": true
+            }" || echo "⚠️ Failed to send Telegram notification"
+          
+          echo "✅ Telegram notification sent"
+        else
+          echo "⚠️ Telegram secrets not configured, skipping notification"
+        fi
+
     # === Commit การเปลี่ยนแปลง ===
     - name: Commit Auto Updates
       if: github.event_name == 'push' # Run only on push events
@@ -394,6 +437,27 @@ jobs:
           git commit -m "🤖 Auto-update: documentation, cleanup, and reports [skip ci]"
           git push
           echo "✅ Changes committed and pushed"
+          
+          # Send deployment notification
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}" ]; then
+            TELEGRAM_URL="https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
+            DEPLOY_MESSAGE="🚀 *Auto-Deployment Success*
+
+Repository: \`${{ github.repository }}\`
+Branch: \`${{ github.ref_name }}\`
+Updates: Documentation, Reports, Cleanup
+
+✅ Status: Successfully deployed
+🕐 Time: $(date '+%Y-%m-%d %H:%M:%S')"
+
+            curl -s -X POST "$TELEGRAM_URL" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"chat_id\": \"${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}\",
+                \"text\": \"$DEPLOY_MESSAGE\",
+                \"parse_mode\": \"Markdown\"
+              }" || echo "⚠️ Failed to send deployment notification"
+          fi
         else
           echo "✨ No changes to commit"
         fi

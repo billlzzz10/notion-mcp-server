@@ -115,26 +115,35 @@ jobs:
 
 ## 🆕 ฟีเจอร์ใหม่ล่าสุด
 
-## ⚙️ **DevOps Automation**
+### 🚀 **Comprehensive Enhancement Update**
 
-- ✅ **GitHub Actions:** Smart Sync, Dependency Management, AI Code Review, Security/Performance Monitoring และ Auto Deploy (เสร็จสมบูรณ์)
+- ✅ **Security Fixes:** All vulnerabilities resolved (0 detected)
+- ✅ **Railway Deployment:** Fixed configuration for seamless deployment
+- ✅ **GitHub Pages:** Auto-deployment for web interface
+- ✅ **Bilingual Documentation:** Thai-English MCP usage guide
+- ✅ **Enhanced Docker:** Multi-stage build with security optimizations
+- ✅ **AI Tool Scanner:** 36 MCP tools, 4 AI providers integrated
+- ✅ **Telegram Notifications:** Real-time deployment and system alerts
+- ✅ **Automation Scripts:** Smart dependency installation and management
+- ✅ **Document Templates:** Professional project templates
 
-*อัปเดต: 17/7/2568 06:21:46*
-
-
-## 🆕 ฟีเจอร์ใหม่ล่าสุด
+*อัปเดต: 3/8/2568 00:30:17*
 
 ### 🔌 **Integration ที่พร้อมใช้**
-- ✅ **Notion API** (10 Databases)
-- ✅ **Gemini AI** (Smart Model Selection)
-- ✅ **Telegram Bot** 
-- ✅ **Make.com Webhook**
-- ✅ **Web Chat Interface** (port 3002)
-- ✅ **MCP Gateway** (port 3001)
+- ✅ **Notion API** (10 Databases) - Production Ready
+- ✅ **Google Gemini AI** (Smart Model Selection) - Optimized
+- ✅ **OpenAI Integration** - Detected & Ready
+- ✅ **Anthropic Claude** - Framework Ready
+- ✅ **Hugging Face** - Model Support Ready
+- ✅ **Telegram Bot** (Enhanced Notifications) - Upgraded with grammy
+- ✅ **Make.com Webhook** - Stable
+- ✅ **Web Chat Interface** (port 3002) - Enhanced
+- ✅ **MCP Gateway** (port 3001) - Production Grade
+- ✅ **GitHub Pages** - Auto-deployed Documentation
 - ⚠️ **YouTube Analyzer** (ยังไม่ได้ทดสอบ)
 - 🚧 **TTS Integration (Google Colab)** (อยู่ระหว่างพัฒนา)
 
-*อัปเดต: 17/7/2568 06:09:47*
+*อัปเดต: 3/8/2568 00:30:17*
 
 
 ## 🌟 Overview
@@ -156,56 +165,147 @@ Notion MCP Server เป็นระบบ Model Context Protocol ขั้น�
 
 ## 🚀 Quick Start
 
-### 1️⃣ **Installation**
+### 🎯 **Three Deployment Options**
 
+#### 1️⃣ **Local Development (Full Stack)**
 ```bash
-# Clone repository
-git clone https://github.com/awkoy/notion-mcp-server.git
-cd notion-mcp-server
+# Quick setup with automation script
+./scripts/install-dependencies.sh
 
-# Install dependencies
-npm install
-
-# Setup environment
+# Configure environment
 cp .env.example .env
+# Edit .env with your tokens
+
+# Start all services
+npm run dev-mcp-only
+```
+
+#### 2️⃣ **Railway Deployment (Production)**
+```bash
+# One-click deploy to Railway
+# Automatic build and deployment configured
+# Health monitoring included
+```
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
+
+#### 3️⃣ **Docker Deployment (Container)**
+```bash
+# Enhanced multi-stage build
+docker build -f Dockerfile.enhanced -t notion-mcp-server .
+docker run -p 3001:3001 -p 8080:8080 notion-mcp-server
+
+# Or use Docker Compose
+docker-compose -f docker-compose.mcp-only.yml up
 ```
 
 ### 2️⃣ **Environment Configuration**
 
 ```env
-# Notion Configuration
-NOTION_TOKEN=your_notion_integration_token
-NOTION_CHARACTERS_DB_ID=your_characters_database_id
-NOTION_SCENES_DB_ID=your_scenes_database_id
-NOTION_LOCATIONS_DB_ID=your_locations_database_id
+# Notion Configuration (Required)
+NOTION_TOKEN=secret_xxxxxxxxxxxxx
+NOTION_CHARACTERS_DB_ID=your_database_id
+NOTION_SCENES_DB_ID=your_database_id
+NOTION_LOCATIONS_DB_ID=your_database_id
+NOTION_PROJECTS_DB_ID=your_database_id
+NOTION_TASKS_DB_ID=your_database_id
 
-# AI Configuration  
+# AI Configuration (Required)
 GEMINI_API_KEY=your_gemini_api_key
+
+# Optional Integrations
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+TELEGRAM_ADMIN_CHAT_ID=your_chat_id
+YOUTUBE_API_KEY=your_youtube_api_key
 
 # Server Configuration
 PORT=3001
 WEB_PORT=3002
+NODE_ENV=production
 ```
 
-### 3️⃣ **Start Services**
+### 3️⃣ **Verification & Testing**
 
 ```bash
-# Start MCP Server
-npm start
+# Health check
+curl http://localhost:3001/health
 
-# Start Enhanced Gateway (API Server)
-npm run start-gateway
+# Test MCP tools
+npx @modelcontextprotocol/inspector backend/build/index.js
 
-# Start Web Chat Interface
-cd web-chat && npm run dev
+# Run AI integration scanner
+./scripts/scan-ai-integration.sh
+
+# Security audit
+npm run security-scan
 ```
 
 ### 🌐 **Access Points**
 - **Enhanced Gateway API**: http://localhost:3001/api/v1
 - **Web Chat Interface**: http://localhost:3002  
 - **Health Check**: http://localhost:3001/health
+- **Documentation**: https://billlzzz10.github.io/notion-mcp-server
+- **AI Integration Report**: `reports/ai-integration-scan-*.md`
+- **MCP Inspector**: Available via npx command
 
 ---
+
+---
+
+## 🤖 **DevOps & Automation**
+
+### 🚀 **Smart Deployment Automation**
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| 🔧 **Dependency Auto-Install** | ✅ Production | Smart script with security checks |
+| 📱 **Telegram Notifications** | ✅ Ready | Real-time deployment & system alerts |
+| 🐳 **Enhanced Docker** | ✅ Multi-stage | Security optimized, health monitoring |
+| 🚀 **Railway Deploy** | ✅ Fixed | One-click production deployment |
+| 📖 **GitHub Pages** | ✅ Auto | Documentation auto-deployment |
+| 🔍 **AI Tool Scanner** | ✅ Ready | 36 tools, 4 AI providers analysis |
+| 🛡️ **Security Monitor** | ✅ Active | Vulnerability scanning & fixes |
+
+### 📋 **Automation Scripts**
+
+```bash
+# Smart dependency installation
+./scripts/install-dependencies.sh [--clean] [--skip-security]
+
+# AI integration analysis
+./scripts/scan-ai-integration.sh
+
+# Health monitoring
+npm run health-check
+
+# Security audit
+npm run security-scan
+
+# Performance testing
+npm run performance-test
+```
+
+### 📊 **Monitoring & Alerts**
+
+- **Health Monitoring**: Automated health checks every 60s
+- **Performance Tracking**: Memory, CPU, response times
+- **Security Scanning**: Dependency vulnerability checks
+- **Telegram Alerts**: Real-time notifications for:
+  - Deployment status (start/success/failure)
+  - Security vulnerabilities (critical/high/medium/low)
+  - Service health (up/down)
+  - Action results (success/failure)
+
+### 🔧 **DevOps Tools Integration**
+
+| Tool | Purpose | Configuration |
+|------|---------|---------------|
+| **GitHub Actions** | CI/CD Pipeline | `.github/workflows/` |
+| **Railway** | Production Hosting | `railway.toml` |
+| **Docker** | Containerization | `Dockerfile.enhanced` |
+| **Telegram Bot** | Notifications | `backend/src/bot/notificationBot.ts` |
+| **MCP Inspector** | Tool Testing | Built-in support |
 
 ## 🏗️ Architecture
 
@@ -554,6 +654,9 @@ See [FRONTEND-API-GUIDE.md](docs/FRONTEND-API-GUIDE.md) for complete API documen
 ### 📚 **Documentation**
 
 - [Ashval World Guide](ASHVAL_GUIDE.md) - Complete world building reference
+- [MCP Usage Guide (Thai-English)](docs/MCP-USAGE-GUIDE.md) - Bilingual usage documentation
+- [Document Templates](docs/DOCUMENT-TEMPLATES.md) - Professional project templates
+- [AI Integration Report](reports/) - Detailed AI tool analysis
 - [Copilot Integration](docs/copilot-integration-guide.md) - GitHub Copilot setup
 - [Bot Integration](docs/bot-integration-guide.md) - Telegram bot configuration  
 - [Frontend API Guide](docs/FRONTEND-API-GUIDE.md) - API documentation for developers
@@ -561,9 +664,18 @@ See [FRONTEND-API-GUIDE.md](docs/FRONTEND-API-GUIDE.md) for complete API documen
 ### 🔗 **Quick Links**
 
 - [Live Demo](demo/) - Integration examples
+- [GitHub Pages Site](https://billlzzz10.github.io/notion-mcp-server) - Online documentation
 - [Roadmap](ROADMAP-UPDATED.md) - Development progress
 - [Change Log](COMPLETION_SUMMARY.md) - Recent updates
 - [Performance Report](PERFORMANCE-INTEGRATION-REPORT.md) - Optimization details
+- [Security Report](reports/ai-integration-scan-*.md) - AI integration analysis
+
+### 🛠️ **Development Tools**
+
+- **MCP Inspector**: `npx @modelcontextprotocol/inspector backend/build/index.js`
+- **AI Scanner**: `./scripts/scan-ai-integration.sh`
+- **Dependency Manager**: `./scripts/install-dependencies.sh`
+- **Health Monitor**: `curl http://localhost:3001/health`
 
 ---
 
