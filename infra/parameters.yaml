@@ -1,0 +1,20 @@
+# Infrastructure Parameters for Different Environments
+# This file contains environment-specific parameters for the Bicep deployment
+
+# Development Environment
+dev:
+  resourcePrefix: "notion-mcp-dev"
+  location: "East US"
+  environment: "dev"
+  
+# Staging Environment  
+staging:
+  resourcePrefix: "notion-mcp-staging"
+  location: "East US"
+  environment: "staging"
+
+# Production Environment
+prod:
+  resourcePrefix: "notion-mcp-prod"
+  location: "East US" 
+  environment: "prod"

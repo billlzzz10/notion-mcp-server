@@ -1,21 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { azureOpenAIService } from "../services/azureOpenAIService.js";
 import { Bot, Context } from "grammy";
 
 export class AshvalChatBot {
-  private gemini: GoogleGenerativeAI;
   private bot: Bot;
-  private model: any;
   private conversationHistory = new Map<string, any[]>();
 
   constructor() {
-    // Initialize Gemini AI
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    if (!geminiApiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is required");
-    }
-    
-    this.gemini = new GoogleGenerativeAI(geminiApiKey);
-    this.model = this.gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Verify Azure OpenAI service
+    console.log("🔧 Azure OpenAI configuration:", azureOpenAIService.getConfig());
 
     // Initialize Telegram Bot with grammy
     const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -144,8 +136,10 @@ If the user asks about specific data manipulation, suggest using appropriate com
       `;
 
       // Generate AI response
-      const result = await this.model.generateContent(contextPrompt);
-      const response = result.response.text();
+      const response = await azureOpenAIService.generateWorldBuilding(
+        contextPrompt,
+        'character' // Default to character generation for Ashval
+      );
 
       // Add AI response to history
       history.push({

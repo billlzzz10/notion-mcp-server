@@ -1,0 +1,119 @@
+# Services Configuration for Azure Container Apps Deployment
+# This file defines the 3 core services for the Notion MCP Server system
+
+services:
+  # 1. Notion MCP Server - Node.js TypeScript Application
+  notion-mcp-server:
+    name: "notion-mcp-server"
+    runtime: "nodejs"
+    port: 8080
+    dockerfile: "Dockerfile.mcp-only"
+    build_command: "npm run build"
+    start_command: "node backend/build/index.js"
+    environment:
+      NODE_ENV: "production"
+      MCP_PORT: "8080"
+    secrets_required:
+      - NOTION_TOKEN
+      - AZURE_OPENAI_ENDPOINT
+      - AZURE_OPENAI_API_KEY
+      - AZURE_OPENAI_DEPLOYMENT_NAME
+    cpu: "0.5"
+    memory: "1Gi"
+    replicas_min: 1
+    replicas_max: 3
+
+  # 2. Agent API - Python FastAPI for AI Processing
+  agent-api:
+    name: "agent-api"
+    runtime: "python"
+    port: 8000
+    dockerfile: "agent-api/Dockerfile"
+    build_command: "pip install -r requirements.txt"
+    start_command: "uvicorn main:app --host 0.0.0.0 --port 8000"
+    environment:
+      PYTHON_ENV: "production"
+      API_PORT: "8000"
+    secrets_required:
+      - AZURE_OPENAI_ENDPOINT
+      - AZURE_OPENAI_API_KEY
+      - AZURE_OPENAI_DEPLOYMENT_NAME
+      - NOTION_TOKEN
+    cpu: "1.0"
+    memory: "2Gi"
+    replicas_min: 1
+    replicas_max: 5
+
+  # 3. Gateway Frontend - Next.js Application  
+  gateway:
+    name: "gateway"
+    runtime: "nodejs"
+    port: 3000
+    dockerfile: "frontend/Dockerfile"
+    build_command: "npm run build"
+    start_command: "npm start"
+    environment:
+      NODE_ENV: "production"
+      PORT: "3000"
+      NEXT_TELEMETRY_DISABLED: "1"
+    secrets_required:
+      - AZURE_OPENAI_ENDPOINT
+      - NOTION_TOKEN
+    cpu: "0.5"
+    memory: "1Gi"
+    replicas_min: 1
+    replicas_max: 3
+
+# Azure Configuration
+azure:
+  resource_group: "notion-mcp-rg"
+  location: "East US"
+  container_app_environment: "notion-mcp-env"
+  log_analytics_workspace: "notion-mcp-logs"
+  
+  # Networking
+  networking:
+    internal_only: false
+    allow_insecure: false
+    
+  # Monitoring
+  monitoring:
+    enable_logging: true
+    enable_metrics: true
+    log_retention_days: 30
+
+# Deployment Configuration
+deployment:
+  strategy: "rolling"
+  max_surge: 1
+  max_unavailable: 0
+  
+  # Health Checks
+  health_checks:
+    notion-mcp-server:
+      path: "/health"
+      interval: 30
+      timeout: 10
+      
+    agent-api:
+      path: "/health"
+      interval: 30
+      timeout: 10
+      
+    gateway:
+      path: "/api/health"
+      interval: 30
+      timeout: 10
+
+# Environment Variables
+environment_variables:
+  # Common
+  LOG_LEVEL: "info"
+  
+  # Azure OpenAI Configuration
+  AZURE_OPENAI_API_VERSION: "2024-02-01"
+  AZURE_OPENAI_MODEL: "gpt-4"
+  
+  # Application Configuration
+  MAX_TOKENS: "4096"
+  TEMPERATURE: "0.7"

@@ -1,20 +1,12 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { azureOpenAIService } from "../services/azureOpenAIService.js";
 // เพิ่ม import สำหรับ platform ของคุณ (Discord, LINE, Web Chat ฯลฯ)
 
 export class YourChatBot {
-  private gemini: GoogleGenerativeAI;
-  private model: any;
   private conversationHistory = new Map<string, any[]>();
 
   constructor() {
-    // Initialize Gemini AI (ใช้ร่วมกับ Telegram Bot)
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-    if (!geminiApiKey) {
-      throw new Error("GEMINI_API_KEY environment variable is required");
-    }
-    
-    this.gemini = new GoogleGenerativeAI(geminiApiKey);
-    this.model = this.gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Verify Azure OpenAI service
+    console.log("🔧 Azure OpenAI configuration:", azureOpenAIService.getConfig());
 
     // Initialize your chat platform here
     this.setupYourPlatform();
