@@ -1,4 +1,6 @@
 name: 🚀 Deploy Notion MCP Server to Azure Container Apps
+permissions:
+  contents: read
 
 on:
   push:
