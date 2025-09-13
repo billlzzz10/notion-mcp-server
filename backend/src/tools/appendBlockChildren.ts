@@ -2,6 +2,7 @@ import { notion } from "../services/notion.js";
 import { AppendBlockChildrenParams } from "../types/blocks.js";
 import { handleNotionError } from "../utils/error.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { BlockObjectRequest } from "@notionhq/client/build/src/api-endpoints";
 
 export const appendBlockChildren = async (
   params: AppendBlockChildrenParams
@@ -9,7 +10,7 @@ export const appendBlockChildren = async (
   try {
     const response = await notion.blocks.children.append({
       block_id: params.blockId,
-      children: params.children,
+      children: params.children as BlockObjectRequest[],
     });
 
     return {

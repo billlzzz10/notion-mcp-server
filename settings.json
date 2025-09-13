@@ -1,0 +1,16 @@
+{
+  "providers": {
+    "openai": { "api_key": "sk-xxx" },
+    "anthropic": { "api_key": "" },
+    "google": { "api_key": "" },
+    "mistral": { "api_key": "" },
+    "huggingface": { "api_key": "" },
+    "openrouter": { "api_key": "" },
+    "ollama": { "host": "http://localhost:11434" }
+  },
+  "cache": {
+    "enabled": true,
+    "path": "./cache/",
+    "max_size": 500
+  }
+}

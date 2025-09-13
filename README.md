@@ -60,7 +60,7 @@ npm run dev
 
 - **Vector Databases**: ChromaDB, Pinecone support
 - **Real-time**: WebSocket + Redis integration  
-- **AI Models**: Multi-provider support
+- **Advanced AI Router**: A sophisticated, rule-based AI router with caching, prompt management, and support for multiple providers.
 - **Monitoring**: Prometheus + Grafana ready
 
 เทคโนโลยีที่เพิ่มเติม:
@@ -251,15 +251,7 @@ cp .env.example .env
 npm run dev-mcp-only
 ```
 
-#### 2️⃣ **Railway Deployment (Production)**
-```bash
-# One-click deploy to Railway
-# Automatic build and deployment configured
-# Health monitoring included
-```
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
-
-#### 3️⃣ **Docker Deployment (Container)**
+#### 2️⃣ **Docker Deployment (Container)**
 ```bash
 # Enhanced multi-stage build
 docker build -f Dockerfile.enhanced -t notion-mcp-server .
@@ -280,12 +272,11 @@ NOTION_LOCATIONS_DB_ID=your_database_id
 NOTION_PROJECTS_DB_ID=your_database_id
 NOTION_TASKS_DB_ID=your_database_id
 
-# AI Configuration (Required)
-GEMINI_API_KEY=your_gemini_api_key
+# AI Configuration
+# AI provider keys and settings are now managed in `settings.json`.
+# Routing rules, default models, and prompt settings are in `config.json`.
 
 # Optional Integrations
-OPENAI_API_KEY=your_openai_api_key
-ANTHROPIC_API_KEY=your_anthropic_api_key
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 TELEGRAM_ADMIN_CHAT_ID=your_chat_id
 YOUTUBE_API_KEY=your_youtube_api_key
@@ -333,7 +324,6 @@ npm run security-scan
 | 🔧 **Dependency Auto-Install** | ✅ Production | Smart script with security checks |
 | 📱 **Telegram Notifications** | ✅ Ready | Real-time deployment & system alerts |
 | 🐳 **Enhanced Docker** | ✅ Multi-stage | Security optimized, health monitoring |
-| 🚀 **Railway Deploy** | ✅ Fixed | One-click production deployment |
 | 📖 **GitHub Pages** | ✅ Auto | Documentation auto-deployment |
 | 🔍 **AI Tool Scanner** | ✅ Ready | 36 tools, 4 AI providers analysis |
 | 🛡️ **Security Monitor** | ✅ Active | Vulnerability scanning & fixes |
@@ -373,7 +363,6 @@ npm run performance-test
 | Tool | Purpose | Configuration |
 |------|---------|---------------|
 | **GitHub Actions** | CI/CD Pipeline | `.github/workflows/` |
-| **Railway** | Production Hosting | `railway.toml` |
 | **Docker** | Containerization | `Dockerfile.enhanced` |
 | **Telegram Bot** | Notifications | `backend/src/bot/notificationBot.ts` |
 | **MCP Inspector** | Tool Testing | Built-in support |
@@ -386,6 +375,7 @@ npm run performance-test
 | **Content Recommendations** | `get_content_recommendations` | คำแนะนำเนื้อหาระหว่างการเขียน |
 | **Plot Hole Detection** | `detect_plot_holes` | ตรวจหาช่องโหว่ในโครงเรื่อง |
 | **Similar Content** | `find_similar_content` | หาเนื้อหาที่คล้ายกัน |
+| **Mind Map Generation** | `ashval_mind_map_generator` | สร้าง Mind Map จากรูปภาพหรือข้อความ |
 
 ### 🚀 **Technology Enhancement**
 
@@ -410,15 +400,17 @@ npm run performance-test
 
 ```
 notion-mcp-server/
-├── 📂 src/                   # MCP Server Core
-│   ├── 📂 tools/             # 17 MCP Tools
-│   ├── 📂 services/          # Notion API Services
-│   ├── 📂 server/            # MCP Configuration
-│   └── index.ts              # MCP Entry Point
-├── 📂 server/                # Enhanced Gateway v3.1
-│   ├── 📂 mcp-gateway/       # HTTP API Gateway
+├── 📂 backend/src/           # Main application source
+│   ├── Router.ts           # Core AI routing logic
+│   ├── ProviderManager.ts  # Manages connections to AI providers
+│   ├── RuleEngine.ts       # Decides which provider/model to use
+│   ├── PromptManager.ts    # Builds and formats prompts
+│   ├── CacheManager.ts     # Caches AI responses
+│   └── tools/              # MCP Tools for specific tasks
+├── 📂 GraphicAI/server/      # Headless MCP server for image generation
+├── 📂 server/                # Express Server
 │   └── app.js                # Express Server + Rate Limiting
-├── 📂 web-chat/              # Web Interface v2.1
+├── 📂 web-chat/              # Web Interface
 │   ├── index.tsx             # React Chat App
 │   ├── index.html            # Web Dashboard
 │   └── package.json          # Frontend Dependencies
@@ -431,48 +423,6 @@ notion-mcp-server/
 ├── ASHVAL_GUIDE.md           # World Building Guide
 ├── ROADMAP-UPDATED.md        # Development Roadmap
 └── .env.example              # Environment Template
-```
-
----
-
-## 🛠️ **Enhanced Gateway v3.1** 
-
-### 🚀 **New Features**
-
-- ✅ **API Versioning**: `/api/v1/*` with backward compatibility
-- ✅ **Rate Limiting**: 100 req/15min (general), 50 req/15min (AI endpoints)
-- ✅ **Enhanced Health Check**: Memory, uptime, services status
-- ✅ **Request Logging**: Timestamp + IP tracking
-- ✅ **Global Error Handler**: 500, 404 with detailed responses
-- ✅ **Enhanced CORS**: Security headers included
-
-### 📡 **API Endpoints**
-
-| Endpoint | Method | Description | Rate Limit |
-|----------|--------|-------------|------------|
-| `/api/v1/health` | GET | Enhanced system health | 100/15min |
-| `/api/v1/agent/*` | POST | AI Agent endpoints | 50/15min |
-| `/api/v1/notion/*` | GET/POST | Notion operations | 100/15min |
-| `/api/v1/tools/*` | POST | MCP Tools access | 100/15min |
-
-### 📋 **Health Check Response**
-
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-01-17T10:30:00.000Z",
-  "uptime": 86400,
-  "memory": {
-    "used": "45.2 MB",
-    "total": "512 MB",
-    "percentage": 8.8
-  },
-  "services": {
-    "mcp": "connected",
-    "notion": "connected",
-    "gemini": "connected"
-  }
-}
 ```
 
 ---
@@ -555,6 +505,8 @@ Characters ↔ Scenes ↔ Locations
 
 ## ⚡ **Performance Optimization** 
 
+The new Router architecture includes a built-in `CacheManager` that caches responses from AI providers. This significantly improves performance and reduces costs for repeated queries.
+
 ### 🚀 **300-500% Performance Boost**
 
 | System | Improvement | Benefit |
@@ -605,7 +557,7 @@ Characters ↔ Scenes ↔ Locations
 | `notion_comments` | Comment management | view, add |
 | `notion_users` | User management | list, info |
 
-### ✅ **Ashval World Building Tools (12/12)**
+### ✅ **Ashval World Building Tools (14/14)**
 
 | Tool | Purpose | Use Case |
 |------|---------|----------|
@@ -621,6 +573,7 @@ Characters ↔ Scenes ↔ Locations
 | `ashval_story_structure_analyzer` | Structure analysis | Pacing optimization |
 | `ashval_character_dialogue_generator` | Dialogue creation | Character development |
 | `ashval_auto_tag_system` | Auto-tagging | Content organization |
+| `ashval_mind_map_generator` | Mind map creation | Visualizing concepts from images/text |
 
 ---
 

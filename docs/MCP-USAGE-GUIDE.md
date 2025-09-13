@@ -27,22 +27,25 @@ cp .env.example .env
 
 #### Configuration
 
-Edit your `.env` file with your Notion integration details:
+The new architecture uses `config.json` for rules and `settings.json` for secrets.
 
-```env
-# Notion Configuration
-NOTION_TOKEN=your_notion_integration_token
-NOTION_CHARACTERS_DB_ID=your_characters_database_id
-NOTION_SCENES_DB_ID=your_scenes_database_id
-NOTION_LOCATIONS_DB_ID=your_locations_database_id
-
-# AI Configuration  
-GEMINI_API_KEY=your_gemini_api_key
-
-# Server Configuration
-PORT=3001
-WEB_PORT=3002
-```
+1.  **`settings.json`**: Create this file in the root directory and add your API keys.
+    ```json
+    {
+      "providers": {
+        "openai": { "api_key": "sk-xxx" },
+        "anthropic": { "api_key": "..." },
+        "google": { "api_key": "..." }
+      }
+    }
+    ```
+2.  **`config.json`**: This file controls the Router's behavior. You can define rules to route specific tasks to different models.
+3.  **`.env` file**: This file is still used for Notion and server settings.
+    ```env
+    # Notion Configuration
+    NOTION_TOKEN=your_notion_integration_token
+    NOTION_CHARACTERS_DB_ID=your_characters_database_id
+    ```
 
 #### Available MCP Tools
 
@@ -54,11 +57,19 @@ WEB_PORT=3002
 - `notion_users` - User management (list, info)
 
 ##### Ashval World Building Tools
+- `ashval_version_control` - Version tracking for data consistency
 - `ashval_timeline_analyzer` - Analyze story timelines for consistency
 - `ashval_conflict_generator` - Generate conflicts for story development
 - `ashval_story_arc_analyzer` - Analyze story arc structure
-- `ashval_character_dialogue_generator` - Generate character dialogue
+- `ashval_smart_filter` - Create smart filters and views for databases
+- `ashval_image_generator` - Generate prompts for AI image generation
 - `ashval_consistency_checker` - Check data consistency across databases
+- `ashval_world_rules_query` - Query and verify world rules
+- `ashval_advanced_prompt_generator` - Create advanced prompts for content generation
+- `ashval_story_structure_analyzer` - Analyze story structure and pacing
+- `ashval_character_dialogue_generator` - Generate character dialogue
+- `ashval_auto_tag_system` - Suggest tags for content automatically
+- `ashval_mind_map_generator` - Create a mind map from an image or text
 
 #### Usage Examples
 
@@ -111,22 +122,25 @@ cp .env.example .env
 
 #### การกำหนดค่า
 
-แก้ไขไฟล์ `.env` ด้วยข้อมูล Notion integration ของคุณ:
+สถาปัตยกรรมใหม่จะใช้ไฟล์ `config.json` สำหรับกฎ และ `settings.json` สำหรับข้อมูลลับ
 
-```env
-# การกำหนดค่า Notion
-NOTION_TOKEN=your_notion_integration_token
-NOTION_CHARACTERS_DB_ID=your_characters_database_id
-NOTION_SCENES_DB_ID=your_scenes_database_id
-NOTION_LOCATIONS_DB_ID=your_locations_database_id
-
-# การกำหนดค่า AI  
-GEMINI_API_KEY=your_gemini_api_key
-
-# การกำหนดค่า Server
-PORT=3001
-WEB_PORT=3002
-```
+1.  **`settings.json`**: สร้างไฟล์นี้ที่ root directory และเพิ่ม API keys ของคุณ
+    ```json
+    {
+      "providers": {
+        "openai": { "api_key": "sk-xxx" },
+        "anthropic": { "api_key": "..." },
+        "google": { "api_key": "..." }
+      }
+    }
+    ```
+2.  **`config.json`**: ไฟล์นี้ใช้ควบคุมการทำงานของ Router คุณสามารถตั้งกฎเพื่อส่ง task บางประเภทไปยังโมเดลที่ต่างกันได้
+3.  **ไฟล์ `.env`**: ไฟล์นี้ยังคงใช้สำหรับการตั้งค่า Notion และ Server
+    ```env
+    # การกำหนดค่า Notion
+    NOTION_TOKEN=your_notion_integration_token
+    NOTION_CHARACTERS_DB_ID=your_characters_database_id
+    ```
 
 #### เครื่องมือ MCP ที่พร้อมใช้งาน
 
@@ -138,11 +152,19 @@ WEB_PORT=3002
 - `notion_users` - จัดการผู้ใช้ (ดูรายการ, ข้อมูล)
 
 ##### เครื่องมือสร้างโลก Ashval
+- `ashval_version_control` - ติดตามและจัดการเวอร์ชันของข้อมูล
 - `ashval_timeline_analyzer` - วิเคราะห์ไทม์ไลน์เรื่องราวเพื่อความสอดคล้อง
 - `ashval_conflict_generator` - สร้างความขัดแย้งสำหรับพัฒนาเรื่องราว
 - `ashval_story_arc_analyzer` - วิเคราะห์โครงสร้างเรื่องราว
-- `ashval_character_dialogue_generator` - สร้างบทสนทนาของตัวละคร
+- `ashval_smart_filter` - สร้าง view และ filter อัจฉริยะ
+- `ashval_image_generator` - สร้าง prompt สำหรับ AI สร้างภาพ
 - `ashval_consistency_checker` - ตรวจสอบความสอดคล้องของข้อมูลทั่วฐานข้อมูล
+- `ashval_world_rules_query` - ค้นหาและตรวจสอบกฎของโลก
+- `ashval_advanced_prompt_generator` - สร้าง AI prompt ขั้นสูง
+- `ashval_story_structure_analyzer` - วิเคราะห์โครงสร้างและ pacing ของเรื่อง
+- `ashval_character_dialogue_generator` - สร้างบทสนทนาของตัวละคร
+- `ashval_auto_tag_system` - แนะนำแท็กสำหรับเนื้อหาโดยอัตโนมัติ
+- `ashval_mind_map_generator` - สร้าง mind map จากรูปภาพหรือข้อความ
 
 #### ตัวอย่างการใช้งาน
 
