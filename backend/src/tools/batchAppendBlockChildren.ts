@@ -2,6 +2,7 @@ import { notion } from "../services/notion.js";
 import { BatchAppendBlockChildrenParams } from "../types/blocks.js";
 import { handleNotionError } from "../utils/error.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { BlockObjectRequest } from "@notionhq/client/build/src/api-endpoints";
 
 export const batchAppendBlockChildren = async (
   params: BatchAppendBlockChildrenParams
@@ -12,7 +13,7 @@ export const batchAppendBlockChildren = async (
     for (const operation of params.operations) {
       const response = await notion.blocks.children.append({
         block_id: operation.blockId,
-        children: operation.children,
+        children: operation.children as BlockObjectRequest[],
       });
 
       results.push({

@@ -2,6 +2,7 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { notion } from "../services/notion.js";
 import { handleNotionError } from "../utils/error.js";
 import { UpdatePagePropertiesParams } from "../types/page.js";
+import { UpdatePageParameters } from "@notionhq/client/build/src/api-endpoints.js";
 
 export async function updatePageProperties(
   params: UpdatePagePropertiesParams
@@ -9,7 +10,7 @@ export async function updatePageProperties(
   try {
     const response = await notion.pages.update({
       page_id: params.pageId,
-      properties: params.properties,
+      properties: params.properties as UpdatePageParameters['properties'],
     });
 
     return {

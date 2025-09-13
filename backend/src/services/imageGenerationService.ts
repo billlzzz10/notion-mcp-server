@@ -1,8 +1,22 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from 'openai';
 
+// Note: The GraphicAI service uses a different SDK: @google/genai
+// For this integration, we will stick to the @google/generative-ai SDK for consistency if possible,
+// but we will adopt the model and logic from GraphicAI's implementation.
+// If direct image generation isn't supported in the same way, we might need to call the GraphicAI service directly.
+
+// Let's assume for now that the 'gemini-pro-vision' can be adapted or we can call a different model.
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+let openai: OpenAI | undefined;
+try {
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
+} catch (e) {
+  console.warn("OpenAI SDK not found or not configured. OpenAI image generation will be unavailable.");
+  openai = undefined;
+}
 
-type ImageProvider = "gemini" | "openai";
+type ImageProvider = "gemini" | "openai" | "graphicai"; // Added graphicai as a provider
 
 interface GenerationOptions {
   prompt: string;
@@ -11,30 +25,37 @@ interface GenerationOptions {
   size?: "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792";
   quality?: "standard" | "hd";
   style?: "vivid" | "natural";
+  // GraphicAI specific options
+  type?: 'sticker' | 'icon' | 'emoji';
+  colors?: string[];
 }
 
-let OpenAI: any;
-try {
-  // Dynamically require OpenAI to avoid compile-time errors if not installed
-  OpenAI = require("openai").default || require("openai");
-} catch (e) {
-  OpenAI = undefined;
+// This function simulates calling the GraphicAI microservice.
+// In a real-world scenario, this would be an HTTP request.
+async function callGraphicAIService(request: any): Promise<string[]> {
+  console.log("Simulating call to GraphicAI microservice with request:", request);
+  // This is where we would use the logic from GraphicAI/server/services/gemini.ts
+  // For now, we'll just return a mock response.
+  const mockBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+  return Array(request.n || 1).fill(mockBase64);
 }
+
 
 export async function generateImage(options: GenerationOptions): Promise<string[] | undefined> {
   const {
     prompt,
-    provider = "gemini", // Default to Gemini
+    provider = "graphicai", // Default to the new GraphicAI service
     n = 1,
     size = "1024x1024",
     quality = "standard",
     style = "vivid",
+    type = 'icon',
+    colors = []
   } = options;
 
   try {
-    if (provider === "openai" && OpenAI) {
+    if (provider === "openai" && openai) {
       console.log(`🎨 Generating ${n} image(s) with OpenAI DALL-E 3...`);
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
       const response = await openai.images.generate({
         model: "dall-e-3",
         prompt: prompt,
@@ -44,26 +65,27 @@ export async function generateImage(options: GenerationOptions): Promise<string[
         style: style,
       });
       return response.data.map((img: any) => img.url || "");
-    } else {
-      // Default to Gemini
-      console.log(`🎨 Generating ${n} image(s) with Google Gemini...`);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" }); // Or other suitable model
-      
-      // Gemini API for image generation might differ, this is a placeholder structure
-      // Based on GraphicAI, it might be a different model endpoint like 'gemini-2.0-flash-preview-image-generation'
-      // For now, we'll simulate a response structure.
-      
-      // Placeholder for actual Gemini image generation call
-      // const result = await model.generateContent([prompt]);
-      // const imageUrl = result.response.text();
-      
-      // Simulating a base64 response for now as per GraphicAI's gemini.ts
-      const simulatedBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-      return Array(n).fill(simulatedBase64);
+
+    } else if (provider === "graphicai") {
+        console.log(`🎨 Generating ${n} image(s) with GraphicAI service...`);
+        // We will call the GraphicAI service.
+        // This decouples the main backend from the specific implementation details of GraphicAI.
+        return await callGraphicAIService({
+            type: type,
+            description: prompt,
+            colors: colors,
+            style: style || 'default',
+            n: n
+        });
+    } else if (provider === "gemini") {
+        console.log("Native Gemini image generation is not implemented in this service. Use 'graphicai' provider instead.");
+        // We could put the GraphicAI logic here directly, but decoupling is a better architecture.
+        return undefined;
     }
+
   } catch (error: any) {
     console.error(`❌ Error generating image with ${provider}:`, error.message);
-    if (OpenAI && error instanceof OpenAI.APIError) {
+    if (provider === 'openai' && openai && error instanceof OpenAI.APIError) {
       console.error("OpenAI API Error Details:", {
         status: error.status,
         headers: error.headers,

@@ -1,14 +1,11 @@
-import { azureOpenAIService } from "../services/azureOpenAIService.js";
 import { Bot, Context } from "grammy";
+import { router } from "../Router.js";
 
 export class AshvalChatBot {
   private bot: Bot;
   private conversationHistory = new Map<string, any[]>();
 
   constructor() {
-    // Verify Azure OpenAI service
-    console.log("🔧 Azure OpenAI configuration:", azureOpenAIService.getConfig());
-
     // Initialize Telegram Bot with grammy
     const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
     if (!telegramToken) {
@@ -135,11 +132,12 @@ Please respond helpfully about Ashval world-building, character development, sto
 If the user asks about specific data manipulation, suggest using appropriate commands like /projects, /characters, etc.
       `;
 
-      // Generate AI response
-      const response = await azureOpenAIService.generateWorldBuilding(
-        contextPrompt,
-        'character' // Default to character generation for Ashval
-      );
+      // Use the new Router to handle the query
+      const routerResponse = await router.handleQuery({
+        query: text,
+        cacheContext: history.map(h => h.parts[0].text).join('\n'),
+      });
+      const response = routerResponse.text;
 
       // Add AI response to history
       history.push({

@@ -46,7 +46,7 @@ export const PARENT_SCHEMA = z.preprocess(
 );
 
 export const CREATE_PAGE_SCHEMA = {
-  parent: PARENT_SCHEMA.optional()
+  parent: PARENT_SCHEMA
     .default({
       type: "page_id",
       page_id: getRootPageId(),
@@ -120,23 +120,16 @@ export const UPDATE_PAGE_PROPERTIES_SCHEMA = {
     .describe("Properties of the page"),
 };
 
-export const SEARCH_PAGES_SCHEMA = {
-  query: z.string().optional().describe("Search query for filtering by title"),
-  sort: z
-    .object({
-      direction: z.enum(["ascending", "descending"]),
-      timestamp: z.literal("last_edited_time"),
-    })
-    .optional()
-    .describe("Sort order for results"),
-  start_cursor: z.string().optional().describe("Cursor for pagination"),
-  page_size: z
-    .number()
-    .min(1)
-    .max(100)
-    .optional()
-    .describe("Number of results to return (1-100)"),
-};
+const SEARCH_PAGES_OPTIONAL_PROPS = z.object({
+  query: z.string(),
+  sort: z.object({
+    direction: z.enum(["ascending", "descending"]),
+    timestamp: z.literal("last_edited_time"),
+  }),
+  start_cursor: z.string(),
+  page_size: z.number().min(1).max(100),
+}).partial();
+export const SEARCH_PAGES_SCHEMA = SEARCH_PAGES_OPTIONAL_PROPS;
 
 // Combined schema for all page operations
 export const PAGES_OPERATION_SCHEMA = {

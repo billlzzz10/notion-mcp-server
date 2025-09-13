@@ -45,7 +45,8 @@
     "cache",
     "batch-processing",
     "ashval",
-    "world-building"
+    "world-building",
+    "codacy"
   ],
   "author": "Yaroslav Boiko <y.boikodeveloper@gmail.com>",
   "license": "MIT",
