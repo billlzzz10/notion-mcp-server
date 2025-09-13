@@ -159,7 +159,7 @@ export const TEXT_BLOCK_REQUEST_SCHEMA = z.preprocess(
 export const APPEND_BLOCK_CHILDREN_SCHEMA = {
   blockId: z.string().describe("The ID of the block to append children to"),
   children: z
-    .array(TEXT_BLOCK_REQUEST_SCHEMA)
+    .array(z.any()) // Simplified to prevent excessive type complexity
     .describe("Array of blocks to append as children"),
 };
 
@@ -232,7 +232,7 @@ export const BATCH_MIXED_OPERATIONS_SCHEMA = {
             .string()
             .describe("The ID of the block to append children to"),
           children: z
-            .array(TEXT_BLOCK_REQUEST_SCHEMA)
+            .array(z.any()) // Simplified to prevent excessive type complexity
             .describe("Array of blocks to append as children"),
         }),
         z.object({

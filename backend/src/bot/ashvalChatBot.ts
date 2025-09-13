@@ -1,13 +1,22 @@
-import { azureOpenAIService } from "../services/azureOpenAIService.js";
 import { Bot, Context } from "grammy";
+import { Router, RouterConfig } from "../Router.js";
+import { ProviderManager } from "../ProviderManager.js";
+import fs from "fs";
 
 export class AshvalChatBot {
   private bot: Bot;
+  private router: Router;
   private conversationHistory = new Map<string, any[]>();
 
   constructor() {
-    // Verify Azure OpenAI service
-    console.log("🔧 Azure OpenAI configuration:", azureOpenAIService.getConfig());
+    // Load configs
+    const config: RouterConfig = JSON.parse(fs.readFileSync("./config.json", "utf-8"));
+    // We don't use settings.json here yet, as ProviderManager is a mock.
+    // In a real implementation, you would pass settings to ProviderManager.
+
+    // Initialize the new Router
+    const providerManager = new ProviderManager();
+    this.router = new Router(providerManager, config);
 
     // Initialize Telegram Bot with grammy
     const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -135,11 +144,12 @@ Please respond helpfully about Ashval world-building, character development, sto
 If the user asks about specific data manipulation, suggest using appropriate commands like /projects, /characters, etc.
       `;
 
-      // Generate AI response
-      const response = await azureOpenAIService.generateWorldBuilding(
-        contextPrompt,
-        'character' // Default to character generation for Ashval
-      );
+      // Use the new Router to handle the query
+      const routerResponse = await this.router.handleQuery({
+        query: text,
+        cacheContext: history.map(h => h.parts[0].text).join('\n'),
+      });
+      const response = routerResponse.text;
 
       // Add AI response to history
       history.push({

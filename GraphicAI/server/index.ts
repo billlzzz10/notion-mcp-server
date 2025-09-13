@@ -1,70 +1,47 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { createMCP } from "@modelcontextprotocol/sdk";
+import { z } from "zod";
+import { generateImages, GenerationRequest } from "./services/gemini.js";
+import dotenv from 'dotenv';
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+dotenv.config();
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
+const { server } = createMCP({
+  // No tools are loaded by default in this standalone server
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+const imageGenerationSchema = z.object({
+  type: z.enum(['sticker', 'icon', 'emoji']).describe("The type of image to generate."),
+  description: z.string().describe("A detailed description of the image content."),
+  colors: z.array(z.string()).optional().describe("An array of preferred colors."),
+  style: z.string().optional().describe("The artistic style of the image."),
+});
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+server.tool(
+  "graphicai_generate_image",
+  "Generates images like stickers, icons, or emojis based on a description.",
+  imageGenerationSchema,
+  async (params: GenerationRequest) => {
+    try {
+      console.log("Received request to generate image with params:", params);
+      const imageUrls = await generateImages(params);
+      console.log(`Successfully generated ${imageUrls.length} images.`);
+      return {
+        success: true,
+        images: imageUrls,
+      };
+    } catch (error: any) {
+      console.error("Error in graphicai_generate_image tool:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   }
+);
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
-})();
+const port = process.env.GRAPHICAI_PORT || 5001;
+
+server.listen(port, () => {
+  console.log(`🎨 GraphicAI MCP Server listening on port ${port}`);
+  console.log("Registered tools:", server.getTools().map(t => t.name));
+});
