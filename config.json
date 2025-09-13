@@ -1,0 +1,14 @@
+{
+  "default_provider": "openai",
+  "default_model": "gpt-4o-mini",
+  "rules": [
+    { "match": { "task": "summarize" }, "provider": "mistral", "model": "mistral-medium" },
+    { "match": { "task": "code" }, "provider": "anthropic", "model": "claude-3-5-sonnet" },
+    { "match": { "task": "local" }, "provider": "ollama", "model": "llama3" }
+  ],
+  "assistant_prompt": {
+    "style": "balanced",
+    "max_length": 1500,
+    "min_length": 300
+  }
+}

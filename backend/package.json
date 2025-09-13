@@ -7,9 +7,8 @@
   },
   "scripts": {
     "dev": "npm-run-all --parallel start-gateway start-web",
-    "build": "tsc",
-    "prepare": "npm run build",
-    "watch": "tsc --watch",
+    "build": "npx tsc",
+    "watch": "npx tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js -e NOTION_TOKEN=your_notion_token -e NOTION_PAGE_ID=your_notion_page_id",
     "update-readme": "node scripts/update-readme.js",
     "status": "node scripts/update-readme.js",

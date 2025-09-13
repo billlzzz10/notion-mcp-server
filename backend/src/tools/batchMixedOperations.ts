@@ -2,6 +2,7 @@ import { notion } from "../services/notion.js";
 import { BatchMixedOperationsParams } from "../types/blocks.js";
 import { handleNotionError } from "../utils/error.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { BlockObjectRequest } from "@notionhq/client/build/src/api-endpoints";
 
 export const batchMixedOperations = async (
   params: BatchMixedOperationsParams
@@ -21,7 +22,7 @@ export const batchMixedOperations = async (
         case "append":
           response = await notion.blocks.children.append({
             block_id: op.blockId,
-            children: op.children,
+            children: op.children as BlockObjectRequest[],
           });
           operationCounts.append++;
           break;
@@ -29,7 +30,7 @@ export const batchMixedOperations = async (
         case "update":
           response = await notion.blocks.update({
             block_id: op.blockId,
-            ...op.data,
+            ...(op.data as any),
           });
           operationCounts.update++;
           break;

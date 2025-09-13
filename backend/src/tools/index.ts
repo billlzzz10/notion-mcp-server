@@ -26,6 +26,11 @@ import { dataCompletionAssistantTool, handleDataCompletionAssistance } from "./d
 import { projectsTools, handleProjectsTools } from "./projects.js";
 import { writerAppTools, writerAppHandlers } from "./writerApp.js";
 
+// Import the new tools
+import { generateCharacterDialogue } from "./characterDialogueGenerator.js";
+import { suggestTagsForContent } from "./autoTagSystem.js";
+import { generateMindMapFromImage } from "./mindMapGenerator.js";
+
 // Import Enhanced AI Tools
 import { 
   semanticSearchTool, 
@@ -39,6 +44,42 @@ import {
 } from "./semanticSearchTool.js";
 
 export const registerAllTools = () => {
+  // Define schemas for the new tools
+  const characterDialogueGeneratorTool = {
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        personality: { type: "string" },
+        situation: { type: "string" },
+      },
+      required: ["name", "personality", "situation"],
+    },
+  };
+
+  const autoTagSystemTool = {
+    inputSchema: {
+      type: "object",
+      properties: {
+        content: { type: "string" },
+        existingTags: { type: "array", items: { type: "string" } },
+        tagOptions: { type: "array", items: { type: "string" } },
+      },
+      required: ["content"],
+    },
+  };
+
+  const mindMapGeneratorTool = {
+    inputSchema: {
+        type: "object",
+        properties: {
+            imageUrl: { type: "string" },
+            imageBase64: { type: "string" },
+            prompt: { type: "string" },
+        },
+    },
+  };
+
   // Register combined pages operation tool
   server.tool(
     "notion_pages",
@@ -216,5 +257,27 @@ export const registerAllTools = () => {
     "ตรวจหาช่องโหว่ในโครงเรื่องและความไม่สอดคล้องในเนื้อหา",
     detectPlotHolesTool.inputSchema as any,
     handleDetectPlotHoles as any
+  );
+
+  // Register the new tools
+  server.tool(
+    "ashval_character_dialogue_generator",
+    "สร้างบทสนทนาสำหรับตัวละครตามบุคลิกและสถานการณ์",
+    characterDialogueGeneratorTool.inputSchema as any,
+    generateCharacterDialogue as any
+  );
+
+  server.tool(
+    "ashval_auto_tag_system",
+    "แนะนำแท็กที่เกี่ยวข้องสำหรับเนื้อหาโดยอัตโนมัติ",
+    autoTagSystemTool.inputSchema as any,
+    suggestTagsForContent as any
+  );
+
+  server.tool(
+    "ashval_mind_map_generator",
+    "สร้าง mind map จากรูปภาพหรือข้อความ",
+    mindMapGeneratorTool.inputSchema as any,
+    generateMindMapFromImage as any
   );
 };
