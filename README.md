@@ -1,7 +1,3 @@
-# 🛑 ห้ามใช้ Codacy ในทุก workflow
-ห้าม generate หรือเพิ่ม Codacy CLI, Codacy Scanner, หรือ Codacy Analysis ใน workflow, script, หรือ pipeline ใดๆ
-- เหตุผล: ปัญหา compatibility กับ Windows และ CI/CD
-- **ให้ใช้ ESLint (JS/TS), Flake8 (Python) แทน**
 # 🚀 Latest Enhancements / การปรับปรุงล่าสุด
 
 > **Status**: ✅ Implemented and ready for use  
