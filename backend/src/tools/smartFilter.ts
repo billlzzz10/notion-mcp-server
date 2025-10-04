@@ -131,8 +131,14 @@ async function filterScenes(args: any) {
       break;
   }
 
-  const response = await notion.databases.query({
-    database_id: scenesDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: scenesDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Scenes DB: ${scenesDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
     sorts: [
       {
@@ -205,8 +211,14 @@ async function filterCharacters(args: any) {
       break;
   }
 
-  const response = await notion.databases.query({
-    database_id: charactersDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: charactersDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
     sorts: [
       {
@@ -260,8 +272,14 @@ async function filterLocations(args: any) {
       break;
   }
 
-  const response = await notion.databases.query({
-    database_id: locationsDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: locationsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Locations DB: ${locationsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
     sorts: [
       {
@@ -308,8 +326,14 @@ async function filterStoryArcs(args: any) {
       break;
   }
 
-  const response = await notion.databases.query({
-    database_id: storyArcsDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
     sorts: [
       {

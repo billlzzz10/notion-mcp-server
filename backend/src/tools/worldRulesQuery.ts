@@ -88,45 +88,26 @@ async function queryRulesByCategory(worldRulesDb: string, category?: string, pri
   if (category && priority) {
     filter = {
       and: [
-        {
-          property: "Category",
-          select: {
-            equals: category
-          }
-        },
-        {
-          property: "Priority",
-          select: {
-            equals: priority
-          }
-        }
+        { property: "Category", select: { equals: category } },
+        { property: "Priority", select: { equals: priority } }
       ]
     };
   } else if (category) {
-    filter = {
-      property: "Category",
-      select: {
-        equals: category
-      }
-    };
+    filter = { property: "Category", select: { equals: category } };
   } else if (priority) {
-    filter = {
-      property: "Priority",
-      select: {
-        equals: priority
-      }
-    };
+    filter = { property: "Priority", select: { equals: priority } };
   }
 
-  const response = await notion.databases.query({
-    database_id: worldRulesDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: worldRulesDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for World Rules DB: ${worldRulesDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter: Object.keys(filter).length > 0 ? filter : undefined,
-    sorts: [
-      {
-        property: "Priority",
-        direction: "ascending"
-      }
-    ]
+    sorts: [{ property: "Priority", direction: "ascending" }]
   });
 
   let result = `📋 **กฎของโลก${category ? ` - หมวด: ${category}` : ""}:**\n\n`;
@@ -162,24 +143,9 @@ async function queryRulesByCategory(worldRulesDb: string, category?: string, pri
 async function queryRulesByKeyword(worldRulesDb: string, keyword: string, priority?: string) {
   let filter: any = {
     or: [
-      {
-        property: "Rule Name",
-        title: {
-          contains: keyword
-        }
-      },
-      {
-        property: "Description", 
-        rich_text: {
-          contains: keyword
-        }
-      },
-      {
-        property: "Examples",
-        rich_text: {
-          contains: keyword
-        }
-      }
+      { property: "Rule Name", title: { contains: keyword } },
+      { property: "Description", rich_text: { contains: keyword } },
+      { property: "Examples", rich_text: { contains: keyword } }
     ]
   };
 
@@ -187,25 +153,21 @@ async function queryRulesByKeyword(worldRulesDb: string, keyword: string, priori
     filter = {
       and: [
         filter,
-        {
-          property: "Priority",
-          select: {
-            equals: priority
-          }
-        }
+        { property: "Priority", select: { equals: priority } }
       ]
     };
   }
 
-  const response = await notion.databases.query({
-    database_id: worldRulesDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: worldRulesDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for World Rules DB: ${worldRulesDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
-    sorts: [
-      {
-        property: "Priority",
-        direction: "ascending"
-      }
-    ]
+    sorts: [{ property: "Priority", direction: "ascending" }]
   });
 
   let result = `🔍 **ผลการค้นหา "${keyword}":**\n\n`;
@@ -237,7 +199,6 @@ async function queryRulesByKeyword(worldRulesDb: string, keyword: string, priori
 }
 
 async function findRelatedRules(worldRulesDb: string, sceneContent: string) {
-  // วิเคราะห์เนื้อหาฉากเพื่อหากฎที่เกี่ยวข้อง
   const keywords = extractKeywordsFromScene(sceneContent);
   
   let result = `🎬 **กฎที่เกี่ยวข้องกับฉาก:**\n\n`;
@@ -263,45 +224,31 @@ async function findRelatedRules(worldRulesDb: string, sceneContent: string) {
 }
 
 async function getAllRules(worldRulesDb: string, priority?: string) {
-  let filter: any = {
-    property: "Status",
-    select: {
-      equals: "Active"
-    }
-  };
+  let filter: any = { property: "Status", select: { equals: "Active" } };
 
   if (priority) {
     filter = {
       and: [
         filter,
-        {
-          property: "Priority",
-          select: {
-            equals: priority
-          }
-        }
+        { property: "Priority", select: { equals: priority } }
       ]
     };
   }
 
-  const response = await notion.databases.query({
-    database_id: worldRulesDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: worldRulesDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for World Rules DB: ${worldRulesDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter,
-    sorts: [
-      {
-        property: "Category",
-        direction: "ascending"
-      },
-      {
-        property: "Priority",
-        direction: "ascending"
-      }
-    ]
+    sorts: [{ property: "Category", direction: "ascending" }, { property: "Priority", direction: "ascending" }]
   });
 
   let result = `📚 **กฎทั้งหมดของโลก Ashval${priority ? ` (${priority})` : ""}:**\n\n`;
 
-  // จัดกลุ่มตามหมวด
   const rulesByCategory = new Map();
   
   response.results.forEach((rule: any) => {
@@ -331,31 +278,21 @@ async function getAllRules(worldRulesDb: string, priority?: string) {
 }
 
 async function validateContentAgainstRules(worldRulesDb: string, content: string) {
-  // ดึงกฎทั้งหมดที่สำคัญ
-  const coreRules = await notion.databases.query({
-    database_id: worldRulesDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: worldRulesDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for World Rules DB: ${worldRulesDb}`);
+  }
+
+  const coreRules = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter: {
       and: [
-        {
-          property: "Status",
-          select: {
-            equals: "Active"
-          }
-        },
+        { property: "Status", select: { equals: "Active" } },
         {
           or: [
-            {
-              property: "Priority",
-              select: {
-                equals: "Core"
-              }
-            },
-            {
-              property: "Priority",
-              select: {
-                equals: "Important"
-              }
-            }
+            { property: "Priority", select: { equals: "Core" } },
+            { property: "Priority", select: { equals: "Important" } }
           ]
         }
       ]
@@ -375,29 +312,17 @@ async function validateContentAgainstRules(worldRulesDb: string, content: string
     const exceptions = properties.Exceptions?.rich_text?.[0]?.text?.content || "";
     const priority = properties.Priority?.select?.name || "";
 
-    // ตรวจสอบการละเมิดกฎ
     const violation = checkRuleViolation(content, ruleName, description, exceptions);
     if (violation) {
-      violations.push({
-        rule: ruleName,
-        priority,
-        violation,
-        description
-      });
+      violations.push({ rule: ruleName, priority, violation, description });
     }
 
-    // ตรวจสอบการสนับสนุนกฎ
     const support = checkRuleSupport(content, ruleName, description);
     if (support) {
-      supportingRules.push({
-        rule: ruleName,
-        priority,
-        support
-      });
+      supportingRules.push({ rule: ruleName, priority, support });
     }
   });
 
-  // แสดงผลการตรวจสอบ
   if (violations.length === 0 && supportingRules.length === 0) {
     result += "ไม่พบการละเมิดกฎหรือการสนับสนุนกฎที่ชัดเจน";
   } else {
@@ -425,7 +350,6 @@ async function validateContentAgainstRules(worldRulesDb: string, content: string
 function extractKeywordsFromScene(sceneContent: string): string[] {
   const keywords: string[] = [];
   
-  // คำสำคัญของโลก Ashval
   const ashvalKeywords = [
     "มานา", "mana", "เอธีเรีย", "อัมบรา", "Arcana", "อาร์คานา",
     "The Fool", "The Hidden", "เหมือง", "หินมานา", 
@@ -441,14 +365,13 @@ function extractKeywordsFromScene(sceneContent: string): string[] {
     }
   });
 
-  return [...new Set(keywords)]; // ลบข้อมูลซ้ำ
+  return [...new Set(keywords)];
 }
 
 function checkRuleViolation(content: string, ruleName: string, ruleDescription: string, exceptions: string): string | null {
   const lowerContent = content.toLowerCase();
   const lowerRule = ruleDescription.toLowerCase();
   
-  // ตรวจสอบการละเมิดกฎเฉพาะ
   if (ruleName.includes("มานาเสียสมดุล")) {
     if (lowerContent.includes("มานา") && lowerContent.includes("สมดุล")) {
       if (!lowerContent.includes("ผุพัง") && !lowerContent.includes("เสียหาย")) {
@@ -471,7 +394,6 @@ function checkRuleViolation(content: string, ruleName: string, ruleDescription: 
 function checkRuleSupport(content: string, ruleName: string, ruleDescription: string): string | null {
   const lowerContent = content.toLowerCase();
   
-  // ตรวจสอบการสนับสนุนกฎ
   if (ruleName.includes("มานาเสียสมดุล")) {
     if (lowerContent.includes("มานา") && (lowerContent.includes("ผุพัง") || lowerContent.includes("เสียหาย"))) {
       return "แสดงผลกระทบของการใช้มานาไม่สมดุล";

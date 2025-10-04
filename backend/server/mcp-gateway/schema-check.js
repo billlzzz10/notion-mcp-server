@@ -10,9 +10,17 @@ async function getSchema(databaseId) {
   let schema = schemaCache.get(databaseId);
   if (schema) return schema;
 
-  // fetch from Notion
-  const response = await notion.databases.retrieve({ database_id: databaseId });
-  schema = response.properties;
+  // 1. Get data sources for the database
+  const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+  const dataSource = dbResponse.data_sources?.[0];
+
+  if (!dataSource) {
+    throw new Error(`No data source found for database ID: ${databaseId}`);
+  }
+
+  // 2. Retrieve the schema from the data source
+  const dsResponse = await notion.dataSources.retrieve({ data_source_id: dataSource.id });
+  schema = dsResponse.properties;
 
   // cache schema
   schemaCache.set(databaseId, schema);
@@ -20,8 +28,19 @@ async function getSchema(databaseId) {
 }
 
 async function refreshSchema(databaseId) {
-  const response = await notion.databases.retrieve({ database_id: databaseId });
-  const schema = response.properties;
+  // 1. Get data sources for the database
+  const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+  const dataSource = dbResponse.data_sources?.[0];
+
+  if (!dataSource) {
+    throw new Error(`No data source found for database ID: ${databaseId}`);
+  }
+
+  // 2. Retrieve the schema from the data source
+  const dsResponse = await notion.dataSources.retrieve({ data_source_id: dataSource.id });
+  const schema = dsResponse.properties;
+
+  // 3. Update cache
   schemaCache.set(databaseId, schema);
   return schema;
 }

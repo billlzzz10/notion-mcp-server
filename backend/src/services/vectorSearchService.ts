@@ -277,8 +277,14 @@ export class VectorSearchService {
     try {
       // Index characters
       if (process.env.NOTION_CHARACTERS_DB_ID) {
-        const characters = await notion.databases.query({
-          database_id: process.env.NOTION_CHARACTERS_DB_ID
+        const dbId = process.env.NOTION_CHARACTERS_DB_ID;
+        const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for Characters DB: ${dbId}`);
+        }
+        const characters = await notion.dataSources.query({
+            data_source_id: dataSource.id
         });
 
         for (const character of characters.results) {
@@ -289,8 +295,14 @@ export class VectorSearchService {
 
       // Index scenes
       if (process.env.NOTION_SCENES_DB_ID) {
-        const scenes = await notion.databases.query({
-          database_id: process.env.NOTION_SCENES_DB_ID
+        const dbId = process.env.NOTION_SCENES_DB_ID;
+        const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for Scenes DB: ${dbId}`);
+        }
+        const scenes = await notion.dataSources.query({
+            data_source_id: dataSource.id
         });
 
         for (const scene of scenes.results) {

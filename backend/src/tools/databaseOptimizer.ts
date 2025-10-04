@@ -49,12 +49,21 @@ export const findAndFillMissingData = {
       for (const dbId of databases) {
         console.log(`🔍 กำลังตรวจสอบฐานข้อมูล: ${dbId}`);
         
-        // ดึงข้อมูลฐานข้อมูล
+        // ดึงข้อมูลฐานข้อมูลและ data source
         const dbInfo = await notion.databases.retrieve({ database_id: dbId });
         const dbName = dbInfo.title[0]?.plain_text || 'Unknown Database';
+        const dataSource = dbInfo.data_sources?.[0];
+        if (!dataSource) {
+          console.warn(`No data source found for database ${dbName} (${dbId}), skipping.`);
+          continue;
+        }
         
         // ดึงรายการหน้า
-        const pages = await notion.databases.query({ database_id: dbId });
+        const pages = await notion.request({
+          path: `data_sources/${dataSource.id}/query`,
+          method: 'post',
+          body: {}
+        }) as any;
         
         const missingDataReport = {
           databaseId: dbId,
@@ -196,12 +205,21 @@ export const analyzeUnnecessaryColumns = {
       for (const dbId of databases) {
         console.log(`📊 กำลังวิเคราะห์ฐานข้อมูล: ${dbId}`);
         
-        // ดึงข้อมูลฐานข้อมูล
+        // ดึงข้อมูลฐานข้อมูลและ data source
         const dbInfo = await notion.databases.retrieve({ database_id: dbId });
         const dbName = dbInfo.title[0]?.plain_text || 'Unknown Database';
+        const dataSource = dbInfo.data_sources?.[0];
+        if (!dataSource) {
+          console.warn(`No data source found for database ${dbName} (${dbId}), skipping.`);
+          continue;
+        }
         
         // ดึงรายการหน้า
-        const pages = await notion.databases.query({ database_id: dbId });
+        const pages = await notion.request({
+          path: `data_sources/${dataSource.id}/query`,
+          method: 'post',
+          body: {}
+        }) as any;
         const totalPages = pages.results.length;
         
         const columnAnalysis = {

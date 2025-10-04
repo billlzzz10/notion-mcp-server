@@ -267,11 +267,18 @@ async function createRoadmapProjects() {
   
   const createdProjects = [];
   
+  // Get data source ID for Projects DB
+  const dbResponse = await notionService.databases.retrieve({ database_id: DATABASES.PROJECTS });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Projects DB: ${DATABASES.PROJECTS}`);
+  }
+
   for (const project of ROADMAP_PROJECTS) {
     try {
       const response = await notionService.pages.create({
         parent: {
-          database_id: DATABASES.PROJECTS
+          data_source_id: dataSource.id
         },
         properties: {
           Name: {
@@ -344,6 +351,13 @@ async function createRoadmapTasks(projects) {
   logger.info('📋 Creating roadmap tasks...');
   
   const createdTasks = [];
+
+  // Get data source ID for Tasks DB
+  const dbResponse = await notionService.databases.retrieve({ database_id: DATABASES.TASKS });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Tasks DB: ${DATABASES.TASKS}`);
+  }
   
   for (const task of ROADMAP_TASKS) {
     try {
@@ -356,7 +370,7 @@ async function createRoadmapTasks(projects) {
 
       const response = await notionService.pages.create({
         parent: {
-          database_id: DATABASES.TASKS
+          data_source_id: dataSource.id
         },
         properties: {
           Name: {
@@ -465,6 +479,13 @@ async function main() {
 
 async function createRoadmapReport(summary) {
   try {
+    // Get data source ID for Reports DB
+    const dbResponse = await notionService.databases.retrieve({ database_id: DATABASES.REPORTS });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for Reports DB: ${DATABASES.REPORTS}`);
+    }
+
     const reportContent = `
 # 🗺️ Development Roadmap Implementation Report
 
@@ -511,7 +532,7 @@ ${summary.projects.map(p => `- [${p.name}](${p.notionUrl})`).join('\n')}
 
     const response = await notionService.pages.create({
       parent: {
-        database_id: DATABASES.REPORTS
+        data_source_id: dataSource.id
       },
       properties: {
         Name: {

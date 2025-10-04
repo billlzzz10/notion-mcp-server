@@ -207,8 +207,18 @@ async function countAllPages(notion) {
     for (const [name, dbId] of Object.entries(DATABASES)) {
       if (dbId) {
         try {
-          const response = await notion.databases.query({
-            database_id: dbId,
+          // First, get the data source ID
+          const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+          const dataSource = dbResponse.data_sources?.[0];
+
+          if (!dataSource) {
+            console.error(`No data source found for ${name}`);
+            results[name] = 0;
+            continue;
+          }
+
+          const response = await notion.dataSources.query({
+            data_source_id: dataSource.id,
             page_size: 100
           });
           

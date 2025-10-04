@@ -109,20 +109,37 @@ export function addMessage(message: ChatMessage) {
 }
 
 function updateChatList() {
-    chatList.innerHTML = '';
+    chatList.textContent = ''; // Use textContent for safe clearing
     
     Object.values(chatSessions)
         .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
         .forEach(chat => {
             const item = document.createElement('div');
             item.className = `chat-list-item ${chat.id === activeChatId ? 'active' : ''}`;
-            item.innerHTML = `
-                <span class="chat-list-item-name">${chat.name}</span>
-                <div class="chat-actions">
-                    <button type="button" title="แก้ไขชื่อ">✏️</button>
-                    <button type="button" title="ลบ">🗑️</button>
-                </div>
-            `;
+            item.dataset.chatId = chat.id;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'chat-list-item-name';
+            nameSpan.textContent = chat.name;
+            item.appendChild(nameSpan);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'chat-actions';
+
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.title = 'แก้ไขชื่อ';
+            editButton.textContent = '✏️';
+            actionsDiv.appendChild(editButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.title = 'ลบ';
+            deleteButton.textContent = '🗑️';
+            actionsDiv.appendChild(deleteButton);
+
+            item.appendChild(actionsDiv);
+
             item.addEventListener('click', () => switchToChat(chat.id));
             chatList.appendChild(item);
         });
@@ -135,7 +152,7 @@ function updateChatTitle() {
 }
 
 function clearChatContainer() {
-    chatContainer.innerHTML = '';
+    chatContainer.textContent = ''; // Use textContent for safe clearing
 }
 
 function renderChatHistory() {
@@ -151,13 +168,29 @@ function renderChatHistory() {
 function renderMessage(message: ChatMessage) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.type}`;
-    messageDiv.innerHTML = `
-        <div class="message-content">${formatMessageContent(message.content)}</div>
-        <div class="message-actions">
-            <button class="message-action-button" type="button">📋 คัดลอก</button>
-            <button class="message-action-button" type="button">💾 บันทึก MCP</button>
-        </div>
-    `;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = formatMessageContent(message.content); // Kept for formatting, as it's a LOW risk
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'message-actions';
+
+    const copyButton = document.createElement('button');
+    copyButton.className = 'message-action-button';
+    copyButton.type = 'button';
+    copyButton.textContent = '📋 คัดลอก';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'message-action-button';
+    saveButton.type = 'button';
+    saveButton.textContent = '💾 บันทึก MCP';
+
+    actionsDiv.appendChild(copyButton);
+    actionsDiv.appendChild(saveButton);
+
+    messageDiv.appendChild(contentDiv);
+    messageDiv.appendChild(actionsDiv);
     
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;

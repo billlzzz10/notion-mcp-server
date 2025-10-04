@@ -1,5 +1,9 @@
 import type { Project, Message, CustomTool, Datasource } from "../types";
 
+// Use a configurable base URL, defaulting to a secure production URL.
+// For local development, this can be overridden by setting `globalThis.API_BASE_URL = 'http://localhost:3001'` in an entry script.
+const API_BASE_URL = (globalThis as any).API_BASE_URL || 'https://mcp-server.notion-project.com';
+
 /**
  * สร้างข้อความสำหรับ AI Agent ผ่าน Notion MCP Server
  */
@@ -12,7 +16,7 @@ export async function* streamChatResponse(
 ): AsyncGenerator<{ type: 'system' | 'text', payload: string }> {
 
   // ส่งข้อความไปยัง MCP Gateway Agent API
-  const response = await fetch('http://localhost:3001/api/v1/agent/process-command', {
+  const response = await fetch(`${API_BASE_URL}/api/v1/agent/process-command`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -64,7 +68,7 @@ export async function* streamChatResponse(
  */
 export async function createProject(name: string, description: string) {
   try {
-    const response = await fetch('http://localhost:3001/api/v1/writer/projects', {
+    const response = await fetch(`${API_BASE_URL}/api/v1/writer/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +93,7 @@ export async function createProject(name: string, description: string) {
  */
 export async function getProjects() {
   try {
-    const response = await fetch('http://localhost:3001/api/v1/writer/projects');
+    const response = await fetch(`${API_BASE_URL}/api/v1/writer/projects`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -102,7 +106,7 @@ export async function getProjects() {
  */
 export async function getDatabases() {
   try {
-    const response = await fetch('http://localhost:3001/api/v1/databases');
+    const response = await fetch(`${API_BASE_URL}/api/v1/databases`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching databases:', error);
@@ -115,7 +119,7 @@ export async function getDatabases() {
  */
 export async function createNote(projectId: string, title: string, content: string) {
   try {
-    const response = await fetch(`http://localhost:3001/api/v1/writer/projects/${projectId}/notes`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/writer/projects/${projectId}/notes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +143,7 @@ export async function createNote(projectId: string, title: string, content: stri
  */
 export async function getProjectNotes(projectId: string) {
   try {
-    const response = await fetch(`http://localhost:3001/api/v1/writer/projects/${projectId}/notes`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/writer/projects/${projectId}/notes`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching project notes:', error);
@@ -152,7 +156,7 @@ export async function getProjectNotes(projectId: string) {
  */
 export async function getProjectStats(projectId: string) {
   try {
-    const response = await fetch(`http://localhost:3001/api/v1/writer/projects/${projectId}/stats`);
+    const response = await fetch(`${API_BASE_URL}/api/v1/writer/projects/${projectId}/stats`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching project stats:', error);

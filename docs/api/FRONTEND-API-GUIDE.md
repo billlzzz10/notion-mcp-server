@@ -786,7 +786,7 @@ Content-Type: application/json
 
 ### 4. Real-time Dashboard Updates
 ```http
-WebSocket: ws://your-domain.com:3001/mcp-updates
+WebSocket: wss://your-domain.com:3001/mcp-updates
 ```
 
 **Event Types:**
@@ -977,7 +977,7 @@ const useMCPWebSocket = () => {
   const [lastUpdate, setLastUpdate] = useState(null);
   
   useEffect(() => {
-    const ws = new WebSocket('ws://your-domain.com:3001/mcp-updates');
+    const ws = new WebSocket('wss://your-domain.com:3001/mcp-updates');
     
     ws.onopen = () => setMCPStatus('connected');
     ws.onclose = () => setMCPStatus('disconnected');
@@ -1766,7 +1766,7 @@ const response = await ai.generate(contextualPrompt);
 **WebSocket Integration:**
 ```javascript
 // Frontend real-time updates
-const socket = io('ws://localhost:3001');
+const socket = io('wss://localhost:3001');
 
 socket.on('mcp_context_learned', (data) => {
   updateContextDisplay(data.newContext);

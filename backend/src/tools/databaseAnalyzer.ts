@@ -687,8 +687,16 @@ async function saveAnalysisReport(analysis: string, args: any): Promise<void> {
   if (!versionsDb) return;
 
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: versionsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for Version History DB: ${versionsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: versionsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Title": {
           title: [

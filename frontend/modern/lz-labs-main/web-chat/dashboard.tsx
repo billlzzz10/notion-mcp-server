@@ -223,48 +223,112 @@ function createPriorityChart(canvasId: string, priorityData: Record<string, numb
 function createDashboardCard(stats: any) {
     const card = document.createElement('div');
     card.className = 'dashboard-card';
-    card.innerHTML = `
-        <div class="dashboard-card-header">
-            <h3 class="dashboard-card-title">${stats.name}</h3>
-            <div class="dashboard-card-total">${stats.total} รายการ</div>
-        </div>
+    card.dataset.database = stats.name; // For easier selection later
+
+    const header = document.createElement('div');
+    header.className = 'dashboard-card-header';
+
+    const title = document.createElement('h3');
+    title.className = 'dashboard-card-title';
+    title.textContent = stats.name;
+    header.appendChild(title);
+
+    const total = document.createElement('div');
+    total.className = 'dashboard-card-total';
+    total.textContent = `${stats.total} รายการ`;
+    header.appendChild(total);
+    card.appendChild(header);
+
+    const content = document.createElement('div');
+    content.className = 'dashboard-card-content';
+
+    if (stats.error) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'dashboard-error';
+        errorDiv.textContent = `❌ ${stats.error}`;
+        content.appendChild(errorDiv);
+    } else {
+        const chartsDiv = document.createElement('div');
+        chartsDiv.className = 'dashboard-charts';
+
+        // Status Chart
+        const statusContainer = document.createElement('div');
+        statusContainer.className = 'chart-container';
+        const statusH4 = document.createElement('h4');
+        statusH4.textContent = 'สถานะ';
+        const statusCanvas = document.createElement('canvas');
+        statusCanvas.id = `status-${stats.name.toLowerCase().replace(/\s+/g, '-')}`;
+        statusCanvas.width = 200;
+        statusCanvas.height = 200;
+        statusContainer.appendChild(statusH4);
+        statusContainer.appendChild(statusCanvas);
+        chartsDiv.appendChild(statusContainer);
+
+        // Priority Chart
+        const priorityContainer = document.createElement('div');
+        priorityContainer.className = 'chart-container';
+        const priorityH4 = document.createElement('h4');
+        priorityH4.textContent = 'ความสำคัญ';
+        const priorityCanvas = document.createElement('canvas');
+        priorityCanvas.id = `priority-${stats.name.toLowerCase().replace(/\s+/g, '-')}`;
+        priorityCanvas.width = 200;
+        priorityCanvas.height = 150;
+        priorityContainer.appendChild(priorityH4);
+        priorityContainer.appendChild(priorityCanvas);
+        chartsDiv.appendChild(priorityContainer);
         
-        <div class="dashboard-card-content">
-            ${stats.error ? 
-                `<div class="dashboard-error">❌ ${stats.error}</div>` :
-                `<div class="dashboard-charts">
-                    <div class="chart-container">
-                        <h4>สถานะ</h4>
-                        <canvas id="status-${stats.name.toLowerCase().replace(/\s+/g, '-')}" width="200" height="200"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h4>ความสำคัญ</h4>
-                        <canvas id="priority-${stats.name.toLowerCase().replace(/\s+/g, '-')}" width="200" height="150"></canvas>
-                    </div>
-                </div>
+        content.appendChild(chartsDiv);
+
+        const activityDiv = document.createElement('div');
+        activityDiv.className = 'recent-activity';
+        const activityH4 = document.createElement('h4');
+        activityH4.textContent = 'กิจกรรมล่าสุด (7 วัน)';
+        activityDiv.appendChild(activityH4);
+
+        const activityList = document.createElement('div');
+        activityList.className = 'activity-list';
+        if (stats.recentActivity.length > 0) {
+            stats.recentActivity.forEach(item => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
                 
-                <div class="recent-activity">
-                    <h4>กิจกรรมล่าสุด (7 วัน)</h4>
-                    <div class="activity-list">
-                        ${stats.recentActivity.length > 0 ? 
-                            stats.recentActivity.map(item => `
-                                <div class="activity-item">
-                                    <span class="activity-title">${item.title}</span>
-                                    <span class="activity-time">${new Date(item.updated).toLocaleDateString('th-TH')}</span>
-                                </div>
-                            `).join('') :
-                            '<div class="no-activity">ไม่มีกิจกรรมล่าสุด</div>'
-                        }
-                    </div>
-                </div>`
-            }
-        </div>
-        
-        <div class="dashboard-card-footer">
-            <span class="last-updated">อัปเดตล่าสุด: ${new Date(stats.lastUpdated).toLocaleString('th-TH')}</span>
-            <button class="refresh-button" onclick="refreshDatabaseStats('${stats.name}')">🔄</button>
-        </div>
-    `;
+                const activityTitle = document.createElement('span');
+                activityTitle.className = 'activity-title';
+                activityTitle.textContent = item.title;
+
+                const activityTime = document.createElement('span');
+                activityTime.className = 'activity-time';
+                activityTime.textContent = new Date(item.updated).toLocaleDateString('th-TH');
+
+                activityItem.appendChild(activityTitle);
+                activityItem.appendChild(activityTime);
+                activityList.appendChild(activityItem);
+            });
+        } else {
+            const noActivity = document.createElement('div');
+            noActivity.className = 'no-activity';
+            noActivity.textContent = 'ไม่มีกิจกรรมล่าสุด';
+            activityList.appendChild(noActivity);
+        }
+        activityDiv.appendChild(activityList);
+        content.appendChild(activityDiv);
+    }
+    card.appendChild(content);
+
+    const footer = document.createElement('div');
+    footer.className = 'dashboard-card-footer';
+
+    const lastUpdated = document.createElement('span');
+    lastUpdated.className = 'last-updated';
+    lastUpdated.textContent = `อัปเดตล่าสุด: ${new Date(stats.lastUpdated).toLocaleString('th-TH')}`;
+    footer.appendChild(lastUpdated);
+
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'refresh-button';
+    refreshButton.textContent = '🔄';
+    refreshButton.onclick = () => refreshDatabaseStats(stats.name);
+    footer.appendChild(refreshButton);
+    card.appendChild(footer);
     
     return card;
 }
@@ -315,18 +379,35 @@ async function updateAllDashboards() {
     ].filter(db => db.id); // Only include databases with valid IDs
 
     // Clear existing dashboard
-    dashboardContainer.innerHTML = `
-        <div class="dashboard-header">
-            <h2>📊 Notion Database Dashboard</h2>
-            <button class="dashboard-toggle" onclick="toggleDashboard()">▼</button>
-        </div>
-        <div class="dashboard-grid" id="dashboard-grid">
-            <div class="loading-dashboard">🔄 กำลังโหลดข้อมูล...</div>
-        </div>
-    `;
+    dashboardContainer.textContent = ''; // Safe clear
 
-    const dashboardGrid = document.getElementById('dashboard-grid');
-    dashboardGrid.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'dashboard-header';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = '📊 Notion Database Dashboard';
+    header.appendChild(h2);
+
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'dashboard-toggle';
+    toggleButton.textContent = '▼';
+    toggleButton.onclick = toggleDashboard;
+    header.appendChild(toggleButton);
+
+    dashboardContainer.appendChild(header);
+
+    const dashboardGrid = document.createElement('div');
+    dashboardGrid.id = 'dashboard-grid';
+    dashboardGrid.className = 'dashboard-grid';
+
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-dashboard';
+    loadingDiv.textContent = '🔄 กำลังโหลดข้อมูล...';
+    dashboardGrid.appendChild(loadingDiv);
+
+    dashboardContainer.appendChild(dashboardGrid);
+
+    dashboardGrid.textContent = ''; // Safe clear before populating
 
     // Fetch and create cards for each database
     for (const db of databases) {

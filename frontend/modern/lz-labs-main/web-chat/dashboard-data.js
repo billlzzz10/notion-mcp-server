@@ -70,19 +70,27 @@ class DashboardDataManager {
     const container = document.getElementById('database-list');
     if (!container) return;
 
-    container.innerHTML = '';
+    container.textContent = ''; // Clear existing content
 
     Object.entries(this.databases).forEach(([name, dbId]) => {
       const dbItem = document.createElement('div');
       dbItem.className = 'database-item';
-      dbItem.innerHTML = `
-        <div class="database-info">
-          <div class="database-name">${name}</div>
-        </div>
-        <button class="view-database-btn" onclick="dashboardData.fetchDatabaseData('${dbId}', '${name}')">
-          View
-        </button>
-      `;
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'database-info';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'database-name';
+      nameDiv.textContent = name;
+      infoDiv.appendChild(nameDiv);
+
+      const button = document.createElement('button');
+      button.className = 'view-database-btn';
+      button.textContent = 'View';
+      button.addEventListener('click', () => this.fetchDatabaseData(dbId, name));
+
+      dbItem.appendChild(infoDiv);
+      dbItem.appendChild(button);
       container.appendChild(dbItem);
     });
 
@@ -94,7 +102,7 @@ class DashboardDataManager {
         <span class="stat-number">${Object.keys(this.databases).length}</span>
         <span class="stat-label">Databases</span>
       </div>
-    `;
+    `; // This is safe, no user input
     container.appendChild(summary);
   }
 
@@ -102,6 +110,8 @@ class DashboardDataManager {
   renderDatabaseData(databaseName, data) {
     const container = document.getElementById('database-content');
     if (!container) return;
+
+    container.textContent = ''; // Clear content
 
     // Calculate stats
     const totalPages = data.pages?.length || 0;
@@ -112,48 +122,59 @@ class DashboardDataManager {
       }
     });
 
-    container.innerHTML = `
-      <div class="database-header">
-        <h2>📊 ${databaseName}</h2>
-        <div class="database-stats">
-          <div class="stat-card">
-            <div class="stat-number">${totalPages}</div>
-            <div class="stat-label">Entries</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">${uniqueProperties.size}</div>
-            <div class="stat-label">Properties</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">${new Date().toLocaleDateString()}</div>
-            <div class="stat-label">Last Updated</div>
-          </div>
-        </div>
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'database-header';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = `📊 ${databaseName}`; // SAFE
+    headerDiv.appendChild(h2);
+
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'database-stats';
+    statsDiv.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-number">${totalPages}</div>
+        <div class="stat-label">Entries</div>
       </div>
-      <div class="database-table-container">
-        ${this.renderDataTable(data)}
+      <div class="stat-card">
+        <div class="stat-number">${uniqueProperties.size}</div>
+        <div class="stat-label">Properties</div>
       </div>
-    `;
+      <div class="stat-card">
+        <div class="stat-number">${new Date().toLocaleDateString()}</div>
+        <div class="stat-label">Last Updated</div>
+      </div>
+    `; // Safe, no user input
+    headerDiv.appendChild(statsDiv);
+    container.appendChild(headerDiv);
+
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'database-table-container';
+    this.renderDataTable(tableContainer, data); // Pass container to render into
+    container.appendChild(tableContainer);
   }
 
   // Render data as table
-  renderDataTable(data) {
+  renderDataTable(container, data) {
+    container.textContent = '';
+
     if (!data.pages || data.pages.length === 0) {
-      return '<div class="no-data">📭 No data found in this database</div>';
+      container.innerHTML = '<div class="no-data">📭 No data found in this database</div>';
+      return;
     }
 
-    // Get all unique properties from all pages
     const allProperties = new Set();
     data.pages.forEach(page => {
       if (page.properties) {
         Object.keys(page.properties).forEach(prop => allProperties.add(prop));
       }
     });
-
     const headers = Array.from(allProperties);
 
-    let tableHTML = `
-      <div class="table-controls">
+    // Create controls
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'table-controls';
+    controlsDiv.innerHTML = `
         <div class="search-container">
           <input type="text" id="table-search" placeholder="🔍 Search entries..." class="table-search-input">
         </div>
@@ -161,79 +182,105 @@ class DashboardDataManager {
           <button class="view-toggle active" data-view="table">📊 Table</button>
           <button class="view-toggle" data-view="cards">📋 Cards</button>
         </div>
-      </div>
-      <div id="table-view">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="title-header">📌 Title</th>
-              ${headers.filter(h => h !== 'Name' && h !== 'Title').map(h => `<th>${h}</th>`).join('')}
-            </tr>
-          </thead>
-          <tbody>
-    `;
+    `; // Safe
+    container.appendChild(controlsDiv);
+
+    const tableView = document.createElement('div');
+    tableView.id = 'table-view';
+    const table = document.createElement('table');
+    table.className = 'data-table';
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    const headerRow = document.createElement('tr');
+    const titleHeader = document.createElement('th');
+    titleHeader.className = 'title-header';
+    titleHeader.textContent = '📌 Title';
+    headerRow.appendChild(titleHeader);
+
+    headers.filter(h => h !== 'Name' && h !== 'Title').forEach(h => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
 
     data.pages.forEach(page => {
-      const title = this.extractTitle(page);
-      tableHTML += `<tr class="table-row">`;
-      tableHTML += `<td class="title-cell">${title}</td>`;
+      const tr = document.createElement('tr');
+      tr.className = 'table-row';
+      const titleTd = document.createElement('td');
+      titleTd.className = 'title-cell';
+      titleTd.textContent = this.extractTitle(page);
+      tr.appendChild(titleTd);
       
       headers.filter(h => h !== 'Name' && h !== 'Title').forEach(header => {
+        const td = document.createElement('td');
         const property = page.properties?.[header];
-        const value = this.formatPropertyValue(property);
-        tableHTML += `<td>${value}</td>`;
+        td.appendChild(this.formatPropertyValue(property));
+        tr.appendChild(td);
       });
-      
-      tableHTML += `</tr>`;
+      tbody.appendChild(tr);
     });
 
-    tableHTML += `
-          </tbody>
-        </table>
-      </div>
-      <div id="cards-view" style="display: none;">
-        ${this.renderDataCards(data)}
-      </div>
-    `;
-    return tableHTML;
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tableView.appendChild(table);
+    container.appendChild(tableView);
+
+    const cardsView = document.createElement('div');
+    cardsView.id = 'cards-view';
+    cardsView.style.display = 'none';
+    this.renderDataCards(cardsView, data); // Pass container
+    container.appendChild(cardsView);
   }
 
   // Render data as cards
-  renderDataCards(data) {
-    let cardsHTML = '<div class="cards-container">';
+  renderDataCards(container, data) {
+    container.textContent = '';
+    const cardsContainer = document.createElement('div');
+    cardsContainer.className = 'cards-container';
     
     data.pages.forEach(page => {
-      const title = this.extractTitle(page);
-      cardsHTML += `
-        <div class="data-card">
-          <div class="card-header">
-            <h3 class="card-title">${title}</h3>
-          </div>
-          <div class="card-properties">
-      `;
-      
+      const card = document.createElement('div');
+      card.className = 'data-card';
+
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      const title = document.createElement('h3');
+      title.className = 'card-title';
+      title.textContent = this.extractTitle(page);
+      header.appendChild(title);
+      card.appendChild(header);
+
+      const propertiesDiv = document.createElement('div');
+      propertiesDiv.className = 'card-properties';
+
       Object.entries(page.properties || {}).forEach(([key, property]) => {
         if (key !== 'Name' && key !== 'Title') {
-          const value = this.formatPropertyValue(property);
-          if (value && value !== '<span class="empty-value">—</span>') {
-            cardsHTML += `
-              <div class="card-property">
-                <span class="property-label">${key}:</span>
-                <span class="property-value">${value}</span>
-              </div>
-            `;
+          const valueNode = this.formatPropertyValue(property);
+          // Only add if it's not the empty node
+          if (valueNode.textContent !== '—') {
+              const propDiv = document.createElement('div');
+              propDiv.className = 'card-property';
+
+              const labelSpan = document.createElement('span');
+              labelSpan.className = 'property-label';
+              labelSpan.textContent = `${key}:`;
+
+              const valueSpan = document.createElement('span');
+              valueSpan.className = 'property-value';
+              valueSpan.appendChild(valueNode);
+
+              propDiv.appendChild(labelSpan);
+              propDiv.appendChild(valueSpan);
+              propertiesDiv.appendChild(propDiv);
           }
         }
       });
-      
-      cardsHTML += `
-          </div>
-        </div>
-      `;
+      card.appendChild(propertiesDiv);
+      cardsContainer.appendChild(card);
     });
-    
-    cardsHTML += '</div>';
-    return cardsHTML;
+    container.appendChild(cardsContainer);
   }
 
   // Extract title from page
@@ -249,44 +296,70 @@ class DashboardDataManager {
 
   // Format property value for display
   formatPropertyValue(property) {
-    if (!property) return '<span class="empty-value">—</span>';
+    const createSpan = (text, className) => {
+        const span = document.createElement('span');
+        if (className) span.className = className;
+        span.textContent = text;
+        return span;
+    };
+
+    if (!property) return createSpan('—', 'empty-value');
 
     switch (property.type) {
       case 'title':
-        return `<strong>${property.title?.[0]?.plain_text || ''}</strong>`;
+        const strong = document.createElement('strong');
+        strong.textContent = property.title?.[0]?.plain_text || '';
+        return strong;
       case 'rich_text':
-        return property.rich_text?.[0]?.plain_text || '';
+        return document.createTextNode(property.rich_text?.[0]?.plain_text || '');
       case 'number':
-        return `<span class="number-value">${property.number || 0}</span>`;
+        return createSpan(property.number || 0, 'number-value');
       case 'select':
         const selectName = property.select?.name || '';
-        return selectName ? `<span class="select-tag select-${selectName.toLowerCase().replace(/\s+/g, '-')}">${selectName}</span>` : '';
+        return selectName ? createSpan(selectName, `select-tag select-${selectName.toLowerCase().replace(/\s+/g, '-')}`) : document.createTextNode('');
       case 'multi_select':
-        return property.multi_select?.map(s => 
-          `<span class="select-tag multi-select-tag">${s.name}</span>`
-        ).join(' ') || '';
+        const fragment = document.createDocumentFragment();
+        (property.multi_select || []).forEach(s => {
+            fragment.appendChild(createSpan(s.name, 'select-tag multi-select-tag'));
+            fragment.appendChild(document.createTextNode(' '));
+        });
+        return fragment;
       case 'date':
-        return property.date?.start ? 
-          `<span class="date-value">${new Date(property.date.start).toLocaleDateString()}</span>` : '';
+        return property.date?.start ? createSpan(new Date(property.date.start).toLocaleDateString(), 'date-value') : document.createTextNode('');
       case 'checkbox':
-        return property.checkbox ? 
-          '<span class="checkbox-value checked">✅ Yes</span>' : 
-          '<span class="checkbox-value unchecked">❌ No</span>';
+        return property.checkbox ? createSpan('✅ Yes', 'checkbox-value checked') : createSpan('❌ No', 'checkbox-value unchecked');
       case 'url':
-        return property.url ? 
-          `<a href="${property.url}" target="_blank" class="url-link">🔗 Link</a>` : '';
+        if (!property.url) return document.createTextNode('');
+        const a = document.createElement('a');
+        if (property.url.startsWith('https://') || property.url.startsWith('http://')) {
+            a.href = property.url;
+        } else {
+            a.href = '#';
+            a.title = 'Invalid URL';
+        }
+        a.target = '_blank';
+        a.className = 'url-link';
+        a.textContent = '🔗 Link';
+        return a;
       case 'email':
-        return property.email ? 
-          `<a href="mailto:${property.email}" class="email-link">${property.email}</a>` : '';
+        if (!property.email) return document.createTextNode('');
+        const mailLink = document.createElement('a');
+        mailLink.href = `mailto:${property.email}`;
+        mailLink.className = 'email-link';
+        mailLink.textContent = property.email;
+        return mailLink;
       case 'phone_number':
-        return property.phone_number ? 
-          `<a href="tel:${property.phone_number}" class="phone-link">${property.phone_number}</a>` : '';
+        if (!property.phone_number) return document.createTextNode('');
+        const phoneLink = document.createElement('a');
+        phoneLink.href = `tel:${property.phone_number}`;
+        phoneLink.className = 'phone-link';
+        phoneLink.textContent = property.phone_number;
+        return phoneLink;
       case 'relation':
-        return property.relation?.length > 0 ? 
-          `<span class="relation-count">${property.relation.length} relations</span>` : '';
+        return property.relation?.length > 0 ? createSpan(`${property.relation.length} relations`, 'relation-count') : document.createTextNode('');
       default:
         const jsonStr = JSON.stringify(property).substring(0, 50);
-        return `<span class="json-preview" title="${jsonStr}...">${jsonStr}...</span>`;
+        return createSpan(`${jsonStr}...`, 'json-preview');
     }
   }
 
@@ -311,13 +384,27 @@ class DashboardDataManager {
   showError(message) {
     const container = document.getElementById('database-content');
     if (container) {
-      container.innerHTML = `
-        <div class="error-message">
-          <div class="error-icon">⚠️</div>
-          <div class="error-text">${message}</div>
-          <button onclick="dashboardData.fetchDatabases()" class="retry-btn">Try Again</button>
-        </div>
-      `;
+      container.textContent = '';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message';
+
+      const iconDiv = document.createElement('div');
+      iconDiv.className = 'error-icon';
+      iconDiv.textContent = '⚠️';
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'error-text';
+      textDiv.textContent = message;
+
+      const button = document.createElement('button');
+      button.className = 'retry-btn';
+      button.textContent = 'Try Again';
+      button.addEventListener('click', () => this.fetchDatabases());
+
+      errorDiv.appendChild(iconDiv);
+      errorDiv.appendChild(textDiv);
+      errorDiv.appendChild(button);
+      container.appendChild(errorDiv);
     }
   }
 

@@ -1,11 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import cookieParser from "cookie-parser";
+import csrf from "csurf";
 import { storage } from "./storage";
 import { insertGenerationSchema } from "@shared/schema";
 import { generateImages as generateWithOpenAI } from "./services/openai";
 import { generateImages as generateWithGemini } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.use(cookieParser());
+  app.use(csrf({ cookie: true }));
   // Generate images endpoint
   app.post("/api/generate", async (req, res) => {
     try {

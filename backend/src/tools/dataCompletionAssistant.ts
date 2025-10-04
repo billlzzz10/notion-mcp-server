@@ -152,10 +152,17 @@ async function suggestMissingData(dbConfig: any, args: any): Promise<string> {
   }
 
   try {
-    const response = await notion.databases.query({
-      database_id: dbId,
-      page_size: args.recordLimit
-    });
+    const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for database ID: ${dbId}`);
+    }
+
+    const response = await notion.request({
+        path: `data_sources/${dataSource.id}/query`,
+        method: 'post',
+        body: { page_size: args.recordLimit }
+    }) as any;
 
     let result = `🔍 **การวิเคราะห์ข้อมูลที่ขาดหายไปในฐานข้อมูล ${dbConfig.displayName}**\n\n`;
 
@@ -263,10 +270,17 @@ async function fillSpecificField(dbConfig: any, args: any): Promise<string> {
   }
 
   try {
-    const response = await notion.databases.query({
-      database_id: dbId,
-      page_size: args.recordLimit
-    });
+    const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for database ID: ${dbId}`);
+    }
+
+    const response = await notion.request({
+        path: `data_sources/${dataSource.id}/query`,
+        method: 'post',
+        body: { page_size: args.recordLimit }
+    }) as any;
 
     let result = `🎯 **การเติมข้อมูลฟิลด์ "${args.specificField}" ในฐานข้อมูล ${dbConfig.displayName}**\n\n`;
 
@@ -308,10 +322,16 @@ async function bulkComplete(dbConfig: any, args: any): Promise<string> {
   }
 
   try {
-    const response = await notion.databases.query({
-      database_id: dbId,
-      page_size: args.recordLimit
-    });
+    const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for database ID: ${dbId}`);
+    }
+    const response = await notion.request({
+        path: `data_sources/${dataSource.id}/query`,
+        method: 'post',
+        body: { page_size: args.recordLimit }
+    }) as any;
 
     if (response.results.length === 0) {
       result += generateSampleDataSuggestions(dbConfig, args);

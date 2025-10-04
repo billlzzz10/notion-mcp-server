@@ -241,9 +241,16 @@ app.post('/api/projects', async (req, res) => {
   }
 
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: DATABASES.PROJECTS });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for Projects DB: ${DATABASES.PROJECTS}`);
+    }
+
     const response = await notion.pages.create({
       parent: {
-        database_id: DATABASES.PROJECTS,
+        data_source_id: dataSource.id,
       },
       properties: {
         Name: {
@@ -301,9 +308,16 @@ app.post('/api/tasks', async (req, res) => {
   }
 
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: DATABASES.TASKS });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for Tasks DB: ${DATABASES.TASKS}`);
+    }
+
     const response = await notion.pages.create({
       parent: {
-        database_id: DATABASES.TASKS,
+        data_source_id: dataSource.id,
       },
       properties: {
         Name: {

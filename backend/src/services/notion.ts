@@ -20,4 +20,5 @@ export function getRootPageId(): string {
 
 export const notion = new Client({
   auth: process.env.NOTION_TOKEN,
+  notionVersion: "2025-09-03",
 });

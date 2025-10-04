@@ -42,7 +42,7 @@ async function initializeApp() {
     // Setup share menu
     const shareButtonContainer = document.querySelector('#share-button')?.parentElement;
     if (shareButtonContainer) {
-        shareButtonContainer.innerHTML += createShareMenu();
+        shareButtonContainer.appendChild(createShareMenu());
     }
 
     // Initialize AI
@@ -193,15 +193,21 @@ async function sendMessage() {
     // Show loading
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'message ai loading';
-    loadingDiv.innerHTML = `
-        <div class="message-content">
-            <div class="loading-indicator">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-        </div>
-    `;
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'loading-indicator';
+
+    for (let i = 0; i < 3; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        loadingIndicator.appendChild(dot);
+    }
+
+    messageContent.appendChild(loadingIndicator);
+    loadingDiv.appendChild(messageContent);
     
     const chatContainer = document.getElementById('chat-container')!;
     chatContainer.appendChild(loadingDiv);
@@ -294,18 +300,31 @@ async function handleFileUpload(file: File): Promise<FileAttachment> {
 function showFilePreview() {
     if (!currentAttachedFile) return;
 
-    filePreviewContainer.innerHTML = `
-        <div class="file-preview">
-            <span class="file-name">📎 ${currentAttachedFile.file.name}</span>
-            <button type="button" onclick="clearFilePreview()" class="file-remove">✕</button>
-        </div>
-    `;
+    filePreviewContainer.textContent = ''; // Clear safely
+
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'file-preview';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'file-name';
+    nameSpan.textContent = `📎 ${currentAttachedFile.file.name}`;
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'file-remove';
+    removeButton.textContent = '✕';
+    removeButton.addEventListener('click', clearFilePreview);
+
+    previewDiv.appendChild(nameSpan);
+    previewDiv.appendChild(removeButton);
+
+    filePreviewContainer.appendChild(previewDiv);
     filePreviewContainer.style.display = 'block';
 }
 
 function clearFilePreview() {
     currentAttachedFile = null;
-    filePreviewContainer.innerHTML = '';
+    filePreviewContainer.textContent = '';
     filePreviewContainer.style.display = 'none';
     if (fileInput) fileInput.value = '';
 }

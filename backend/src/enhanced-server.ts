@@ -176,7 +176,7 @@ async function handleRealtimeCollaboration(args: any) {
     case "start_session":
       result = `🚀 Real-time session started: ${session_id || 'ashval_session_' + Date.now()}
       
-📡 WebSocket endpoint: ws://localhost:3003
+📡 WebSocket endpoint: wss://localhost:3003
 👥 Collaboration features:
    • Live cursor tracking
    • Real-time text sync  

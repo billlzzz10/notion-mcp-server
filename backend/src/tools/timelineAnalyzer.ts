@@ -35,8 +35,12 @@ export async function handleTimelineAnalysis(args: any) {
 
   try {
     // ดึงข้อมูล Timeline ในช่วงที่กำหนด
-    const timelineResponse = await notion.databases.query({
-      database_id: timelineDb,
+    const dbResponseTimeline = await notion.databases.retrieve({ database_id: timelineDb });
+    const dataSourceTimeline = dbResponseTimeline.data_sources?.[0];
+    if (!dataSourceTimeline) throw new Error(`No data source found for Timeline DB: ${timelineDb}`);
+
+    const timelineResponse = await notion.dataSources.query({
+      data_source_id: dataSourceTimeline.id,
       filter: {
         and: [
           {
@@ -61,9 +65,13 @@ export async function handleTimelineAnalysis(args: any) {
       ]
     });
 
-    // ดึงข้อมูล Scenes ในช่วงเดียวกน
-    const scenesResponse = await notion.databases.query({
-      database_id: scenesDb,
+    // ดึงข้อมูล Scenes ในช่วงเดียวกัน
+    const dbResponseScenes = await notion.databases.retrieve({ database_id: scenesDb });
+    const dataSourceScenes = dbResponseScenes.data_sources?.[0];
+    if (!dataSourceScenes) throw new Error(`No data source found for Scenes DB: ${scenesDb}`);
+
+    const scenesResponse = await notion.dataSources.query({
+      data_source_id: dataSourceScenes.id,
       filter: {
         and: [
           {
@@ -126,7 +134,6 @@ export async function handleTimelineAnalysis(args: any) {
 function analyzeTimelineGaps(timelineEvents: any[], scenes: any[]): string {
   let analysis = "🔍 **การวิเคราะห์ช่องว่างใน Timeline:**\n\n";
   
-  // ตรวจสอบลำดับเหตุการณ์
   const orders = timelineEvents.map(event => {
     const orderProp = event.properties["Timeline Order"];
     return orderProp?.number || 0;
@@ -139,7 +146,6 @@ function analyzeTimelineGaps(timelineEvents: any[], scenes: any[]): string {
     }
   }
 
-  // ตรวจสอบเหตุการณ์ที่ไม่มีฉากรองรับ
   const eventsWithoutScenes = timelineEvents.filter(event => {
     const relatedScenes = event.properties["Related Scenes"];
     return !relatedScenes?.relation || relatedScenes.relation.length === 0;
@@ -159,7 +165,6 @@ function analyzeTimelineGaps(timelineEvents: any[], scenes: any[]): string {
 function analyzeTimelineConflicts(timelineEvents: any[]): string {
   let analysis = "⚔️ **การวิเคราะห์ความขัดแย้งใน Timeline:**\n\n";
   
-  // ตรวจสอบเหตุการณ์ที่เกิดขึ้นพร้อมกัน
   const eventsByChapter = new Map();
   
   timelineEvents.forEach(event => {
@@ -191,7 +196,6 @@ function analyzePacing(timelineEvents: any[], scenes: any[]): string {
   const eventsByChapter = new Map();
   const scenesByChapter = new Map();
 
-  // จัดกลุ่มเหตุการณ์ตามตอน
   timelineEvents.forEach(event => {
     const chapter = event.properties["Real Chapter"]?.number || 0;
     if (!eventsByChapter.has(chapter)) {
@@ -200,7 +204,6 @@ function analyzePacing(timelineEvents: any[], scenes: any[]): string {
     eventsByChapter.get(chapter).push(event);
   });
 
-  // จัดกลุ่มฉากตามตอน
   scenes.forEach(scene => {
     const chapter = scene.properties["Chapter"]?.number || 0;
     if (!scenesByChapter.has(chapter)) {
@@ -209,7 +212,6 @@ function analyzePacing(timelineEvents: any[], scenes: any[]): string {
     scenesByChapter.set(chapter, scenesByChapter.get(chapter) + 1);
   });
 
-  // วิเคราะห์ความหนาแน่นของเหตุการณ์
   const allChapters = new Set([...eventsByChapter.keys(), ...scenesByChapter.keys()]);
   
   allChapters.forEach(chapter => {
