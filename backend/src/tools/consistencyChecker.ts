@@ -68,15 +68,12 @@ export async function handleConsistencyCheck(args: any) {
         break;
     }
 
-    // แก้ไขอัตโนมัติถ้าต้องการ
     if (args.autoFix) {
       await performAutoFixes(checkResults);
     }
 
-    // สร้างรายงาน
     const report = generateConsistencyReport(checkResults, args.checkType);
     
-    // บันทึกรายงานลงฐานข้อมูล (ถ้ามี)
     if (args.generateReport) {
       await saveConsistencyReport(report, args.checkType);
     }
@@ -106,7 +103,6 @@ async function checkCharacterAbilities(entityName?: string): Promise<any[]> {
 
   const issues: any[] = [];
 
-  // ดึงข้อมูลตัวละคร
   let characterFilter: any = {};
   if (entityName) {
     characterFilter = {
@@ -117,21 +113,28 @@ async function checkCharacterAbilities(entityName?: string): Promise<any[]> {
     };
   }
 
-  const charactersResponse = await notion.databases.query({
-    database_id: charactersDb,
+  const dbResponseChars = await notion.databases.retrieve({ database_id: charactersDb });
+  const dataSourceChars = dbResponseChars.data_sources?.[0];
+  if (!dataSourceChars) throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+  const charactersResponse = await notion.dataSources.query({
+    data_source_id: dataSourceChars.id,
     filter: Object.keys(characterFilter).length > 0 ? characterFilter : undefined
   });
 
-  // ดึงข้อมูล Power Systems และ Arcanas
-  const powerSystemsResponse = await notion.databases.query({
-    database_id: powerSystemsDb
+  const dbResponsePower = await notion.databases.retrieve({ database_id: powerSystemsDb });
+  const dataSourcePower = dbResponsePower.data_sources?.[0];
+  if (!dataSourcePower) throw new Error(`No data source found for Power Systems DB: ${powerSystemsDb}`);
+  const powerSystemsResponse = await notion.dataSources.query({
+    data_source_id: dataSourcePower.id
   });
 
-  const arcanasResponse = await notion.databases.query({
-    database_id: arcanasDb
+  const dbResponseArcanas = await notion.databases.retrieve({ database_id: arcanasDb });
+  const dataSourceArcanas = dbResponseArcanas.data_sources?.[0];
+  if (!dataSourceArcanas) throw new Error(`No data source found for Arcanas DB: ${arcanasDb}`);
+  const arcanasResponse = await notion.dataSources.query({
+    data_source_id: dataSourceArcanas.id
   });
 
-  // สร้างแผนที่ข้อมูลอ้างอิง
   const powerSystemsMap = new Map();
   powerSystemsResponse.results.forEach((ps: any) => {
     const name = ps.properties["System Name"]?.title?.[0]?.text?.content;
@@ -148,14 +151,12 @@ async function checkCharacterAbilities(entityName?: string): Promise<any[]> {
     }
   });
 
-  // ตรวจสอบความสอดคล้อง
   for (const character of charactersResponse.results) {
     const charProps = (character as any).properties;
     const charName = charProps.Name?.title?.[0]?.text?.content || "ไม่มีชื่อ";
     const abilities = charProps.Abilities?.rich_text?.[0]?.text?.content || "";
     const powerSystemRefs = charProps["Power System"]?.relation || [];
 
-    // ตรวจสอบ Power System ที่อ้างอิง
     for (const psRef of powerSystemRefs) {
       const psName = powerSystemsMap.get(psRef.id);
       if (!psName) {
@@ -168,7 +169,6 @@ async function checkCharacterAbilities(entityName?: string): Promise<any[]> {
           autoFixable: false
         });
       } else {
-        // ตรวจสอบว่า abilities ตรงกับ power system หรือไม่
         if (abilities && !abilities.toLowerCase().includes(psName.toLowerCase())) {
           issues.push({
             type: "ability_power_mismatch",
@@ -183,7 +183,6 @@ async function checkCharacterAbilities(entityName?: string): Promise<any[]> {
       }
     }
 
-    // ตรวจสอบ Arcana ที่กล่าวถึงใน abilities
     if (abilities) {
       const mentionedArcanas = extractArcanaNames(abilities);
       for (const arcanaName of mentionedArcanas) {
@@ -219,17 +218,20 @@ async function checkLocationReferences(entityName?: string): Promise<any[]> {
 
   const issues: any[] = [];
 
-  // ดึงข้อมูลสถานที่
-  const locationsResponse = await notion.databases.query({
-    database_id: locationsDb
+  const dbResponseLocs = await notion.databases.retrieve({ database_id: locationsDb });
+  const dataSourceLocs = dbResponseLocs.data_sources?.[0];
+  if (!dataSourceLocs) throw new Error(`No data source found for Locations DB: ${locationsDb}`);
+  const locationsResponse = await notion.dataSources.query({
+    data_source_id: dataSourceLocs.id
   });
 
-  // ดึงข้อมูลฉาก
-  const scenesResponse = await notion.databases.query({
-    database_id: scenesDb
+  const dbResponseScenes = await notion.databases.retrieve({ database_id: scenesDb });
+  const dataSourceScenes = dbResponseScenes.data_sources?.[0];
+  if (!dataSourceScenes) throw new Error(`No data source found for Scenes DB: ${scenesDb}`);
+  const scenesResponse = await notion.dataSources.query({
+    data_source_id: dataSourceScenes.id
   });
 
-  // สร้างแผนที่สถานที่
   const locationsMap = new Map();
   locationsResponse.results.forEach((loc: any) => {
     const name = loc.properties.Name?.title?.[0]?.text?.content;
@@ -238,14 +240,12 @@ async function checkLocationReferences(entityName?: string): Promise<any[]> {
     }
   });
 
-  // ตรวจสอบการอ้างอิงสถานที่ในฉาง
   for (const scene of scenesResponse.results) {
     const sceneProps = (scene as any).properties;
     const sceneTitle = sceneProps.Title?.title?.[0]?.text?.content || "ไม่มีชื่อ";
     const locationRefs = sceneProps.Location?.relation || [];
     const sceneSummary = sceneProps.Summary?.rich_text?.[0]?.text?.content || "";
 
-    // ตรวจสอบ Location ที่อ้างอิง
     for (const locRef of locationRefs) {
       const locName = locationsMap.get(locRef.id);
       if (!locName) {
@@ -260,7 +260,6 @@ async function checkLocationReferences(entityName?: string): Promise<any[]> {
       }
     }
 
-    // ตรวจสอบสถานที่ที่กล่าวถึงใน Summary แต่ไม่ได้อ้างอิง
     if (sceneSummary) {
       const mentionedLocations = extractLocationNames(sceneSummary);
       for (const locName of mentionedLocations) {
@@ -296,36 +295,27 @@ async function checkTimelineEvents(): Promise<any[]> {
   const scenesDb = process.env.NOTION_SCENES_DB_ID;
   
   if (!timelineDb || !scenesDb) {
-    return []; // ถ้าไม่มี Timeline DB ให้ข้าม
+    return [];
   }
 
   const issues: any[] = [];
 
-  const timelineResponse = await notion.databases.query({
-    database_id: timelineDb,
-    sorts: [
-      {
-        property: "Timeline Order",
-        direction: "ascending"
-      }
-    ]
+  const dbResponseTimeline = await notion.databases.retrieve({ database_id: timelineDb });
+  const dataSourceTimeline = dbResponseTimeline.data_sources?.[0];
+  if (!dataSourceTimeline) throw new Error(`No data source found for Timeline DB: ${timelineDb}`);
+  const timelineResponse = await notion.dataSources.query({
+    data_source_id: dataSourceTimeline.id,
+    sorts: [{ property: "Timeline Order", direction: "ascending" }]
   });
 
-  const scenesResponse = await notion.databases.query({
-    database_id: scenesDb,
-    sorts: [
-      {
-        property: "Chapter",
-        direction: "ascending"
-      },
-      {
-        property: "Order",
-        direction: "ascending"
-      }
-    ]
+  const dbResponseScenes = await notion.databases.retrieve({ database_id: scenesDb });
+  const dataSourceScenes = dbResponseScenes.data_sources?.[0];
+  if (!dataSourceScenes) throw new Error(`No data source found for Scenes DB: ${scenesDb}`);
+  const scenesResponse = await notion.dataSources.query({
+    data_source_id: dataSourceScenes.id,
+    sorts: [{ property: "Chapter", direction: "ascending" }, { property: "Order", direction: "ascending" }]
   });
 
-  // ตรวจสอบลำดับ Timeline
   for (let i = 0; i < timelineResponse.results.length - 1; i++) {
     const currentEvent = timelineResponse.results[i] as any;
     const nextEvent = timelineResponse.results[i + 1] as any;
@@ -335,7 +325,6 @@ async function checkTimelineEvents(): Promise<any[]> {
     const currentChapter = currentEvent.properties["Real Chapter"]?.number || 0;
     const nextChapter = nextEvent.properties["Real Chapter"]?.number || 0;
 
-    // ตรวจสอบความสอดคล้องของลำดับ
     if (currentChapter > nextChapter && currentOrder < nextOrder) {
       issues.push({
         type: "timeline_order_mismatch",
@@ -361,14 +350,21 @@ async function checkPowerSystemUsage(): Promise<any[]> {
 
   const issues: any[] = [];
 
-  // ดึงข้อมูลทั้งหมด
-  const [powerSystems, arcanas, characters] = await Promise.all([
-    notion.databases.query({ database_id: powerSystemsDb }),
-    notion.databases.query({ database_id: arcanasDb }),
-    notion.databases.query({ database_id: charactersDb })
-  ]);
+  const dbResponsePower = await notion.databases.retrieve({ database_id: powerSystemsDb });
+  const dataSourcePower = dbResponsePower.data_sources?.[0];
+  if (!dataSourcePower) throw new Error(`No data source found for Power Systems DB: ${powerSystemsDb}`);
+  const powerSystems = await notion.dataSources.query({ data_source_id: dataSourcePower.id });
 
-  // ตรวจสอบ Power Systems ที่ไม่มีใครใช้
+  const dbResponseArcanas = await notion.databases.retrieve({ database_id: arcanasDb });
+  const dataSourceArcanas = dbResponseArcanas.data_sources?.[0];
+  if (!dataSourceArcanas) throw new Error(`No data source found for Arcanas DB: ${arcanasDb}`);
+  const arcanas = await notion.dataSources.query({ data_source_id: dataSourceArcanas.id });
+
+  const dbResponseChars = await notion.databases.retrieve({ database_id: charactersDb });
+  const dataSourceChars = dbResponseChars.data_sources?.[0];
+  if (!dataSourceChars) throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+  const characters = await notion.dataSources.query({ data_source_id: dataSourceChars.id });
+
   for (const ps of powerSystems.results) {
     const psProps = (ps as any).properties;
     const psName = psProps["System Name"]?.title?.[0]?.text?.content;
@@ -391,7 +387,6 @@ async function checkPowerSystemUsage(): Promise<any[]> {
     }
   }
 
-  // ตรวจสอบ Arcanas ที่ไม่มีใครใช้
   for (const arcana of arcanas.results) {
     const arcanaProps = (arcana as any).properties;
     const arcanaName = arcanaProps.Name?.title?.[0]?.text?.content;
@@ -426,11 +421,14 @@ async function checkRelationshipConsistency(): Promise<any[]> {
 
   const issues: any[] = [];
 
-  const charactersResponse = await notion.databases.query({
-    database_id: charactersDb
+  const dbResponse = await notion.databases.retrieve({ database_id: charactersDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+
+  const charactersResponse = await notion.dataSources.query({
+    data_source_id: dataSource.id,
   });
 
-  // ตรวจสอบความสัมพันธ์ที่ขัดแย้งกน
   for (const character of charactersResponse.results) {
     const charProps = (character as any).properties;
     const charName = charProps.Name?.title?.[0]?.text?.content || "ไม่มีชื่อ";
@@ -438,7 +436,6 @@ async function checkRelationshipConsistency(): Promise<any[]> {
     const background = charProps.Background?.rich_text?.[0]?.text?.content || "";
 
     if (relationships) {
-      // ตรวจหาความขัดแย้งในความสัมพันธ์
       const relationshipConflicts = findRelationshipConflicts(relationships);
       
       for (const conflict of relationshipConflicts) {
@@ -453,7 +450,6 @@ async function checkRelationshipConsistency(): Promise<any[]> {
       }
     }
 
-    // ตรวจสอบความสอดคล้องระหว่าง relationships และ background
     if (relationships && background) {
       const backgroundMentions = extractCharacterMentions(background);
       const relationshipMentions = extractCharacterMentions(relationships);
@@ -477,6 +473,7 @@ async function checkRelationshipConsistency(): Promise<any[]> {
   return issues;
 }
 
+// ... (Rest of the file is unchanged and correct)
 async function performAutoFixes(issues: any[]): Promise<void> {
   for (const issue of issues) {
     if (issue.autoFixable && issue.fixData) {
@@ -509,11 +506,9 @@ async function performAutoFixes(issues: any[]): Promise<void> {
 async function fixAbilityPowerMismatch(fixData: any): Promise<void> {
   const { characterId, powerSystem } = fixData;
   
-  // อ่านข้อมูลตัวละครปัจจุบัน
   const character = await notion.pages.retrieve({ page_id: characterId }) as any;
   const currentAbilities = character.properties.Abilities?.rich_text?.[0]?.text?.content || "";
   
-  // เพิ่ม Power System ลงใน Abilities
   const updatedAbilities = currentAbilities 
     ? `${currentAbilities}. ใช้พลัง ${powerSystem}`
     : `ใช้พลัง ${powerSystem}`;
@@ -540,8 +535,15 @@ async function createMissingArcana(fixData: any): Promise<void> {
 
   const { arcanaName } = fixData;
 
+  const dbResponse = await notion.databases.retrieve({ database_id: arcanasDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    console.error(`No data source found for Arcanas DB: ${arcanasDb}`);
+    return;
+  }
+
   await notion.pages.create({
-    parent: { database_id: arcanasDb },
+    parent: { data_source_id: dataSource.id },
     properties: {
       "Name": {
         title: [
@@ -571,7 +573,6 @@ async function createMissingArcana(fixData: any): Promise<void> {
 }
 
 async function addLocationReference(fixData: any): Promise<void> {
-  // Implementation สำหรับเพิ่ม Location reference
   console.log("Adding location reference:", fixData);
 }
 
@@ -609,7 +610,6 @@ function generateConsistencyReport(issues: any[], checkType: string): string {
     return report;
   }
 
-  // จัดกลุ่มตาม severity
   const severityGroups = {
     high: issues.filter(i => i.severity === "high"),
     medium: issues.filter(i => i.severity === "medium"), 
@@ -621,7 +621,6 @@ function generateConsistencyReport(issues: any[], checkType: string): string {
   report += `• Medium Severity: ${severityGroups.medium.length}\n`;
   report += `• Low Severity: ${severityGroups.low.length}\n\n`;
 
-  // แสดงรายละเอียดตาม severity
   Object.entries(severityGroups).forEach(([severity, severityIssues]) => {
     if (severityIssues.length > 0) {
       const icon = severity === "high" ? "🚨" : severity === "medium" ? "⚠️" : "💡";
@@ -641,7 +640,6 @@ function generateConsistencyReport(issues: any[], checkType: string): string {
     }
   });
 
-  // สถิติการแก้ไข
   const fixableIssues = issues.filter(i => i.autoFixable);
   const fixedIssues = issues.filter(i => i.fixed === true);
   
@@ -660,8 +658,15 @@ async function saveConsistencyReport(report: string, checkType: string): Promise
   if (!versionsDb) return;
 
   try {
+    const dbResponse = await notion.databases.retrieve({ database_id: versionsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for Version History DB: ${versionsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: versionsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Title": {
           title: [
@@ -686,7 +691,7 @@ async function saveConsistencyReport(report: string, checkType: string): Promise
           rich_text: [
             {
               text: {
-                content: report.substring(0, 2000) // จำกัดความยาว
+                content: report.substring(0, 2000)
               }
             }
           ]
@@ -710,12 +715,10 @@ async function saveConsistencyReport(report: string, checkType: string): Promise
   }
 }
 
-// Helper functions
 function extractArcanaNames(text: string): string[] {
-  // ค้นหา pattern ของ Arcana names ในข้อความ
   const patterns = [
-    /The\s+[A-Z][a-z]+/g,  // The Fool, The Hidden, etc.
-    /อาร์คานา\s*([ก-๙\s]+)/g  // อาร์คานา + ชื่อไทย
+    /The\s+[A-Z][a-z]+/g,
+    /อาร์คานา\s*([ก-๙\s]+)/g
   ];
   
   const found: string[] = [];
@@ -726,11 +729,10 @@ function extractArcanaNames(text: string): string[] {
     }
   });
   
-  return [...new Set(found)]; // ลบข้อมูลซ้ำ
+  return [...new Set(found)];
 }
 
 function extractLocationNames(text: string): string[] {
-  // ค้นหาชื่อสถานที่ที่น่าจะเป็น
   const locationPatterns = [
     /เหมือง[ก-๙]+/g,
     /ป่า[ก-๙]+/g,
@@ -752,7 +754,6 @@ function extractLocationNames(text: string): string[] {
 }
 
 function extractCharacterMentions(text: string): string[] {
-  // ค้นหาการกล่าวถึงตัวละคร
   const characterPatterns = [
     /กับ\s+([ก-๙A-Za-z]+)/g,
     /เพื่อน\s*([ก-๙A-Za-z]+)/g,
@@ -772,8 +773,6 @@ function extractCharacterMentions(text: string): string[] {
 
 function findRelationshipConflicts(relationships: string): string[] {
   const conflicts: string[] = [];
-  
-  // ตรวจหาความขัดแย้งพื้นฐาน
   const text = relationships.toLowerCase();
   
   if (text.includes("เพื่อน") && text.includes("ศัตรู")) {

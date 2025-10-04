@@ -20,17 +20,28 @@ export function showToast(message: string, type: ToastType = 'success', showDont
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'toast-message';
+    messageDiv.textContent = message;
+    toast.appendChild(messageDiv);
     
     if (showDontShowAgain) {
-        toast.innerHTML = `
-            <div class="toast-message">${message}</div>
-            <div class="toast-actions">
-                <button class="toast-button toast-dismiss">ปิด</button>
-                <button class="toast-button toast-dont-show" data-toast-type="${type}">ไม่แสดงอีกวันนี้</button>
-            </div>
-        `;
-    } else {
-        toast.innerHTML = `<div class="toast-message">${message}</div>`;
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'toast-actions';
+
+        const dismissButton = document.createElement('button');
+        dismissButton.className = 'toast-button toast-dismiss';
+        dismissButton.textContent = 'ปิด';
+        actionsDiv.appendChild(dismissButton);
+
+        const dontShowButton = document.createElement('button');
+        dontShowButton.className = 'toast-button toast-dont-show';
+        dontShowButton.textContent = 'ไม่แสดงอีกวันนี้';
+        dontShowButton.dataset.toastType = type;
+        actionsDiv.appendChild(dontShowButton);
+
+        toast.appendChild(actionsDiv);
     }
     
     toast.style.opacity = '0';

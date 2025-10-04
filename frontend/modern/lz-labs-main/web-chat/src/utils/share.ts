@@ -2,20 +2,38 @@
 import { getCurrentChat } from '../modules/chat.js';
 import { showToast } from './toast.js';
 
-export function createShareMenu(): string {
-    return `
-        <div id="share-menu" class="actions-menu hidden" style="display: none;">
-            <a href="#" onclick="window.shareToPlatform('facebook')">📘 Facebook</a>
-            <a href="#" onclick="window.shareToPlatform('twitter')">🐦 Twitter</a>
-            <a href="#" onclick="window.shareToPlatform('line')">💚 LINE</a>
-            <a href="#" onclick="window.shareToPlatform('telegram')">✈️ Telegram</a>
-            <a href="#" onclick="window.shareToPlatform('whatsapp')">💬 WhatsApp</a>
-            <a href="#" onclick="window.shareToPlatform('email')">📧 Email</a>
-            <a href="#" onclick="window.shareToPlatform('copy')">📋 คัดลอกลิงค์</a>
-            <a href="#" onclick="window.shareToPlatform('google-docs')">📄 Google Docs</a>
-            <a href="#" onclick="window.shareToPlatform('notion')">📝 Notion</a>
-        </div>
-    `;
+export function createShareMenu(): HTMLElement {
+    const menu = document.createElement('div');
+    menu.id = 'share-menu';
+    menu.className = 'actions-menu hidden';
+    // menu.style.display = 'none'; // The 'hidden' class should handle this
+
+    const platforms = [
+        { name: 'facebook', icon: '📘', label: 'Facebook' },
+        { name: 'twitter', icon: '🐦', label: 'Twitter' },
+        { name: 'line', icon: '💚', label: 'LINE' },
+        { name: 'telegram', icon: '✈️', label: 'Telegram' },
+        { name: 'whatsapp', icon: '💬', label: 'WhatsApp' },
+        { name: 'email', icon: '📧', label: 'Email' },
+        { name: 'copy', icon: '📋', label: 'คัดลอกลิงค์' },
+        { name: 'google-docs', icon: '📄', label: 'Google Docs' },
+        { name: 'notion', icon: '📝', label: 'Notion' }
+    ];
+
+    platforms.forEach(platform => {
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = `${platform.icon} ${platform.label}`;
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent closing menu immediately
+            shareToPlatform(platform.name);
+            menu.classList.add('hidden'); // Hide menu after click
+        });
+        menu.appendChild(link);
+    });
+
+    return menu;
 }
 
 export function shareToPlatform(platform: string) {

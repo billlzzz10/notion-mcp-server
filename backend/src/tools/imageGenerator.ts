@@ -285,8 +285,16 @@ function getServiceSpecificTags(service: string): string {
 
 async function saveImagePrompt(aiPromptsDb: string, prompt: string, args: any) {
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: aiPromptsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for AI Prompts DB: ${aiPromptsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: aiPromptsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Prompt Type": {
           select: {

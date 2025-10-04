@@ -10,12 +10,9 @@ export function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
 
+import DOMPurify from 'dompurify';
+
 export function getSafeHtml(html: string): { __html: string } {
-  // Basic HTML sanitization - in a real app, use a proper library like DOMPurify
-  const sanitized = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/javascript:/gi, '')
-    .replace(/on\w+="[^"]*"/gi, '');
-  
+  const sanitized = DOMPurify.sanitize(html);
   return { __html: sanitized };
 }

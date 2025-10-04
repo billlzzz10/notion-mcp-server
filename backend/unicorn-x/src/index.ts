@@ -474,7 +474,7 @@ server.listen(PORT, () => {
 🌐 Server: http://${HOST}:${PORT}
 📱 Web UI: http://${HOST}:${PORT}/user-interface.html
 🔧 Health: http://${HOST}:${PORT}/api/health
-📊 WebSocket: ws://${HOST}:${PORT}
+📊 WebSocket: wss://${HOST}:${PORT}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚀 Ready to process natural language commands!
   `);
