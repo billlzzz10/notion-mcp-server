@@ -234,7 +234,7 @@ async function analyzePacing(storyData: any, args: any): Promise<string> {
   analysis += "\n🎯 **การวิเคราะห์ Pacing โดยรวม:**\n";
   pacingData.forEach((count, pacing) => {
     const percentage = storyData.scenes.length > 0 ? ((count / storyData.scenes.length) * 100).toFixed(1) : "0.0";
-    analysis += `  ${pacing}: ${count} ฉาง (${percentage}%)\n`;
+    analysis += `  ${pacing}: ${count} ฉาก (${percentage}%)\n`;
   });
 
   analysis += "\n⚠️ **ปัญหา Pacing ที่พบ:**\n";
