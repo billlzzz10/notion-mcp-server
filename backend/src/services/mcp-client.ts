@@ -104,12 +104,19 @@ export class CentralMcpClient {
                 const childProcess = spawn(command, args || [], { cwd, stdio: 'pipe' });
                 connection.process = childProcess;
 
-                childProcess.stderr?.on('data', (data) => console.error(`[${serverName} STDERR]: ${data.toString()}`));
+                if (childProcess.stderr) {
+                    childProcess.stderr.on('data', (data) => console.error(`[${serverName} STDERR]: ${data.toString()}`));
+                }
                 childProcess.on('close', (code) => {
                     console.log(`[${serverName}] process exited with code ${code}`);
                     connection.status = 'disconnected';
                 });
 
+                if (!childProcess.stdin || !childProcess.stdout) {
+                    // Ensure we have the expected streams before creating the transport
+                    childProcess.kill();
+                    throw new Error(`Failed to obtain stdio streams for stdio server '${serverName}'`);
+                }
                 connection.transport = new StdioClientTransport(childProcess.stdin, childProcess.stdout);
             } else if (connection.config.type === 'socket') {
                 const { host, port } = connection.config;
