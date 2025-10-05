@@ -7,12 +7,14 @@ import {
   GetCommentsParams,
 } from "../types/comments.js";
 import { handleNotionError } from "../utils/error.js";
+import { CreateCommentParameters, ListCommentsParameters } from "@notionhq/client/build/src/api-endpoints.js";
 
 const registerGetCommentsTool = async (
   params: GetCommentsParams
 ): Promise<CallToolResult> => {
   try {
-    const response = await notion.comments.list(params);
+    // The SDK expects block_id to be required.
+    const response = await notion.comments.list(params as ListCommentsParameters);
 
     return {
       content: [
@@ -35,7 +37,8 @@ const registerAddPageCommentTool = async (
   params: AddPageCommentParams
 ): Promise<CallToolResult> => {
   try {
-    const response = await notion.comments.create(params);
+    // The SDK expects a specific shape for rich_text. We cast to ensure compatibility.
+    const response = await notion.comments.create(params as CreateCommentParameters);
 
     return {
       content: [
@@ -58,7 +61,8 @@ const registerAddDiscussionCommentTool = async (
   params: AddDiscussionCommentParams
 ): Promise<CallToolResult> => {
   try {
-    const response = await notion.comments.create(params);
+    // The SDK expects a specific shape for rich_text. We cast to ensure compatibility.
+    const response = await notion.comments.create(params as CreateCommentParameters);
 
     return {
       content: [

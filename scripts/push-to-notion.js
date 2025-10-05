@@ -127,6 +127,13 @@ async function findExistingPage(databaseId, title) {
 }
 
 async function createNotionPage(databaseId, title, content, metadata) {
+  // Get data source ID
+  const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for database ID: ${databaseId}`);
+  }
+
   const properties = {
     Name: {
       title: [
@@ -166,7 +173,7 @@ async function createNotionPage(databaseId, title, content, metadata) {
 
   const page = await notion.pages.create({
     parent: {
-      database_id: databaseId,
+      data_source_id: dataSource.id,
     },
     properties,
   });

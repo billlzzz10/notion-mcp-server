@@ -183,10 +183,17 @@ async function saveAnalysisToNotion(analysisResult, databaseId) {
     if (!dbId) {
       throw new Error('ไม่พบ Database ID สำหรับบันทึกผลลัพธ์');
     }
+
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: dbId });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for database ID: ${dbId}`);
+    }
     
     // Create page data with only existing properties in Projects DB
     const pageData = {
-      parent: { database_id: dbId },
+      parent: { data_source_id: dataSource.id },
       properties: {
         Name: {
           title: [{

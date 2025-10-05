@@ -74,17 +74,27 @@ export async function handleConflictGeneration(args: any) {
 async function getCharacterDetails(charactersDb: string, characterNames: string[]) {
   const characters = [];
   
+  // Get data source ID for Characters DB
+  const dbResponse = await notion.databases.retrieve({ database_id: charactersDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+  }
+
   for (const name of characterNames) {
     try {
-      const response = await notion.databases.query({
-        database_id: charactersDb,
-        filter: {
-          property: "Name",
-          title: {
-            contains: name
+      const response = await notion.request({
+        path: `data_sources/${dataSource.id}/query`,
+        method: 'post',
+        body: {
+          filter: {
+            property: "Name",
+            title: {
+              contains: name
+            }
           }
         }
-      });
+      }) as any;
 
       if (response.results.length > 0) {
         const char = response.results[0] as any;
@@ -175,8 +185,16 @@ function generateConflictPrompt(args: any, characters: any[]): string {
 
 async function saveConflictPrompt(aiPromptsDb: string, prompt: string, args: any) {
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: aiPromptsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for AI Prompts DB: ${aiPromptsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: aiPromptsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Prompt Type": {
           select: {

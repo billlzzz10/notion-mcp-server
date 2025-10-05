@@ -76,8 +76,14 @@ async function analyzeArcProgress(storyArcsDb: string, arcName?: string) {
     };
   }
 
-  const response = await notion.databases.query({
-    database_id: storyArcsDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter: Object.keys(filter).length > 0 ? filter : undefined,
     sorts: [
       {
@@ -105,17 +111,14 @@ async function analyzeArcProgress(storyArcsDb: string, arcName?: string) {
     const arcType = properties["Arc Type"]?.select?.name || "ไม่ระบุ";
     const priority = properties["Priority"]?.select?.name || "ไม่ระบุ";
 
-    // นับสถานะ
     if (statusCounts.hasOwnProperty(status)) {
       (statusCounts as any)[status]++;
     }
 
-    // แสดงรายละเอียด Arc
     analysis += `**${name}** (${arcType})\n`;
     analysis += `  📊 สถานะ: ${status} | ระดับความสำคัญ: ${priority}\n`;
     analysis += `  📖 ตอนที่: ${startChapter}${endChapter > 0 ? ` - ${endChapter}` : " (ยังไม่กำหนด)"}\n`;
     
-    // วิเคราะห์ความคืบหน้า
     if (status === "In Progress") {
       const progress = endChapter > 0 ? `${((startChapter / endChapter) * 100).toFixed(1)}%` : "ไม่สามารถคำนวณได้";
       analysis += `  ⏳ ความคืบหน้าโดยประมาณ: ${progress}\n`;
@@ -124,7 +127,6 @@ async function analyzeArcProgress(storyArcsDb: string, arcName?: string) {
     analysis += "\n";
   });
 
-  // สรุปสถิติ
   analysis += "📊 **สรุปสถิติ:**\n";
   Object.entries(statusCounts).forEach(([status, count]) => {
     analysis += `• ${status}: ${count} arcs\n`;
@@ -134,8 +136,14 @@ async function analyzeArcProgress(storyArcsDb: string, arcName?: string) {
 }
 
 async function analyzeCharacterDevelopment(storyArcsDb: string, characterName?: string) {
-  const response = await notion.databases.query({
-    database_id: storyArcsDb,
+  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id,
     filter: {
       property: "Arc Type",
       select: {
@@ -184,10 +192,8 @@ async function analyzeCharacterDevelopment(storyArcsDb: string, characterName?: 
     });
   });
 
-  // ถ้าระบุตัวละครเฉพาะ ให้กรองเฉพาะตัวละครนั้น
   if (characterName) {
     analysis += `🎭 **การพัฒนาตัวละคร: ${characterName}**\n\n`;
-    // ต้องค้นหา character ID จากชื่อ (ถ้าต้องการ)
   } else {
     analysis += `📋 **รายงานการพัฒนาตัวละครทั้งหมด:**\n\n`;
   }
@@ -211,8 +217,14 @@ async function analyzeCharacterDevelopment(storyArcsDb: string, characterName?: 
 }
 
 async function analyzeThemeConsistency(storyArcsDb: string) {
-  const response = await notion.databases.query({
-    database_id: storyArcsDb
+  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id
   });
 
   let analysis = "🎨 **ความสอดคล้องของธีม:**\n\n";
@@ -226,10 +238,8 @@ async function analyzeThemeConsistency(storyArcsDb: string) {
     const arcType = properties["Arc Type"]?.select?.name || "ไม่ระบุ";
     const arcName = properties["Arc Name"]?.title?.[0]?.text?.content || "ไม่มีชื่อ";
 
-    // นับธีม
     themeCounts.set(theme, (themeCounts.get(theme) || 0) + 1);
     
-    // จัดกลุ่มธีมตามประเภท Arc
     if (!themesByArcType.has(arcType)) {
       themesByArcType.set(arcType, new Map());
     }
@@ -237,7 +247,6 @@ async function analyzeThemeConsistency(storyArcsDb: string) {
     arcTypeThemes.set(theme, (arcTypeThemes.get(theme) || 0) + 1);
   });
 
-  // วิเคราะห์การกระจายธีม
   analysis += "📊 **การกระจายธีมโดยรวม:**\n";
   const sortedThemes = Array.from(themeCounts.entries()).sort((a, b) => b[1] - a[1]);
   
@@ -254,7 +263,6 @@ async function analyzeThemeConsistency(storyArcsDb: string) {
     });
   });
 
-  // คำแนะนำ
   analysis += "\n💡 **คำแนะนำ:**\n";
   if (sortedThemes.length > 0) {
     const dominantTheme = sortedThemes[0];
@@ -271,8 +279,14 @@ async function analyzeThemeConsistency(storyArcsDb: string) {
 }
 
 async function analyzeDependencies(storyArcsDb: string) {
-  const response = await notion.databases.query({
-    database_id: storyArcsDb
+  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  }
+
+  const response = await notion.dataSources.query({
+    data_source_id: dataSource.id
   });
 
   let analysis = "🔗 **การวิเคราะห์ Dependencies:**\n\n";
@@ -280,7 +294,6 @@ async function analyzeDependencies(storyArcsDb: string) {
   const dependencyMap = new Map();
   const arcNames = new Map();
 
-  // สร้างแผนที่ชื่อ Arc
   response.results.forEach((arc: any) => {
     const properties = arc.properties;
     const id = arc.id;
@@ -288,7 +301,6 @@ async function analyzeDependencies(storyArcsDb: string) {
     arcNames.set(id, name);
   });
 
-  // วิเคราะห์ dependencies
   response.results.forEach((arc: any) => {
     const properties = arc.properties;
     const arcId = arc.id;
@@ -315,7 +327,6 @@ async function analyzeDependencies(storyArcsDb: string) {
     return analysis;
   }
 
-  // แสดงรายการ dependencies
   analysis += "📋 **รายการ Dependencies:**\n";
   dependencyMap.forEach((arcData, arcId) => {
     analysis += `\n**${arcData.name}** (สถานะ: ${arcData.status})\n`;
@@ -327,7 +338,6 @@ async function analyzeDependencies(storyArcsDb: string) {
     });
   });
 
-  // ตรวจสอบปัญหา dependencies
   analysis += "\n⚠️ **การตรวจสอบปัญหา:**\n";
   let hasIssues = false;
 
@@ -340,13 +350,11 @@ async function analyzeDependencies(storyArcsDb: string) {
       const depEndChapter = depArc?.properties["End Chapter"]?.number || 0;
       const depStatus = depArc?.properties["Status"]?.select?.name || "ไม่ระบุ";
 
-      // ตรวจสอบลำดับตอน
       if (depEndChapter > 0 && arcStartChapter > 0 && depEndChapter >= arcStartChapter) {
         analysis += `🚨 **${arcData.name}** เริ่มตอนที่ ${arcStartChapter} แต่ **${dep.name}** จบตอนที่ ${depEndChapter}\n`;
         hasIssues = true;
       }
 
-      // ตรวจสอบสถานะ
       if (arcData.status === "In Progress" && depStatus !== "Completed") {
         analysis += `⚠️ **${arcData.name}** กำลังดำเนินการแต่ **${dep.name}** ยังไม่เสร็จสิ้น\n`;
         hasIssues = true;

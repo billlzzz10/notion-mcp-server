@@ -109,20 +109,37 @@ export function addMessage(message: ChatMessage) {
 }
 
 function updateChatList() {
-    chatList.innerHTML = '';
+    chatList.textContent = ''; // Use textContent for safe clearing
     
     Object.values(chatSessions)
         .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
         .forEach(chat => {
             const item = document.createElement('div');
             item.className = `chat-list-item ${chat.id === activeChatId ? 'active' : ''}`;
-            item.innerHTML = `
-                <span class="chat-list-item-name">${chat.name}</span>
-                <div class="chat-actions">
-                    <button type="button" title="แก้ไขชื่อ">✏️</button>
-                    <button type="button" title="ลบ">🗑️</button>
-                </div>
-            `;
+            item.dataset.chatId = chat.id;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'chat-list-item-name';
+            nameSpan.textContent = chat.name;
+            item.appendChild(nameSpan);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'chat-actions';
+
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.title = 'แก้ไขชื่อ';
+            editButton.textContent = '✏️';
+            actionsDiv.appendChild(editButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.title = 'ลบ';
+            deleteButton.textContent = '🗑️';
+            actionsDiv.appendChild(deleteButton);
+
+            item.appendChild(actionsDiv);
+
             item.addEventListener('click', () => switchToChat(chat.id));
             chatList.appendChild(item);
         });
@@ -135,7 +152,7 @@ function updateChatTitle() {
 }
 
 function clearChatContainer() {
-    chatContainer.innerHTML = '';
+    chatContainer.textContent = ''; // Use textContent for safe clearing
 }
 
 function renderChatHistory() {
@@ -151,25 +168,64 @@ function renderChatHistory() {
 function renderMessage(message: ChatMessage) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.type}`;
-    messageDiv.innerHTML = `
-        <div class="message-content">${formatMessageContent(message.content)}</div>
-        <div class="message-actions">
-            <button class="message-action-button" type="button">📋 คัดลอก</button>
-            <button class="message-action-button" type="button">💾 บันทึก MCP</button>
-        </div>
-    `;
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    appendFormattedContent(contentDiv, message.content);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'message-actions';
+
+    const copyButton = document.createElement('button');
+    copyButton.className = 'message-action-button';
+    copyButton.type = 'button';
+    copyButton.textContent = '📋 คัดลอก';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'message-action-button';
+    saveButton.type = 'button';
+    saveButton.textContent = '💾 บันทึก MCP';
+
+    actionsDiv.appendChild(copyButton);
+    actionsDiv.appendChild(saveButton);
+
+    messageDiv.appendChild(contentDiv);
+    messageDiv.appendChild(actionsDiv);
     
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-function formatMessageContent(content: string): string {
-    // Basic markdown-like formatting
-    return content
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>')
-        .replace(/`(.*?)`/g, '<code>$1</code>');
+function appendFormattedContent(element: HTMLElement, content: string) {
+    element.textContent = ''; // Clear previous content
+
+    const lines = content.split('\n');
+    lines.forEach((line, index) => {
+        if (index > 0) {
+            element.appendChild(document.createElement('br'));
+        }
+        // Regex to find tokens for bold, italic, code
+        const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
+        const parts = line.split(regex).filter(part => part);
+
+        parts.forEach(part => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                const strong = document.createElement('strong');
+                strong.textContent = part.slice(2, -2);
+                element.appendChild(strong);
+            } else if (part.startsWith('*') && part.endsWith('*')) {
+                const em = document.createElement('em');
+                em.textContent = part.slice(1, -1);
+                element.appendChild(em);
+            } else if (part.startsWith('`') && part.endsWith('`')) {
+                const code = document.createElement('code');
+                code.textContent = part.slice(1, -1);
+                element.appendChild(code);
+            } else {
+                element.appendChild(document.createTextNode(part));
+            }
+        });
+    });
 }
 
 export function saveChatSessions() {

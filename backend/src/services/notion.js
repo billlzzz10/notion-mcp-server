@@ -16,12 +16,30 @@ export async function notionFetch(endpoint, options = {}) {
     const { method = 'GET', body, ...otherOptions } = options;
     
     if (endpoint === '/pages' && method === 'POST') {
-      return await notion.pages.create(JSON.parse(body));
+      const params = JSON.parse(body);
+      if (params.parent && params.parent.database_id) {
+        const dbResponse = await notion.databases.retrieve({ database_id: params.parent.database_id });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for database ID: ${params.parent.database_id}`);
+        }
+        params.parent = { data_source_id: dataSource.id };
+      }
+      return await notion.pages.create(params);
     } else if (endpoint.includes('/databases/') && endpoint.includes('/query')) {
       const databaseId = endpoint.split('/')[2];
-      return await notion.databases.query({ 
-        database_id: databaseId,
-        ...JSON.parse(body || '{}')
+
+      // Get data source ID
+      const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+      const dataSource = dbResponse.data_sources?.[0];
+      if (!dataSource) {
+        throw new Error(`No data source found for database ID: ${databaseId}`);
+      }
+
+      // Use the dedicated SDK v5 method to query the data source
+      return await notion.dataSources.query({
+          data_source_id: dataSource.id,
+          ...JSON.parse(body || '{}')
       });
     } else {
       throw new Error(`Unsupported endpoint: ${endpoint} with method: ${method}`);
@@ -37,7 +55,17 @@ export async function notionFetch(endpoint, options = {}) {
  */
 export async function getProgressTasks() {
   const databaseId = process.env.NOTION_PROJECT_PROGRESS_DB_ID || process.env.NOTION_PROJECTS_DB_ID;
-  const response = await notion.databases.query({ database_id: databaseId });
+
+  // Get data source ID
+  const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for database ID: ${databaseId}`);
+  }
+
+  const response = await notion.dataSources.query({
+      data_source_id: dataSource.id,
+  });
   return response.results;
 }
 
@@ -47,8 +75,16 @@ export async function getProgressTasks() {
  */
 export async function createProgressTask(task) {
   const databaseId = process.env.NOTION_PROJECT_PROGRESS_DB_ID || process.env.NOTION_PROJECTS_DB_ID;
+
+  // Get data source ID
+  const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+  const dataSource = dbResponse.data_sources?.[0];
+  if (!dataSource) {
+    throw new Error(`No data source found for database ID: ${databaseId}`);
+  }
+
   const response = await notion.pages.create({
-    parent: { database_id: databaseId },
+    parent: { data_source_id: dataSource.id },
     properties: {
       'Task Name': { title: [{ text: { content: task.name } }] },
       'Module': { select: { name: task.module } },
