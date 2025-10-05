@@ -165,7 +165,7 @@ export class CentralMcpClient {
      * @returns The result from the tool call.
      */
     async callTool(serverName: string, toolName: string, args: Record<string, any>): Promise<any> {
-        console.log(`Calling tool '${toolName}' on server '${serverName}' with args:`, args);
+        console.log(`Calling tool '${toolName}' on server '${serverName}'.`);
 
         const connection = this.servers.get(serverName);
         if (!connection) {
