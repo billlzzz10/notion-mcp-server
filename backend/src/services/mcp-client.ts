@@ -48,7 +48,7 @@ const SERVER_CONFIGS: McpServerConfig[] = [
         name: 'graphicai',
         type: 'socket',
         host: 'localhost',
-        port: Number(process.env.GRAPHICAI_PORT) || 5001,
+        port: (() => { const p = process.env.GRAPHICAI_PORT !== undefined ? parseInt(process.env.GRAPHICAI_PORT, 10) : NaN; return Number.isNaN(p) ? 5001 : p; })(),
         command: 'node', // Command to start this server if it's not already running
         args: ['build/index.js'],
         cwd: path.resolve(process.cwd(), 'GraphicAI'),
