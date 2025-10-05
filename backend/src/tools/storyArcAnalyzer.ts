@@ -76,10 +76,15 @@ async function analyzeArcProgress(storyArcsDb: string, arcName?: string) {
     };
   }
 
-  const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  let dbResponse;
+  try {
+    dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+  } catch (err) {
+    throw new Error(`Failed to retrieve database ${storyArcsDb}: ${err instanceof Error ? err.message : String(err)}`);
+  }
   const dataSource = dbResponse.data_sources?.[0];
-  if (!dataSource) {
-    throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+  if (!dataSource || !dataSource.id) {
+    throw new Error(`No data source with an id found for Story Arcs DB: ${storyArcsDb}`);
   }
 
   const response = await notion.dataSources.query({
