@@ -271,17 +271,18 @@ async function fillSpecificField(dbConfig: any, args: any): Promise<string> {
   }
 
   try {
-    const dbResponse = await notion.databases.retrieve({ database_id: dbId });
-    const dataSource = dbResponse.data_sources?.[0];
-    if (!dataSource) {
-      throw new Error(`No data source found for database ID: ${dbId}`);
-    }
-
-    const response = await notion.request({
+    const response = await (async function fetchDataSourceQuery(databaseId: string, pageSize: number) {
+      const dbResponse = await notion.databases.retrieve({ database_id: databaseId });
+      const dataSource = dbResponse.data_sources?.[0];
+      if (!dataSource) {
+        throw new Error(`No data source found for database ID: ${databaseId}`);
+      }
+      return await notion.request({
         path: `data_sources/${dataSource.id}/query`,
         method: 'post',
-        body: { page_size: args.recordLimit }
-    }) as any;
+        body: { page_size: pageSize }
+      }) as any;
+    })(dbId, args.recordLimit);
 
     let result = `🎯 **การเติมข้อมูลฟิลด์ "${args.specificField}" ในฐานข้อมูล ${dbConfig.displayName}**\n\n`;
 
