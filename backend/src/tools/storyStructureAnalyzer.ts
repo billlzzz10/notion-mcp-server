@@ -234,7 +234,7 @@ async function analyzePacing(storyData: any, args: any): Promise<string> {
   analysis += "\n🎯 **การวิเคราะห์ Pacing โดยรวม:**\n";
   pacingData.forEach((count, pacing) => {
     const percentage = storyData.scenes.length > 0 ? ((count / storyData.scenes.length) * 100).toFixed(1) : "0.0";
-    analysis += `  ${pacing}: ${count} ฉาก (${percentage}%)\n`;
+    analysis += `  ${pacing}: ${count} ฉาง (${percentage}%)\n`;
   });
 
   analysis += "\n⚠️ **ปัญหา Pacing ที่พบ:**\n";
@@ -352,10 +352,7 @@ async function analyzePlotStructure(storyData: any, template?: string): Promise<
   let analysis = "📚 **การวิเคราะห์โครงสร้างเนื้อเรื่อง:**\n\n";
   if (storyData.scenes.length === 0) return analysis + "ไม่มีข้อมูลฉากให้วิเคราะห์";
 
-  const chapterNumbers = storyData.scenes
-    .map((s: any) => Number(s.chapter))
-    .filter((n: number) => Number.isFinite(n) && n > 0);
-  const totalChapters = chapterNumbers.length > 0 ? Math.max(...chapterNumbers) : 1;
+  const totalChapters = Math.max(1, ...storyData.scenes.map((s: any) => s.chapter));
   const act1End = Math.floor(totalChapters * 0.25);
   const act2End = Math.floor(totalChapters * 0.75);
 

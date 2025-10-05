@@ -48,7 +48,7 @@ const SERVER_CONFIGS: McpServerConfig[] = [
         name: 'graphicai',
         type: 'socket',
         host: 'localhost',
-        port: (() => { const p = process.env.GRAPHICAI_PORT !== undefined ? parseInt(process.env.GRAPHICAI_PORT, 10) : NaN; return Number.isNaN(p) ? 5001 : p; })(),
+        port: Number(process.env.GRAPHICAI_PORT) || 5001,
         command: 'node', // Command to start this server if it's not already running
         args: ['build/index.js'],
         cwd: path.resolve(process.cwd(), 'GraphicAI'),
@@ -104,19 +104,12 @@ export class CentralMcpClient {
                 const childProcess = spawn(command, args || [], { cwd, stdio: 'pipe' });
                 connection.process = childProcess;
 
-                if (childProcess.stderr) {
-                    childProcess.stderr.on('data', (data) => console.error(`[${serverName} STDERR]: ${data.toString()}`));
-                }
+                childProcess.stderr?.on('data', (data) => console.error(`[${serverName} STDERR]: ${data.toString()}`));
                 childProcess.on('close', (code) => {
                     console.log(`[${serverName}] process exited with code ${code}`);
                     connection.status = 'disconnected';
                 });
 
-                if (!childProcess.stdin || !childProcess.stdout) {
-                    // Ensure we have the expected streams before creating the transport
-                    childProcess.kill();
-                    throw new Error(`Failed to obtain stdio streams for stdio server '${serverName}'`);
-                }
                 connection.transport = new StdioClientTransport(childProcess.stdin, childProcess.stdout);
             } else if (connection.config.type === 'socket') {
                 const { host, port } = connection.config;
@@ -165,7 +158,7 @@ export class CentralMcpClient {
      * @returns The result from the tool call.
      */
     async callTool(serverName: string, toolName: string, args: Record<string, any>): Promise<any> {
-        console.log(`Calling tool '${toolName}' on server '${serverName}'.`);
+        console.log(`Calling tool '${toolName}' on server '${serverName}' with args:`, args);
 
         const connection = this.servers.get(serverName);
         if (!connection) {

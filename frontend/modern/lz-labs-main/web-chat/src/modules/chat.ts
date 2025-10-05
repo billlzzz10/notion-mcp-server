@@ -171,7 +171,7 @@ function renderMessage(message: ChatMessage) {
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = formatMessageContent(message.content); // Kept for formatting, as it's a LOW risk
+    appendFormattedContent(contentDiv, message.content);
 
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'message-actions';
@@ -196,13 +196,36 @@ function renderMessage(message: ChatMessage) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-function formatMessageContent(content: string): string {
-    // Basic markdown-like formatting
-    return content
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>')
-        .replace(/`(.*?)`/g, '<code>$1</code>');
+function appendFormattedContent(element: HTMLElement, content: string) {
+    element.textContent = ''; // Clear previous content
+
+    const lines = content.split('\n');
+    lines.forEach((line, index) => {
+        if (index > 0) {
+            element.appendChild(document.createElement('br'));
+        }
+        // Regex to find tokens for bold, italic, code
+        const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
+        const parts = line.split(regex).filter(part => part);
+
+        parts.forEach(part => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                const strong = document.createElement('strong');
+                strong.textContent = part.slice(2, -2);
+                element.appendChild(strong);
+            } else if (part.startsWith('*') && part.endsWith('*')) {
+                const em = document.createElement('em');
+                em.textContent = part.slice(1, -1);
+                element.appendChild(em);
+            } else if (part.startsWith('`') && part.endsWith('`')) {
+                const code = document.createElement('code');
+                code.textContent = part.slice(1, -1);
+                element.appendChild(code);
+            } else {
+                element.appendChild(document.createTextNode(part));
+            }
+        });
+    });
 }
 
 export function saveChatSessions() {
