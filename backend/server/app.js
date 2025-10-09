@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import csrf from 'csurf';
 import gateway from './mcp-gateway/request-gateway.js';
 import agentRoutes from './mcp-gateway/agent-endpoints.js';
 import writerRoutes from './mcp-gateway/writer-endpoints.js';
@@ -40,6 +42,8 @@ const agentLimiter = rateLimit({
 // Middleware สำหรับ JSON parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
 // Request logging middleware
 app.use((req, res, next) => {

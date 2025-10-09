@@ -222,14 +222,24 @@ export class NotionAITools {
         let startCursor: string | undefined = undefined;
         const allResults: any[] = [];
 
+        // Get data source ID
+        const dbResponse = await this.notion.databases.retrieve({ database_id: db.id });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for database: ${db.name}`);
+        }
+
         while (hasMore) {
-          const response = await this.notion.databases.query({
-            database_id: db.id,
-            filter: db.filter,
-            sorts: db.sorts,
-            start_cursor: startCursor,
-            page_size: 100
-          });
+          const response = await this.notion.request({
+            path: `data_sources/${dataSource.id}/query`,
+            method: 'post',
+            body: {
+              filter: db.filter,
+              sorts: db.sorts,
+              start_cursor: startCursor,
+              page_size: 100
+            }
+          }) as any;
 
           allResults.push(...response.results);
           hasMore = response.has_more;

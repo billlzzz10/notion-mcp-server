@@ -47,7 +47,6 @@ export const storyStructureAnalyzerTool: Tool = {
 
 export async function handleStoryStructureAnalysis(args: any) {
   try {
-    // รวบรวมข้อมูลจากฐานข้อมูลทั้งหมด
     const storyData = await gatherStoryData(args.chapterRange);
     
     let analysisResult = "";
@@ -79,13 +78,11 @@ export async function handleStoryStructureAnalysis(args: any) {
         break;
     }
 
-    // สร้างคำแนะนำการปรับปรุง
     let suggestions = "";
     if (args.generateSuggestions) {
       suggestions = await generateImprovementSuggestions(storyData, args.analysisType);
     }
 
-    // บันทึกผลการวิเคราะห์
     await saveAnalysisReport(analysisResult, suggestions, args);
 
     return {
@@ -107,44 +104,29 @@ async function gatherStoryData(chapterRange?: any) {
     scenes: [],
     characters: [],
     storyArcs: [],
-    timeline: [],
-    worldRules: [],
     aiPrompts: []
   };
 
-  // ตั้งค่าช่วงตอน
   let filter: any = {};
   if (chapterRange) {
     filter = {
       and: [
-        {
-          property: "Chapter",
-          number: {
-            greater_than_or_equal_to: chapterRange.start
-          }
-        },
-        {
-          property: "Chapter", 
-          number: {
-            less_than_or_equal_to: chapterRange.end
-          }
-        }
+        { property: "Chapter", number: { greater_than_or_equal_to: chapterRange.start } },
+        { property: "Chapter", number: { less_than_or_equal_to: chapterRange.end } }
       ]
     };
   }
 
-  // ดึงข้อมูลฉาง
   const scenesDb = process.env.NOTION_SCENES_DB_ID;
   if (scenesDb) {
-    const scenesResponse = await notion.databases.query({
-      database_id: scenesDb,
+    const dbResponse = await notion.databases.retrieve({ database_id: scenesDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) throw new Error(`No data source found for Scenes DB: ${scenesDb}`);
+    const scenesResponse = await notion.dataSources.query({
+      data_source_id: dataSource.id,
       filter: Object.keys(filter).length > 0 ? filter : undefined,
-      sorts: [
-        { property: "Chapter", direction: "ascending" },
-        { property: "Order", direction: "ascending" }
-      ]
+      sorts: [{ property: "Chapter", direction: "ascending" }, { property: "Order", direction: "ascending" }]
     });
-
     storyData.scenes = scenesResponse.results.map((scene: any) => {
       const props = scene.properties;
       return {
@@ -163,13 +145,12 @@ async function gatherStoryData(chapterRange?: any) {
     });
   }
 
-  // ดึงข้อมูลตัวละคร
   const charactersDb = process.env.NOTION_CHARACTERS_DB_ID;
   if (charactersDb) {
-    const charactersResponse = await notion.databases.query({
-      database_id: charactersDb
-    });
-
+    const dbResponse = await notion.databases.retrieve({ database_id: charactersDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+    const charactersResponse = await notion.dataSources.query({ data_source_id: dataSource.id });
     storyData.characters = charactersResponse.results.map((char: any) => {
       const props = char.properties;
       return {
@@ -184,13 +165,12 @@ async function gatherStoryData(chapterRange?: any) {
     });
   }
 
-  // ดึงข้อมูล Story Arcs
   const storyArcsDb = process.env.NOTION_STORY_ARCS_DB_ID;
   if (storyArcsDb) {
-    const arcsResponse = await notion.databases.query({
-      database_id: storyArcsDb
-    });
-
+    const dbResponse = await notion.databases.retrieve({ database_id: storyArcsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) throw new Error(`No data source found for Story Arcs DB: ${storyArcsDb}`);
+    const arcsResponse = await notion.dataSources.query({ data_source_id: dataSource.id });
     storyData.storyArcs = arcsResponse.results.map((arc: any) => {
       const props = arc.properties;
       return {
@@ -206,13 +186,12 @@ async function gatherStoryData(chapterRange?: any) {
     });
   }
 
-  // ดึงข้อมูล AI Prompts
   const aiPromptsDb = process.env.NOTION_AI_PROMPTS_DB_ID;
   if (aiPromptsDb) {
-    const promptsResponse = await notion.databases.query({
-      database_id: aiPromptsDb
-    });
-
+    const dbResponse = await notion.databases.retrieve({ database_id: aiPromptsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) throw new Error(`No data source found for AI Prompts DB: ${aiPromptsDb}`);
+    const promptsResponse = await notion.dataSources.query({ data_source_id: dataSource.id });
     storyData.aiPrompts = promptsResponse.results.map((prompt: any) => {
       const props = prompt.properties;
       return {
@@ -231,25 +210,19 @@ async function gatherStoryData(chapterRange?: any) {
 async function analyzePacing(storyData: any, args: any): Promise<string> {
   let analysis = "⏱️ **การวิเคราะห์ Pacing:**\n\n";
 
-  // วิเคราะห์การกระจายฉากต่อตอน
   const chapterDistribution = new Map();
   const pacingData = new Map();
 
   storyData.scenes.forEach((scene: any) => {
     const chapter = scene.chapter;
-    
-    // นับฉากต่อตอน
     chapterDistribution.set(chapter, (chapterDistribution.get(chapter) || 0) + 1);
-    
-    // จัดกลุ่มตาม pacing
     const pacing = scene.pacing || "Medium";
     pacingData.set(pacing, (pacingData.get(pacing) || 0) + 1);
   });
 
-  // วิเคราะห์การกระจายฉาก
   analysis += "📊 **การกระจายฉากต่อตอน:**\n";
   const chapters = Array.from(chapterDistribution.keys()).sort((a, b) => a - b);
-  const avgScenesPerChapter = Array.from(chapterDistribution.values()).reduce((a, b) => a + b, 0) / chapters.length;
+  const avgScenesPerChapter = chapters.length > 0 ? storyData.scenes.length / chapters.length : 0;
   
   chapters.forEach(chapter => {
     const sceneCount = chapterDistribution.get(chapter);
@@ -258,18 +231,15 @@ async function analyzePacing(storyData: any, args: any): Promise<string> {
     analysis += `  ตอนที่ ${chapter}: ${sceneCount} ฉาก ${status}\n`;
   });
 
-  // วิเคราะห์ pacing โดยรวม
   analysis += "\n🎯 **การวิเคราะห์ Pacing โดยรวม:**\n";
   pacingData.forEach((count, pacing) => {
-    const percentage = ((count / storyData.scenes.length) * 100).toFixed(1);
+    const percentage = storyData.scenes.length > 0 ? ((count / storyData.scenes.length) * 100).toFixed(1) : "0.0";
     analysis += `  ${pacing}: ${count} ฉาง (${percentage}%)\n`;
   });
 
-  // ตรวจหาปัญหา pacing
   analysis += "\n⚠️ **ปัญหา Pacing ที่พบ:**\n";
   let issues = 0;
 
-  // ตรวจสอบฉากต่อเนื่องที่ช้าเกินไป
   for (let i = 0; i < storyData.scenes.length - 2; i++) {
     const current = storyData.scenes[i];
     const next = storyData.scenes[i + 1];
@@ -281,9 +251,8 @@ async function analyzePacing(storyData: any, args: any): Promise<string> {
     }
   }
 
-  // ตรวจสอบการขาดฉากผ่อนคลาย
   const fastScenes = storyData.scenes.filter((s: any) => s.pacing === "Very Fast" || s.pacing === "Fast");
-  if (fastScenes.length > storyData.scenes.length * 0.6) {
+  if (storyData.scenes.length > 0 && fastScenes.length > storyData.scenes.length * 0.6) {
     analysis += `  ⚡ การเร่งรัดเกินไป: ${fastScenes.length}/${storyData.scenes.length} ฉากมี pacing เร็ว\n`;
     issues++;
   }
@@ -297,8 +266,6 @@ async function analyzePacing(storyData: any, args: any): Promise<string> {
 
 async function analyzeCharacterDevelopment(storyData: any, focusCharacter?: string): Promise<string> {
   let analysis = "👥 **การวิเคราะห์การพัฒนาตัวละคร:**\n\n";
-
-  // สร้างแผนที่ตัวละครในแต่ละฉาก
   const characterAppearances = new Map();
   
   storyData.scenes.forEach((scene: any) => {
@@ -316,14 +283,12 @@ async function analyzeCharacterDevelopment(storyData: any, focusCharacter?: stri
     });
   });
 
-  // หาตัวละครหลักจาก appearances
   const mainCharacters = Array.from(characterAppearances.entries())
     .sort(([,a], [,b]) => b.length - a.length)
     .slice(0, 5);
 
   if (focusCharacter) {
     analysis += `🎯 **โฟกัส: ${focusCharacter}**\n\n`;
-    // วิเคราะห์ตัวละครเฉพาะ
     const charData = storyData.characters.find((c: any) => c.name.includes(focusCharacter));
     if (charData) {
       const appearances = characterAppearances.get(charData.id) || [];
@@ -340,7 +305,6 @@ async function analyzeCharacterDevelopment(storyData: any, focusCharacter?: stri
     });
   }
 
-  // วิเคราะห์การกระจาย screen time
   analysis += "\n⏱️ **การวิเคราะห์ Screen Time:**\n";
   const screenTimeDistribution = new Map();
   
@@ -358,15 +322,12 @@ async function analyzeCharacterDevelopment(storyData: any, focusCharacter?: stri
 
 function analyzeIndividualCharacter(charData: any, appearances: any[]): string {
   let analysis = "";
-  
   analysis += `**ข้อมูลพื้นฐาน:**\n`;
   analysis += `  บทบาท: ${charData.role}\n`;
   analysis += `  เป้าหมาย: ${charData.goal || "ไม่ระบุ"}\n`;
   analysis += `  สถานะ Arc: ${charData.arcStatus || "ไม่ระบุ"}\n\n`;
-
   analysis += `**การปรากฏในเรื่อง (${appearances.length} ฉาก):**\n`;
   
-  // จัดกลุ่มตามตอน
   const chapterGroups = new Map();
   appearances.forEach(app => {
     const chapter = app.chapter;
@@ -389,9 +350,9 @@ function analyzeIndividualCharacter(charData: any, appearances: any[]): string {
 
 async function analyzePlotStructure(storyData: any, template?: string): Promise<string> {
   let analysis = "📚 **การวิเคราะห์โครงสร้างเนื้อเรื่อง:**\n\n";
+  if (storyData.scenes.length === 0) return analysis + "ไม่มีข้อมูลฉากให้วิเคราะห์";
 
-  // วิเคราะห์โครงสร้าง 3 องก์
-  const totalChapters = Math.max(...storyData.scenes.map((s: any) => s.chapter));
+  const totalChapters = Math.max(1, ...storyData.scenes.map((s: any) => s.chapter));
   const act1End = Math.floor(totalChapters * 0.25);
   const act2End = Math.floor(totalChapters * 0.75);
 
@@ -400,7 +361,6 @@ async function analyzePlotStructure(storyData: any, template?: string): Promise<
   analysis += `  Act 2 (Confrontation): ตอนที่ ${act1End + 1}-${act2End}\n`;
   analysis += `  Act 3 (Resolution): ตอนที่ ${act2End + 1}-${totalChapters}\n\n`;
 
-  // วิเคราะห์การกระจาย conflicts
   const conflictsByAct = {
     act1: storyData.scenes.filter((s: any) => s.chapter <= act1End && s.conflict).length,
     act2: storyData.scenes.filter((s: any) => s.chapter > act1End && s.chapter <= act2End && s.conflict).length,
@@ -412,7 +372,6 @@ async function analyzePlotStructure(storyData: any, template?: string): Promise<
   analysis += `  Act 2: ${conflictsByAct.act2} ฉากที่มี conflict\n`;
   analysis += `  Act 3: ${conflictsByAct.act3} ฉากที่มี conflict\n\n`;
 
-  // วิเคราะห์ emotional beats
   const emotionalProgression = storyData.scenes.map((s: any) => ({
     chapter: s.chapter,
     emotional: s.emotionalArc,
@@ -434,8 +393,8 @@ async function analyzePlotStructure(storyData: any, template?: string): Promise<
 
 async function analyzeEmotionalBeats(storyData: any): Promise<string> {
   let analysis = "💝 **การวิเคราะห์ Emotional Beats:**\n\n";
+  if (storyData.scenes.length === 0) return analysis + "ไม่มีข้อมูลฉากให้วิเคราะห์";
 
-  // วิเคราะห์ tone progression
   const toneProgression = storyData.scenes.map((s: any) => ({
     chapter: s.chapter,
     order: s.order,
@@ -445,13 +404,10 @@ async function analyzeEmotionalBeats(storyData: any): Promise<string> {
 
   analysis += "🎭 **Tone Progression:**\n";
   
-  // จัดกลุ่มตามตอน
   const chapterTones = new Map();
   toneProgression.forEach((tp: any) => {
     const chapter = tp.chapter;
-    if (!chapterTones.has(chapter)) {
-      chapterTones.set(chapter, []);
-    }
+    if (!chapterTones.has(chapter)) chapterTones.set(chapter, []);
     chapterTones.get(chapter).push(tp);
   });
 
@@ -461,28 +417,28 @@ async function analyzeEmotionalBeats(storyData: any): Promise<string> {
     analysis += `  ตอนที่ ${chapter}: ${dominantTone} (${tones.length} ฉาก)\n`;
   });
 
-  // วิเคราะห์ emotional variety
   const toneVariety = new Set(toneProgression.map((tp: any) => tp.tone));
   analysis += `\n🌈 **ความหลากหลายทางอารมณ์:** ${toneVariety.size} โทนที่แตกต่าง\n`;
 
-  // ตรวจสอบความสมดุลทางอารมณ์
   const toneCounts = new Map();
   toneProgression.forEach((tp: any) => {
     toneCounts.set(tp.tone, (toneCounts.get(tp.tone) || 0) + 1);
   });
 
   const totalScenes = toneProgression.length;
-  const darkTones = ["มืดมัว", "น่ากลัว", "เศร้า"].reduce((sum, tone) => sum + (toneCounts.get(tone) || 0), 0);
-  const lightTones = ["หวังใจ", "สงบ"].reduce((sum, tone) => sum + (toneCounts.get(tone) || 0), 0);
-
-  analysis += `\n⚖️ **สมดุลทางอารมณ์:**\n`;
-  analysis += `  โทนมืด: ${darkTones}/${totalScenes} (${((darkTones/totalScenes)*100).toFixed(1)}%)\n`;
-  analysis += `  โทนสว่าง: ${lightTones}/${totalScenes} (${((lightTones/totalScenes)*100).toFixed(1)}%)\n`;
+  if (totalScenes > 0) {
+    const darkTones = ["มืดมัว", "น่ากลัว", "เศร้า"].reduce((sum, tone) => sum + (toneCounts.get(tone) || 0), 0);
+    const lightTones = ["หวังใจ", "สงบ"].reduce((sum, tone) => sum + (toneCounts.get(tone) || 0), 0);
+    analysis += `\n⚖️ **สมดุลทางอารมณ์:**\n`;
+    analysis += `  โทนมืด: ${darkTones}/${totalScenes} (${((darkTones/totalScenes)*100).toFixed(1)}%)\n`;
+    analysis += `  โทนสว่าง: ${lightTones}/${totalScenes} (${((lightTones/totalScenes)*100).toFixed(1)}%)\n`;
+  }
 
   return analysis;
 }
 
 function findDominantTone(tones: any[]): string {
+  if (tones.length === 0) return "ไม่ระบุ";
   const toneCount = new Map();
   tones.forEach(t => {
     toneCount.set(t.tone, (toneCount.get(t.tone) || 0) + 1);
@@ -501,12 +457,12 @@ function findDominantTone(tones: any[]): string {
 }
 
 async function analyzeThemeConsistency(storyData: any): Promise<string> {
-  // วิเคราะห์ความสอดคล้องของธีม
   return "🎨 **การวิเคราะห์ความสอดคล้องของธีม:**\n(ฟีเจอร์นี้ต้องการข้อมูลเพิ่มเติมจาก Story Arcs)";
 }
 
 async function analyzeConflictProgression(storyData: any): Promise<string> {
   let analysis = "⚔️ **การวิเคราะห์ Conflict Progression:**\n\n";
+  if (storyData.scenes.length === 0) return analysis + "ไม่มีข้อมูลฉากให้วิเคราะห์";
 
   const conflictScenes = storyData.scenes.filter((s: any) => s.conflict && s.conflict.trim() !== "");
   
@@ -514,7 +470,6 @@ async function analyzeConflictProgression(storyData: any): Promise<string> {
   analysis += `  ฉากที่มี conflict: ${conflictScenes.length}/${storyData.scenes.length}\n`;
   analysis += `  อัตราส่วน: ${((conflictScenes.length/storyData.scenes.length)*100).toFixed(1)}%\n\n`;
 
-  // วิเคราะห์การกระจาย conflict ตามตอน
   const conflictByChapter = new Map();
   conflictScenes.forEach((scene: any) => {
     const chapter = scene.chapter;
@@ -566,8 +521,10 @@ async function generateImprovementSuggestions(storyData: any, analysisType: stri
 
 function generatePacingSuggestions(storyData: any): string {
   let suggestions = "";
+  if (storyData.scenes.length === 0) return suggestions;
   
-  const avgScenesPerChapter = storyData.scenes.length / Math.max(...storyData.scenes.map((s: any) => s.chapter));
+  const chapters = [...new Set(storyData.scenes.map(s => s.chapter))];
+  const avgScenesPerChapter = chapters.length > 0 ? storyData.scenes.length / chapters.length : 0;
   
   if (avgScenesPerChapter > 4) {
     suggestions += "📝 **Pacing:** พิจารณารวมฉากสั้นๆ เข้าด้วยกันเพื่อความลื่นไหล\n";
@@ -585,6 +542,7 @@ function generatePacingSuggestions(storyData: any): string {
 
 function generateCharacterSuggestions(storyData: any): string {
   let suggestions = "";
+  if (storyData.characters.length === 0) return suggestions;
   
   const majorCharacters = storyData.characters.filter((c: any) => c.screenTime === "Major");
   const developingCharacters = storyData.characters.filter((c: any) => c.arcStatus === "Developing");
@@ -593,7 +551,7 @@ function generateCharacterSuggestions(storyData: any): string {
     suggestions += "👥 **Characters:** มีตัวละครหลักมากเกินไป พิจารณาลดหรือรวมบทบาท\n";
   }
   
-  if (developingCharacters.length < majorCharacters.length * 0.5) {
+  if (majorCharacters.length > 0 && developingCharacters.length < majorCharacters.length * 0.5) {
     suggestions += "📈 **Character Development:** ตัวละครหลักส่วนใหญ่ไม่ได้พัฒนา พิจารณาเพิ่ม character arcs\n";
   }
 
@@ -602,6 +560,7 @@ function generateCharacterSuggestions(storyData: any): string {
 
 function generatePlotSuggestions(storyData: any): string {
   let suggestions = "";
+  if (storyData.scenes.length === 0) return suggestions;
   
   const conflictScenes = storyData.scenes.filter((s: any) => s.conflict && s.conflict.trim() !== "").length;
   const conflictRatio = conflictScenes / storyData.scenes.length;
@@ -624,8 +583,15 @@ async function saveAnalysisReport(analysis: string, suggestions: string, args: a
   if (!versionsDb) return;
 
   try {
+    const dbResponse = await notion.databases.retrieve({ database_id: versionsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for Version History DB: ${versionsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: versionsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Title": {
           title: [
@@ -636,37 +602,11 @@ async function saveAnalysisReport(analysis: string, suggestions: string, args: a
             }
           ]
         },
-        "Entity Type": {
-          select: {
-            name: "Analysis"
-          }
-        },
-        "Change Type": {
-          select: {
-            name: "Analysis"
-          }
-        },
-        "New Value": {
-          rich_text: [
-            {
-              text: {
-                content: `${analysis}\n\n${suggestions}`.substring(0, 2000)
-              }
-            }
-          ]
-        },
-        "Reason": {
-          rich_text: [
-            {
-              text: {
-                content: "Story structure analysis report"
-              }
-            }
-          ]
-        },
-        "AI Generated": {
-          checkbox: true
-        }
+        "Entity Type": { select: { name: "Analysis" } },
+        "Change Type": { select: { name: "Analysis" } },
+        "New Value": { rich_text: [{ text: { content: `${analysis}\n\n${suggestions}`.substring(0, 2000) } }] },
+        "Reason": { rich_text: [{ text: { content: "Story structure analysis report" } }] },
+        "AI Generated": { checkbox: true }
       }
     });
   } catch (error) {
@@ -683,7 +623,6 @@ async function analyzeAIPrompts(storyData: any): Promise<string> {
     return analysis;
   }
 
-  // วิเคราะห์ประเภท prompts
   const promptTypes = new Map();
   storyData.aiPrompts.forEach((prompt: any) => {
     const type = prompt.type || "ไม่ระบุ";
@@ -700,15 +639,13 @@ async function analyzeAIPrompts(storyData: any): Promise<string> {
     analysis += `  ${type}: ${count} prompts (${percentage}%)\n`;
   });
 
-  // วิเคราะห์ประสิทธิภาพ
   const effectivePrompts = storyData.aiPrompts.filter((p: any) => p.effectiveness >= 7);
-  const averageEffectiveness = storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length;
+  const averageEffectiveness = storyData.aiPrompts.length > 0 ? storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length : 0;
 
   analysis += `\n⭐ **ประสิทธิภาพ:**\n`;
   analysis += `  ค่าเฉลี่ย: ${averageEffectiveness.toFixed(1)}/10\n`;
   analysis += `  Prompts ที่มีประสิทธิภาพสูง (7+): ${effectivePrompts.length}/${storyData.aiPrompts.length}\n`;
 
-  // แนะนำ prompts ที่มีประสิทธิภาพสูง
   if (effectivePrompts.length > 0) {
     analysis += `\n🌟 **Prompts ที่แนะนำ:**\n`;
     effectivePrompts.slice(0, 3).forEach((prompt: any, index: number) => {
@@ -735,7 +672,7 @@ function generateAIPromptSuggestions(storyData: any): string {
     return suggestions;
   }
 
-  const averageEffectiveness = storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length;
+  const averageEffectiveness = storyData.aiPrompts.length > 0 ? storyData.aiPrompts.reduce((sum: number, p: any) => sum + (p.effectiveness || 0), 0) / storyData.aiPrompts.length : 0;
   
   if (averageEffectiveness < 6) {
     suggestions += "📈 **AI Prompts:** ปรับปรุงคุณภาพ prompts โดยเพิ่มรายละเอียดและบริบท\n";

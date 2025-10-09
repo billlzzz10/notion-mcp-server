@@ -51,8 +51,15 @@ export async function handleVersionControl(args: any) {
   }
 
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: versionHistoryDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      throw new Error(`No data source found for Version History DB: ${versionHistoryDb}`);
+    }
+
     const response = await notion.pages.create({
-      parent: { database_id: versionHistoryDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Title": {
           title: [

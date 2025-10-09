@@ -1,5 +1,18 @@
 // Enhanced Chat Features for Ashval Chat v2.0
 
+// Helper to escape HTML
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') {
+        return '';
+    }
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 // Folder Management System
 class FolderManager {
   constructor() {
@@ -70,16 +83,29 @@ class FolderManager {
     const folderList = document.getElementById('folder-list');
     if (!folderList) return;
 
-    folderList.innerHTML = '';
+    folderList.textContent = '';
     
     Object.entries(this.folders).forEach(([name, chats]) => {
       const folderItem = document.createElement('div');
       folderItem.className = 'folder-item';
-      folderItem.innerHTML = `
-        <span class="folder-name">📁 ${name}</span>
-        <span class="chat-count">${chats.length}</span>
-        ${name !== this.defaultFolder ? `<button onclick="folderManager.deleteFolder('${name}')">🗑️</button>` : ''}
-      `;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'folder-name';
+      nameSpan.textContent = `📁 ${name}`;
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'chat-count';
+      countSpan.textContent = chats.length;
+
+      folderItem.appendChild(nameSpan);
+      folderItem.appendChild(countSpan);
+
+      if (name !== this.defaultFolder) {
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '🗑️';
+        deleteButton.addEventListener('click', () => this.deleteFolder(name));
+        folderItem.appendChild(deleteButton);
+      }
       folderList.appendChild(folderItem);
     });
   }
@@ -116,20 +142,33 @@ class DatabaseDetector {
     
     if (!container || !list) return;
 
-    list.innerHTML = '';
+    list.textContent = '';
     
     this.detectedDatabases.forEach(db => {
       const item = document.createElement('div');
       item.className = 'database-item';
-      item.innerHTML = `
-        <div class="database-info">
-          <div class="database-name">${db.name}</div>
-          <div class="database-type">${db.type}</div>
-        </div>
-        <button class="button secondary" onclick="databaseDetector.selectDatabase('${db.id}', '${db.type}')">
-          ✅ Select
-        </button>
-      `;
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'database-info';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'database-name';
+      nameDiv.textContent = db.name;
+
+      const typeDiv = document.createElement('div');
+      typeDiv.className = 'database-type';
+      typeDiv.textContent = db.type;
+
+      infoDiv.appendChild(nameDiv);
+      infoDiv.appendChild(typeDiv);
+
+      const button = document.createElement('button');
+      button.className = 'button secondary';
+      button.textContent = '✅ Select';
+      button.addEventListener('click', () => this.selectDatabase(db.id, db.type));
+
+      item.appendChild(infoDiv);
+      item.appendChild(button);
       list.appendChild(item);
     });
 
@@ -181,7 +220,7 @@ class ChatListRenderer {
       chatsByFolder[folder].push(chat);
     });
 
-    chatList.innerHTML = '';
+    chatList.textContent = '';
 
     // Render each folder
     Object.entries(chatsByFolder).forEach(([folderName, folderChats]) => {
@@ -192,21 +231,37 @@ class ChatListRenderer {
   renderFolder(container, folderName, chats) {
     const folderSection = document.createElement('div');
     folderSection.className = 'folder-section';
+    folderSection.dataset.folder = folderName;
 
     const folderHeader = document.createElement('div');
     folderHeader.className = 'folder-header';
     folderHeader.onclick = () => this.toggleFolder(folderName);
     
     const isCollapsed = this.collapsedFolders.has(folderName);
+
+    const folderTitle = document.createElement('div');
+    folderTitle.className = 'folder-title';
+
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = '📁';
     
-    folderHeader.innerHTML = `
-      <div class="folder-title">
-        <span>📁</span>
-        <span>${folderName}</span>
-        <span class="chat-count">(${chats.length})</span>
-      </div>
-      <span class="folder-toggle ${isCollapsed ? 'collapsed' : ''}">▼</span>
-    `;
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = folderName;
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'chat-count';
+    countSpan.textContent = `(${chats.length})`;
+
+    folderTitle.appendChild(iconSpan);
+    folderTitle.appendChild(nameSpan);
+    folderTitle.appendChild(countSpan);
+
+    const toggleSpan = document.createElement('span');
+    toggleSpan.className = `folder-toggle ${isCollapsed ? 'collapsed' : ''}`;
+    toggleSpan.textContent = '▼';
+
+    folderHeader.appendChild(folderTitle);
+    folderHeader.appendChild(toggleSpan);
 
     const folderContent = document.createElement('div');
     folderContent.className = `folder-content ${isCollapsed ? 'collapsed' : ''}`;
@@ -230,24 +285,40 @@ class ChatListRenderer {
       item.classList.add('active');
     }
 
-    item.innerHTML = `
-      <div class="chat-list-item-content">
-        <div class="chat-list-item-name">${chat.title || 'New Chat'}</div>
-        <div class="chat-list-item-preview">${chat.preview || 'No messages yet'}</div>
-      </div>
-      <div class="chat-list-item-actions">
-        <button class="chat-action-button" onclick="chatListRenderer.editChatName('${chat.id}')" title="Edit name">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-          </svg>
-        </button>
-        <button class="chat-action-button" onclick="chatListRenderer.deleteChat('${chat.id}')" title="Delete chat">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-          </svg>
-        </button>
-      </div>
-    `;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'chat-list-item-content';
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'chat-list-item-name';
+    nameDiv.textContent = chat.title || 'New Chat';
+
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'chat-list-item-preview';
+    previewDiv.textContent = chat.preview || 'No messages yet';
+
+    contentDiv.appendChild(nameDiv);
+    contentDiv.appendChild(previewDiv);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'chat-list-item-actions';
+
+    const editButton = document.createElement('button');
+    editButton.className = 'chat-action-button';
+    editButton.title = 'Edit name';
+    editButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`;
+    editButton.addEventListener('click', () => this.editChatName(chat.id));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'chat-action-button';
+    deleteButton.title = 'Delete chat';
+    deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
+    deleteButton.addEventListener('click', () => this.deleteChat(chat.id));
+
+    actionsDiv.appendChild(editButton);
+    actionsDiv.appendChild(deleteButton);
+
+    item.appendChild(contentDiv);
+    item.appendChild(actionsDiv);
 
     item.addEventListener('click', (e) => {
       if (!e.target.closest('.chat-action-button')) {
@@ -266,7 +337,6 @@ class ChatListRenderer {
     }
     
     // Re-render to update collapsed state
-    // This would typically call the main render function
     const folderSection = document.querySelector(`[data-folder="${folderName}"]`);
     if (folderSection) {
       const toggle = folderSection.querySelector('.folder-toggle');
@@ -477,12 +547,12 @@ class MenuManager {
     
     messages.forEach(msg => {
       const role = msg.classList.contains('user-message') ? 'User' : 'Assistant';
-      const text = msg.querySelector('.message-content')?.innerHTML || '';
+      const text = msg.querySelector('.message-content')?.textContent || '';
       const messageClass = msg.classList.contains('user-message') ? 'user-message' : 'assistant-message';
       content += `
   <div class="message ${messageClass}">
-    <div class="role">${role}</div>
-    <div class="content">${text}</div>
+    <div class="role">${escapeHtml(role)}</div>
+    <div class="content">${escapeHtml(text)}</div>
   </div>
 `;
     });
@@ -517,12 +587,12 @@ class MenuManager {
     
     messages.forEach(msg => {
       const role = msg.classList.contains('user-message') ? 'User' : 'Assistant';
-      const text = msg.querySelector('.message-content')?.innerHTML || '';
+      const text = msg.querySelector('.message-content')?.textContent || '';
       const messageClass = msg.classList.contains('user-message') ? 'user-message' : 'assistant-message';
       content += `
   <div class="message ${messageClass}">
-    <div class="role">${role}</div>
-    <div class="content">${text}</div>
+    <div class="role">${escapeHtml(role)}</div>
+    <div class="content">${escapeHtml(text)}</div>
   </div>
 `;
     });

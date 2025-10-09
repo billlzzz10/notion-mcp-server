@@ -113,7 +113,8 @@ class AdvancedLogManager {
   async writeLog(type, data) {
     try {
       const date = new Date().toISOString().split('T')[0];
-      const logFile = path.join(this.logDir, `${date}-${type}.log`);
+      const sanitizedType = type.replace(/[^a-zA-Z0-9_-]/g, '');
+      const logFile = path.join(this.logDir, `${date}-${sanitizedType}.log`);
       const logEntry = JSON.stringify(data) + '\n';
       
       await fs.appendFile(logFile, logEntry);
@@ -164,7 +165,8 @@ class AdvancedLogManager {
    */
   async getStatistics(date = null) {
     try {
-      const targetDate = date || new Date().toISOString().split('T')[0];
+      const rawDate = date || new Date().toISOString().split('T')[0];
+      const targetDate = rawDate.replace(/[^0-9-]/g, '');
       const successFile = path.join(this.logDir, `${targetDate}-transaction_success.log`);
       const errorFile = path.join(this.logDir, `${targetDate}-transaction_error.log`);
 

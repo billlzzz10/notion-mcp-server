@@ -3,6 +3,7 @@ import { router } from "../Router.js";
 
 export class AshvalChatBot {
   private bot: Bot;
+  private router: Router;
   private conversationHistory = new Map<string, any[]>();
 
   constructor() {

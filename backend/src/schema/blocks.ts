@@ -253,77 +253,78 @@ export const BATCH_MIXED_OPERATIONS_SCHEMA = {
     .describe("Array of mixed operations to perform in a single batch"),
 };
 
+// Define the discriminated union separately to help with type inference.
+export const BlockOperationPayloadSchema = z.preprocess(
+  preprocessJson,
+  z.discriminatedUnion("action", [
+    z.object({
+      action: z
+        .literal("append_block_children")
+        .describe("Use this action to append children to a block."),
+      params: z.object(APPEND_BLOCK_CHILDREN_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("retrieve_block")
+        .describe("Use this action to retrieve a block."),
+      params: z.object(RETRIEVE_BLOCK_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("retrieve_block_children")
+        .describe("Use this action to retrieve children of a block."),
+      params: z.object(RETRIEVE_BLOCK_CHILDREN_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("update_block")
+        .describe("Use this action to update a block."),
+      params: z.object(UPDATE_BLOCK_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("delete_block")
+        .describe("Use this action to delete/archive a block."),
+      params: z.object(DELETE_BLOCK_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("batch_append_block_children")
+        .describe(
+          "Use this action to perform batch append operations on blocks."
+        ),
+      params: z.object(BATCH_APPEND_BLOCK_CHILDREN_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("batch_update_blocks")
+        .describe(
+          "Use this action to perform batch update operations on blocks."
+        ),
+      params: z.object(BATCH_UPDATE_BLOCKS_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("batch_delete_blocks")
+        .describe(
+          "Use this action to perform batch delete operations on blocks."
+        ),
+      params: z.object(BATCH_DELETE_BLOCKS_SCHEMA),
+    }),
+    z.object({
+      action: z
+        .literal("batch_mixed_operations")
+        .describe(
+          "Use this action to perform batch mixed operations on blocks."
+        ),
+      params: z.object(BATCH_MIXED_OPERATIONS_SCHEMA),
+    }),
+  ])
+).describe(
+  "A union of all possible block operations. Each operation has a specific action and corresponding parameters. Use this schema to validate the input for block operations such as appending, retrieving, updating, deleting, and performing batch operations. Available actions include: 'append_block_children', 'retrieve_block', 'retrieve_block_children', 'update_block', 'delete_block', 'batch_append_block_children', 'batch_update_blocks', 'batch_delete_blocks', and 'batch_mixed_operations'. Each operation requires specific parameters as defined in the corresponding schemas."
+);
+
 // Combined schema for all block operations
 export const BLOCKS_OPERATION_SCHEMA = {
-  payload: z
-    .preprocess(
-      preprocessJson,
-      z.discriminatedUnion("action", [
-        z.object({
-          action: z
-            .literal("append_block_children")
-            .describe("Use this action to append children to a block."),
-          params: z.object(APPEND_BLOCK_CHILDREN_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("retrieve_block")
-            .describe("Use this action to retrieve a block."),
-          params: z.object(RETRIEVE_BLOCK_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("retrieve_block_children")
-            .describe("Use this action to retrieve children of a block."),
-          params: z.object(RETRIEVE_BLOCK_CHILDREN_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("update_block")
-            .describe("Use this action to update a block."),
-          params: z.object(UPDATE_BLOCK_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("delete_block")
-            .describe("Use this action to delete/archive a block."),
-          params: z.object(DELETE_BLOCK_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("batch_append_block_children")
-            .describe(
-              "Use this action to perform batch append operations on blocks."
-            ),
-          params: z.object(BATCH_APPEND_BLOCK_CHILDREN_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("batch_update_blocks")
-            .describe(
-              "Use this action to perform batch update operations on blocks."
-            ),
-          params: z.object(BATCH_UPDATE_BLOCKS_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("batch_delete_blocks")
-            .describe(
-              "Use this action to perform batch delete operations on blocks."
-            ),
-          params: z.object(BATCH_DELETE_BLOCKS_SCHEMA),
-        }),
-        z.object({
-          action: z
-            .literal("batch_mixed_operations")
-            .describe(
-              "Use this action to perform batch mixed operations on blocks."
-            ),
-          params: z.object(BATCH_MIXED_OPERATIONS_SCHEMA),
-        }),
-      ])
-    )
-    .describe(
-      "A union of all possible block operations. Each operation has a specific action and corresponding parameters. Use this schema to validate the input for block operations such as appending, retrieving, updating, deleting, and performing batch operations. Available actions include: 'append_block_children', 'retrieve_block', 'retrieve_block_children', 'update_block', 'delete_block', 'batch_append_block_children', 'batch_update_blocks', 'batch_delete_blocks', and 'batch_mixed_operations'. Each operation requires specific parameters as defined in the corresponding schemas."
-    ),
+  payload: BlockOperationPayloadSchema,
 };

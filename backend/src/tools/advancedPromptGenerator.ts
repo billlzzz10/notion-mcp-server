@@ -94,10 +94,15 @@ async function gatherContextData(args: any) {
   if (args.charactersInvolved && args.charactersInvolved.length > 0) {
     const charactersDb = process.env.NOTION_CHARACTERS_DB_ID;
     if (charactersDb) {
+      const dbResponse = await notion.databases.retrieve({ database_id: charactersDb });
+      const dataSource = dbResponse.data_sources?.[0];
+      if (!dataSource) {
+        throw new Error(`No data source found for Characters DB: ${charactersDb}`);
+      }
       for (const charName of args.charactersInvolved) {
         try {
-          const response = await notion.databases.query({
-            database_id: charactersDb,
+          const response = await notion.dataSources.query({
+            data_source_id: dataSource.id,
             filter: {
               property: "Name",
               title: {
@@ -131,8 +136,13 @@ async function gatherContextData(args: any) {
     const locationsDb = process.env.NOTION_LOCATIONS_DB_ID;
     if (locationsDb) {
       try {
-        const response = await notion.databases.query({
-          database_id: locationsDb,
+        const dbResponse = await notion.databases.retrieve({ database_id: locationsDb });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for Locations DB: ${locationsDb}`);
+        }
+        const response = await notion.dataSources.query({
+          data_source_id: dataSource.id,
           filter: {
             property: "Name",
             title: {
@@ -164,8 +174,13 @@ async function gatherContextData(args: any) {
     const worldRulesDb = process.env.NOTION_WORLD_RULES_DB_ID;
     if (worldRulesDb) {
       try {
-        const response = await notion.databases.query({
-          database_id: worldRulesDb,
+        const dbResponse = await notion.databases.retrieve({ database_id: worldRulesDb });
+        const dataSource = dbResponse.data_sources?.[0];
+        if (!dataSource) {
+          throw new Error(`No data source found for World Rules DB: ${worldRulesDb}`);
+        }
+        const response = await notion.dataSources.query({
+          data_source_id: dataSource.id,
           filter: {
             and: [
               {
@@ -416,8 +431,16 @@ async function saveAdvancedPrompt(prompt: string, args: any): Promise<void> {
   if (!aiPromptsDb) return;
 
   try {
+    // Get data source ID
+    const dbResponse = await notion.databases.retrieve({ database_id: aiPromptsDb });
+    const dataSource = dbResponse.data_sources?.[0];
+    if (!dataSource) {
+      console.error(`No data source found for AI Prompts DB: ${aiPromptsDb}`);
+      return;
+    }
+
     await notion.pages.create({
-      parent: { database_id: aiPromptsDb },
+      parent: { data_source_id: dataSource.id },
       properties: {
         "Prompt Type": {
           select: {

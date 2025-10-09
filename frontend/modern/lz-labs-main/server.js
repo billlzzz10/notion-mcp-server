@@ -2,7 +2,12 @@
 const express = require('express');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
 const app = express();
+
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
 // Health endpoint
 app.get('/api/health', (req, res) => {
@@ -10,7 +15,8 @@ app.get('/api/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'gateway-frontend',
-    version: '1.0.0'
+    version: '1.0.0',
+    csrfToken: req.csrfToken()
   });
 });
 

@@ -78,7 +78,7 @@ async def get_azure_openai_client(settings: Settings = Depends(get_settings)) ->
         )
         return client
     except Exception as e:
-        logger.error(f"Failed to create Azure OpenAI client: {e}")
+        logger.error("Failed to create Azure OpenAI client: %s", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to initialize Azure OpenAI client"
@@ -101,7 +101,7 @@ async def health_check(settings: Settings = Depends(get_settings)):
             if response.status_code != 200:
                 azure_status = "unhealthy"
     except Exception as e:
-        logger.warning(f"Azure OpenAI health check failed: {e}")
+        logger.warning("Azure OpenAI health check failed: %s", e)
         azure_status = "unhealthy"
     
     return HealthResponse(
@@ -158,7 +158,7 @@ async def agent_chat(
         )
         
     except Exception as e:
-        logger.error(f"Error in agent chat: {e}")
+        logger.error("Error in agent chat: %s", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate agent response: {str(e)}"
@@ -209,7 +209,7 @@ async def analyze_notion_content(
         }
         
     except Exception as e:
-        logger.error(f"Error in Notion analysis: {e}")
+        logger.error("Error in Notion analysis: %s", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to analyze Notion content: {str(e)}"
@@ -262,7 +262,7 @@ async def batch_process_requests(
         }
         
     except Exception as e:
-        logger.error(f"Error in batch processing: {e}")
+        logger.error("Error in batch processing: %s", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Batch processing failed: {str(e)}"
@@ -307,7 +307,7 @@ async def http_exception_handler(request, exc):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
-    logger.error(f"Unhandled exception: {exc}")
+    logger.error("Unhandled exception: %s", exc)
     return JSONResponse(
         status_code=500,
         content={

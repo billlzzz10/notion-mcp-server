@@ -264,7 +264,7 @@ const NotesView: React.FC<NotesViewProps> = ({
                 </div>
                 <div className="flex-grow">
                     {!showFullContent && displayFormat !== 'cover' && (
-                        <div className={`text-sm opacity-90 ${contentLineClamp} markdown-content`} dangerouslySetInnerHTML={{ __html: note.content.replace(/<[^>]+>/g, '').substring(0, 150) + '...' }}></div>
+                        <div className={`text-sm opacity-90 ${contentLineClamp} markdown-content`} dangerouslySetInnerHTML={getSafeHtml(note.content)}></div>
                     )}
                     {showFullContent && (
                         <div className={`markdown-content text-sm mt-4`} dangerouslySetInnerHTML={getSafeHtml(note.content)}></div>
