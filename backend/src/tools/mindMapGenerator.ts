@@ -1,5 +1,4 @@
-import { aigateway } from '../services/ai-gateway';
-import { generateImage } from '../services/imageGenerationService';
+import { router } from "../Router.js";
 
 interface MindMapRequest {
   imageUrl?: string;
@@ -49,7 +48,7 @@ export async function generateMindMapFromImage(request: MindMapRequest): Promise
 
     ${imagePromptPart}
 
-    Return the result as a JSON object with the following structure:
+    Return the result as a raw JSON object with the following structure, and no other text or markdown:
     {
       "id": "root",
       "content": "Central Theme",
@@ -67,44 +66,32 @@ export async function generateMindMapFromImage(request: MindMapRequest): Promise
 
   // Call the AI Gateway to get the structured data
   // We'll use a provider that supports vision, like Gemini.
-  const jsonResponse = await aigateway.generate(prompt, {
-    provider: 'gemini', // Assuming Gemini has vision capabilities
-    // In a real scenario, you'd pass the image data here.
+  const response = await router.handleQuery({
+    query: prompt,
+    task: "mind_map",
+    // In a real scenario, you'd pass the image data here as part of the context or a specific parameter.
   });
 
-  // For now, let's use a mock response, as we can't pass image data yet.
-  const mockJsonResponse = {
-    id: 'root',
-    content: 'The Solar System',
-    children: [
-      { id: 'sun', content: 'Sun', children: [] },
-      {
-        id: 'inner_planets',
-        content: 'Inner Planets',
-        children: [
-          { id: 'mercury', content: 'Mercury', children: [] },
-          { id: 'venus', content: 'Venus', children: [] },
-          { id: 'earth', content: 'Earth', children: [] },
-          { id: 'mars', content: 'Mars', children: [] },
-        ],
-      },
-      {
-        id: 'outer_planets',
-        content: 'Outer Planets',
-        children: [
-          { id: 'jupiter', content: 'Jupiter', children: [] },
-          { id: 'saturn', content: 'Saturn', children: [] },
-          { id: 'uranus', content: 'Uranus', children: [] },
-          { id: 'neptune', content: 'Neptune', children: [] },
-        ],
-      },
-    ],
-  };
-
-  const mindMapJson: MindMapNode = mockJsonResponse; // In a real scenario: JSON.parse(jsonResponse);
-  const mindMapMarkdown = formatJsonToMarkdown(mindMapJson);
-
-  return {
+  try {
+    const mindMapJson: MindMapNode = JSON.parse(response.text);
+    const mindMapMarkdown = formatJsonToMarkdown(mindMapJson);
+    return {
+      markdown: mindMapMarkdown,
+      json: mindMapJson,
+    };
+  } catch (error) {
+    console.error("Failed to parse JSON response from AI:", response.text);
+    const errorNode = {
+      id: "error",
+      content: "Error: Could not generate mind map.",
+      children: [],
+    };
+    return {
+      markdown: "- Error: Could not generate mind map.",
+      json: errorNode,
+    };
+  }
+}
     markdown: mindMapMarkdown,
     json: mindMapJson,
   };

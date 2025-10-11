@@ -1,4 +1,4 @@
-import { aigateway } from '../services/ai-gateway'; // This will be the new AI gateway
+import { router } from "../Router.js";
 
 interface ContentToTag {
   content: string;
@@ -21,16 +21,22 @@ export async function suggestTagsForContent(content: ContentToTag): Promise<Tagg
 
     Consider the themes, characters, locations, and plot points in the content.
     Provide a list of suggested tags and a confidence score (0.0 to 1.0).
-    Format the output as a JSON object with "suggestedTags" and "confidence" keys.
+    Respond with ONLY the raw JSON object, without any markdown formatting or commentary.
+    The JSON object should have "suggestedTags" and "confidence" keys.
   `;
 
-  // Placeholder for the future AI gateway call
-  // const response = await aigateway.generate(prompt, { format: 'json' });
-  // return JSON.parse(response);
+  const response = await router.handleQuery({
+    query: prompt,
+    task: "auto_tag",
+  });
 
-  // For now, return a mock response
-  return {
-    suggestedTags: ['conflict', 'political-intrigue', 'character-moment'],
-    confidence: 0.85
-  };
+  try {
+    return JSON.parse(response.text);
+  } catch (error) {
+    console.error("Failed to parse JSON response from AI:", response.text);
+    return {
+      suggestedTags: ["error-parsing-response"],
+      confidence: 0.0,
+    };
+  }
 }

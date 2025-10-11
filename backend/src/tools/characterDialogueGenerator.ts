@@ -1,4 +1,4 @@
-import { aigateway } from '../services/ai-gateway'; // This will be the new AI gateway
+import { router } from "../Router.js";
 
 interface CharacterProfile {
   name: string;
@@ -20,16 +20,24 @@ export async function generateCharacterDialogue(profile: CharacterProfile): Prom
 
     The dialogue should be authentic to the character's personality and the situation.
     Also, provide a list of emotions conveyed in the dialogue.
-    Format the output as a JSON object with "dialogue" and "emotions" keys.
+    Respond with ONLY the raw JSON object, without any markdown formatting or commentary.
+    The JSON object should have "dialogue" and "emotions" keys.
   `;
 
-  // Placeholder for the future AI gateway call
-  // const response = await aigateway.generate(prompt, { format: 'json' });
-  // return JSON.parse(response);
+  const response = await router.handleQuery({
+    query: prompt,
+    task: "generate_dialogue", // This could be used by the RuleEngine
+  });
 
-  // For now, return a mock response
-  return {
-    dialogue: `Given the circumstances, I see only one viable path forward. We must act now, or risk losing everything.`,
-    emotions: ['determined', 'urgent', 'serious']
-  };
+  try {
+    // The AI's response should be a raw JSON string.
+    return JSON.parse(response.text);
+  } catch (error) {
+    console.error("Failed to parse JSON response from AI:", response.text);
+    // Return a structured error or a default value
+    return {
+      dialogue: "Error: Could not generate dialogue.",
+      emotions: ["error"],
+    };
+  }
 }

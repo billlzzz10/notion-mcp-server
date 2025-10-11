@@ -336,7 +336,7 @@ export const DATABASE_PROPERTY_SCHEMA = z.preprocess(
 
 // Create database schema
 export const CREATE_DATABASE_SCHEMA = {
-  parent: PARENT_SCHEMA.optional()
+  parent: PARENT_SCHEMA
     .default({
       type: "page_id",
       page_id: getRootPageId(),
@@ -373,64 +373,37 @@ export const CREATE_DATABASE_SCHEMA = {
 };
 
 // Query database schema
-export const QUERY_DATABASE_SCHEMA = {
+const QUERY_DATABASE_REQUIRED_PROPS = z.object({
   database_id: z.string().describe("The ID of the database to query"),
-  filter: z
-    .preprocess(preprocessJson, z.any())
-    .optional()
-    .describe("Filter criteria for the query"),
-  sorts: z
-    .array(
-      z.object({
-        property: z.string().optional().describe("Property to sort by"),
-        timestamp: z
-          .enum(["created_time", "last_edited_time"])
-          .describe("Timestamp to sort by"),
-        direction: z
-          .enum(["ascending", "descending"])
-          .describe("Sort direction"),
-      })
-    )
-    .optional()
-    .describe("Sort criteria for the query"),
-  start_cursor: z.string().optional().describe("Cursor for pagination"),
-  page_size: z
-    .number()
-    .min(1)
-    .max(100)
-    .optional()
-    .describe("Number of results to return (1-100)"),
-};
+});
+const QUERY_DATABASE_OPTIONAL_PROPS = z.object({
+  filter: z.preprocess(preprocessJson, z.any()),
+  sorts: z.array(
+    z.object({
+      property: z.string().optional(),
+      timestamp: z.enum(["created_time", "last_edited_time"]),
+      direction: z.enum(["ascending", "descending"]),
+    })
+  ),
+  start_cursor: z.string(),
+  page_size: z.number().min(1).max(100),
+}).partial();
+export const QUERY_DATABASE_SCHEMA = QUERY_DATABASE_REQUIRED_PROPS.merge(QUERY_DATABASE_OPTIONAL_PROPS);
+
 
 // Update database schema
-export const UPDATE_DATABASE_SCHEMA = {
-  database_id: z.string().describe("The ID of the database to update"),
-  title: z
-    .array(RICH_TEXT_ITEM_REQUEST_SCHEMA)
-    .optional()
-    .describe("Updated database title"),
-  description: z
-    .array(RICH_TEXT_ITEM_REQUEST_SCHEMA)
-    .optional()
-    .describe("Updated database description"),
-  properties: z
-    .record(
-      z.string().describe("Property name"),
-      DATABASE_PROPERTY_SCHEMA.describe("Property schema")
-    )
-    .describe("Properties of the page"),
-  is_inline: z.boolean().optional().describe("Whether database is inline"),
-  icon: z.preprocess(
-    preprocessJson,
-    ICON_SCHEMA.nullable().optional().describe("Updated icon for the database")
-  ),
-  cover: z.preprocess(
-    preprocessJson,
-    FILE_SCHEMA.nullable()
-      .optional()
-      .describe("Updated cover image for the database")
-  ),
-};
+const UPDATE_DATABASE_REQUIRED_PROPS = z.object({
+    database_id: z.string().describe("The ID of the database to update"),
+});
+const UPDATE_DATABASE_OPTIONAL_PROPS = z.object({
+    title: z.array(RICH_TEXT_ITEM_REQUEST_SCHEMA),
+    description: z.array(RICH_TEXT_ITEM_REQUEST_SCHEMA),
+    properties: z.record(z.string(), DATABASE_PROPERTY_SCHEMA),
+    is_inline: z.boolean(),
+    icon: z.preprocess(preprocessJson, ICON_SCHEMA.nullable()),
+    cover: z.preprocess(preprocessJson, FILE_SCHEMA.nullable()),
+}).partial();
+export const UPDATE_DATABASE_SCHEMA = UPDATE_DATABASE_REQUIRED_PROPS.merge(UPDATE_DATABASE_OPTIONAL_PROPS);
 
 // Combined schema for all database operations
 export const DATABASE_OPERATION_SCHEMA = {

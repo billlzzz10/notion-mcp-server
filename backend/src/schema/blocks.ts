@@ -135,6 +135,10 @@ export const IMAGE_BLOCK_REQUEST_SCHEMA = BASE_BLOCK_REQUEST_SCHEMA.extend({
     .describe("Image block content"),
 });
 
+// Define a lazy schema for recursive block types
+export type BlockObjectRequest = z.infer<typeof TEXT_BLOCK_REQUEST_SCHEMA>;
+const BlockObjectRequestSchema: z.ZodType<BlockObjectRequest> = z.lazy(() => TEXT_BLOCK_REQUEST_SCHEMA);
+
 export const TEXT_BLOCK_REQUEST_SCHEMA = z.preprocess(
   preprocessJson,
   z
@@ -159,7 +163,7 @@ export const TEXT_BLOCK_REQUEST_SCHEMA = z.preprocess(
 export const APPEND_BLOCK_CHILDREN_SCHEMA = {
   blockId: z.string().describe("The ID of the block to append children to"),
   children: z
-    .array(z.any()) // Simplified to prevent excessive type complexity
+    .array(BlockObjectRequestSchema)
     .describe("Array of blocks to append as children"),
 };
 
@@ -197,7 +201,7 @@ export const BATCH_APPEND_BLOCK_CHILDREN_SCHEMA = {
           .string()
           .describe("The ID of the block to append children to"),
         children: z
-          .array(TEXT_BLOCK_REQUEST_SCHEMA)
+          .array(BlockObjectRequestSchema)
           .describe("Array of blocks to append as children"),
       })
     )
@@ -232,7 +236,7 @@ export const BATCH_MIXED_OPERATIONS_SCHEMA = {
             .string()
             .describe("The ID of the block to append children to"),
           children: z
-            .array(z.any()) // Simplified to prevent excessive type complexity
+            .array(BlockObjectRequestSchema)
             .describe("Array of blocks to append as children"),
         }),
         z.object({

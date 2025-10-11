@@ -2,18 +2,18 @@ import { z } from "zod";
 import { preprocessJson } from "./preprocess.js";
 
 // Schema for listing users with pagination
-export const LIST_USERS_SCHEMA = {
-  start_cursor: z.string().optional().describe("Pagination cursor"),
-  page_size: z
-    .number()
-    .optional()
-    .describe("Number of users to return per page"),
-};
+const LIST_USERS_OPTIONAL_PROPS = z.object({
+    start_cursor: z.string(),
+    page_size: z.number(),
+}).partial();
+export const LIST_USERS_SCHEMA = LIST_USERS_OPTIONAL_PROPS;
+
 
 // Schema for getting a single user
-export const GET_USER_SCHEMA = {
-  user_id: z.string().describe("The ID of the user to retrieve"),
-};
+const GET_USER_REQUIRED_PROPS = z.object({
+    user_id: z.string().describe("The ID of the user to retrieve"),
+});
+export const GET_USER_SCHEMA = GET_USER_REQUIRED_PROPS;
 
 // Combined schema for all user operations
 export const USERS_OPERATION_SCHEMA = {
