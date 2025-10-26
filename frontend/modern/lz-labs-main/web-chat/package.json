@@ -14,12 +14,12 @@
     "@google/genai": "^0.12.0",
     "html2canvas": "1.4.1",
     "jspdf": "3.0.2",
-    "mammoth": "1.8.0",
+    "mammoth": "1.11.0",
     "pdfjs-dist": "^5.3.93"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "typescript": "~5.7.2",
-    "vite": "^6.3.6"
+    "vite": "^6.4.1"
   }
 }
