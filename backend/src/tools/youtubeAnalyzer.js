@@ -100,7 +100,7 @@ export async function analyzeYouTubeVideo(args) {
 }
 
 function extractVideoId(url) {
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const regex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_-]{11})/;
   const match = url.match(regex);
   return match ? match[1] : null;
 }
