@@ -1,7 +1,7 @@
 # 🦄 UnicornX Platform - Production Dockerfile
 
 # Stage 1: Build the application
-FROM node:22.12-alpine AS builder
+FROM node:22.21.1-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY public/ ./public/
 RUN npm run build
 
 # Stage 2: Production runtime
-FROM node:22.12-alpine AS production
+FROM node:22.21.1-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
