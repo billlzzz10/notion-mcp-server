@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "@google/generative-ai": "^0.24.1"
-  },
-  "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.10",
-    "vitest": "^3.2.4"
-  }
-}
