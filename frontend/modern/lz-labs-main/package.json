@@ -14,7 +14,7 @@
     "@types/dompurify": "^3.0.5",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.23",
     "axios": "^1.13.2",
     "cookie-parser": "^1.4.7",
     "csurf": "^1.11.0",
