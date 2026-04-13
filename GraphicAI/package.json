@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.8.0",
-    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@modelcontextprotocol/sdk": "^1.25.3",
     "dotenv": "^16.4.5",
     "zod": "^3.25.76"
   },
